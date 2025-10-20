@@ -16,7 +16,7 @@
                     "scale":  [1146, 640],
                     "scroll": [0,0]
                 },
-                "visible": false,
+                "visible": true,
                 "color":   [20,20,30]
             },
             "script_properties": {},
@@ -37,7 +37,7 @@
                     "scale":  [1106, 535],
                     "scroll": [0,0]
                 },
-                "visible": false,
+                "visible": true,
                 "color":   [5,5,10]
             },
             "script_properties": {},
