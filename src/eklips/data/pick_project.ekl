@@ -57,6 +57,6 @@ def _hover(self):
     if broken:
         pointer.properties["text"] = "!>"
     else:
-        pointer.properties["text"] = f"->{projid}"
+        pointer.properties["text"] = f"->"
     pointer.x = self.x - 10
     pointer.y = self.y

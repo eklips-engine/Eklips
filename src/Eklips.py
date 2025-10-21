@@ -41,7 +41,6 @@ while (engine.im_running):
             engine.keys_pressed                                          = engine.event.key_once_map
             engine.keys_held_dict                                        = engine.event.key_map
             engine.keys_held                                             = []
-
         except Exception as error:
             ErrorHandler.error  = error
             ErrorHandler.reason = "Reading User input"
