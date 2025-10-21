@@ -135,7 +135,7 @@ def _onready(self):
                     "pos":    [55+x,  100+y],
                     "rot":    0,
                     "anchor": "",
-                    "layer":  10,
+                    "layer":  -10,
                     "alpha":  1,
                     "scale":  [width-15,300],
                     "scroll": [0,     0]
