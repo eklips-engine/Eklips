@@ -1,6 +1,6 @@
 ## Import inherited
 from classes.node.gui.canvasitem         import CanvasItem
-from classes.node.gui.media.audio_player import AudioPlayer
+from classes.node.gui.media.audio_player import _AudioHelper
 
 ## Import engine singleton and others
 import pyglet as pg, pyvidplayer2 as vid
@@ -62,7 +62,7 @@ class VideoPlayer(CanvasItem):
         self.media_id                 = None
         self.playing                  = False
     
-    def play(self, volume=1):
+    def play(self, volume=1, category="nil"):
         self.call_signal("_player_started")
         if not self.vid:
             # XXX this sucks. Find way to not use temporary file
@@ -77,7 +77,7 @@ class VideoPlayer(CanvasItem):
             self.vid        = vid.VideoPyglet(tmp_file_path)
             self.og_px_size = self.vid.current_size
 
-        self.vid.set_volume(volume)
+        self.vid.set_volume(_AudioHelper.calculate_volume(_, volume, category))
         self.vid.seek(0)
         self.vid.play()
         self.playing = True

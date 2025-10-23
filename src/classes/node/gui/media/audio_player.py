@@ -6,6 +6,18 @@ import pyglet as pg
 import pygame as pyg
 import classes.Singleton as engine
 
+## Helper
+class _AudioHelper:
+    def get_master_volume(_):
+        return engine.savefile.get("sound/master", 0.75)
+    def get_volume_category(_, category):
+        return engine.savefile.get(f"sound/{category}", 1)
+    def calculate_volume(_, volume, category="nil"):
+        master   = _AudioHelper.get_master_volume(_)
+        category = _AudioHelper.get_master_volume(_)
+        
+        return volume * category * master
+
 ## Node
 class AudioPlayer(Node):
     """
@@ -43,14 +55,11 @@ class AudioPlayer(Node):
         self._autoplay_has_played_yet = False
         self.channel                  = None
     
-    def get_master_volume(self):
-        return engine.savefile.get("sound/master", 0.75)
-    
-    def play(self, volume=1):
+    def play(self, volume=1, category="nil"):
         self.call_signal("_player_started")
         if not self.audio_data:
             self.audio_data : pyg.Sound = self.resourceman.load(self.properties["media"]).get()
-        self.audio_data.set_volume(volume * self.get_master_volume())
+        self.audio_data.set_volume(_AudioHelper.calculate_volume(None, volume, category))
         self.channel = self.audio_data.play()
 
     def pause(self):
