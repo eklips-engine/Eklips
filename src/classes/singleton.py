@@ -27,36 +27,37 @@ mpos, mpressed, dmpos = [0,0], [0,0,0], [0,0]
 flags = []
 
 ## Global variables
-pacing          : int                   = 1             # delta = (calculate delta here) * pacing
-old_pacing      : int                   = pacing        # Run it back
-obj_ids         : int                   = 10            
-delta           : int                   = 0             
-truedelta       : int                   = 0             
-keys_held, keys_pressed, modifiers      = [None],[None],[None] 
-savefile        : Save.Savefile         = 0             
-resource_loader : Resources.Loader      = 0             
-display         : Any                   = 0             
-batch           : pg.graphics.Batch     = 0             
-icon            : pg.image.BufferImage  = 0             
-global_stream   : pg.media.Player       = 0             
-interface       : UI.Interface          = 0             
-initialized     : bool                  = False         
-event           : Event.Event           = 0             
-im_running      : bool                  = True          
-ignore_os       : bool                  = False
-ticks           : int                   = 0             
-clock           : Clock.Time            = 0             
-scene           : Scene.Scene           = 0             
-console         : ConHost.ConHost       = 0             
-cvars           : CV.CvarCollection     = 0             
-fps_display     : fpsdisp.FPSDisplay    = 0             
-cam_pos         : list                  = [0,0,0]
-cam_zoom        : int                   = 0
-thm             : Resources.Theme       = 0
+pacing          : int                    = 1             # delta = (calculate delta here) * pacing
+old_pacing      : int                    = pacing        # Run it back
+obj_ids         : int                    = 10            
+delta           : int                    = 0             
+truedelta       : int                    = 0             
+keys_held, keys_pressed, modifiers       = [None],[None],[None] 
+savefile        : Save.Savefile          = 0             
+resource_loader : Resources.Loader       = 0             
+display         : Any                    = 0             
+batch           : pg.graphics.Batch      = 0             
+icon            : pg.image.BufferImage   = 0             
+global_stream   : pg.media.Player        = 0             
+interface       : UI.Interface           = 0             
+initialized     : bool                   = False         
+event           : Event.Event            = 0             
+im_running      : bool                   = True          
+ignore_os       : bool                   = False
+ticks           : int                    = 0             
+clock           : Clock.Time             = 0             
+scene           : Scene.Scene            = 0             
+console         : ConHost.ConHost        = 0             
+cvars           : CV.CvarCollection      = 0             
+fps_display     : fpsdisp.FPSDisplay     = 0             
+cam_pos         : list                   = [0,0,0]
+cam_zoom        : int                    = 0
+thm             : Resources.Theme        = 0
+global_scripts  : list[Resources.Script] = []
 
 ## Global functions
 def reload_engine(dir=None):
-    global savefile,resource_loader,cvars,console,thm,keys_held,keys_pressed,display,batch,icon,initialized,interface,event,im_running,ticks,clock,scene, global_stream, fps_display
+    global savefile,resource_loader,cvars,global_scripts,console,thm,keys_held,keys_pressed,display,batch,icon,initialized,interface,event,im_running,ticks,clock,scene, global_stream, fps_display
     """Reload/Load the engine variables."""
     
     ## Save if possible
@@ -66,7 +67,7 @@ def reload_engine(dir=None):
     ## Reload data and load cvars and print basic information
     gc.enable()
     cvars = Data._init()
-    printf(f"{Data.game_name} v{Data.game_bdata['project-ver']} for {ENGINE_NAME} v{VER}")
+    printf(f"{Data.game_name} v{Data.game_bdata['project_ver']} for {ENGINE_NAME} v{VER}")
     printf(" ~ Initializing CVARs")
     if dir:
         Data.data_directory = dir
@@ -132,6 +133,12 @@ def reload_engine(dir=None):
         "keys": ["`","~"],
         "holdable": False
     }
+
+    ## Autoload
+    for script in cvars.get("global_scripts", []):
+        scriptobj = resource_loader.load(script, force_new_resource=True)
+        scriptobj.init_param({})
+        global_scripts.append(scriptobj)
 
     ## Set flag to true
     initialized = True

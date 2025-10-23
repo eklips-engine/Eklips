@@ -98,13 +98,14 @@ class Scene(Object):
 
         # Construct node data
         node_obj_data = {
-            "prop":   node_data["properties"],
-            "data":   {},
-            "meta":   {
+            "prop":     node_data["properties"],
+            "data":     {},
+            "meta":     {
                 "kind": "Node",
                 "name": node_data["name"]
             },
-            "script": node_data["script"]
+            "script":   node_data["script"],
+            "signal":   node_data["signals"]
         }
 
         # Create the actual node
@@ -112,12 +113,12 @@ class Scene(Object):
         object             = classobj.__new__(classobj)
         object.__init__(node_obj_data, parent)
 
-        # Store in flat dictionary
+        # Store in dictionary
         self.nodes[id] = {
-            "class": node_data["type"],
-            "path": node_data["path"],
-            "object": object,
-            "name": node_data["name"],
+            "class":     node_data["type"],
+            "path":      node_data["path"],
+            "object":    object,
+            "name":      node_data["name"],
             "base_data": node_data
         }
 

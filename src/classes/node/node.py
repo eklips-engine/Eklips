@@ -31,6 +31,8 @@ class Node(Object, NodeMixin):
         "script": None
     }
 
+    node_signals = []
+
     def __init__(self, data=node_base_data, parent=None):
         self.parent      = parent
         self.screen      = engine.interface

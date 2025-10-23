@@ -10,9 +10,10 @@ from classes import Resources
 ## Node
 class VideoPlayer(CanvasItem):
     """
-    ## A Media Node to render video and play it's audio.
+    ## A Canvas node to play video files (.MP4, .WEBM, etc..)
      
-    Self-explanatory.
+    The properties are basically the same as AudioPlayer, but it has a transform property like any Canvas Node.
+    NOTE: FFmpeg needs to be installed and recognized in PATH for the VideoPlayer to work.
     """
 
     node_base_data = {
@@ -20,7 +21,6 @@ class VideoPlayer(CanvasItem):
             "media":       "res://media/load.mp4",
             "loop":        False,
             "where":       0,
-            "rot":         0,
             "autostart":   False,
 
             "transform":  {
@@ -29,6 +29,7 @@ class VideoPlayer(CanvasItem):
                 "anchor": "top left",
                 "layer":  0,
                 "alpha":  1,
+                "rot":    0,
                 "scroll": [0,0]
             }
         },
@@ -40,19 +41,29 @@ class VideoPlayer(CanvasItem):
         "script": None
     }
 
+    node_signals = [
+        "_hover",
+        "_pressed_down",
+        "_clicked",
+        "_player_started",
+        "_player_paused",
+        "_player_resumed",
+        "_player_stopped"
+    ]
+
     def __init__(self, data=node_base_data, parent=None):
         global player_global
         super().__init__(data,parent)
 
-        self.old_size     = [0,0]
-        self.og_px_size   = [0,0]
-        self.vid          = None
-        self.is_playedyet = 0
-        self.media_id     = None
-        self.playing      = False
+        self.old_size                 = [0,0]
+        self.og_px_size               = [0,0]
+        self.vid                      = None
+        self._autoplay_has_played_yet = False
+        self.media_id                 = None
+        self.playing                  = False
     
     def play(self, volume=1):
-        self.call("_player_started")
+        self.call_signal("_player_started")
         if not self.vid:
             # XXX this sucks. Find way to not use temporary file
 
@@ -72,7 +83,7 @@ class VideoPlayer(CanvasItem):
         self.playing = True
 
     def pause(self):
-        self.call("_player_paused")
+        self.call_signal("_player_paused")
         self.vid.pause()
     
     def seek(self, index):
@@ -82,11 +93,11 @@ class VideoPlayer(CanvasItem):
         self.vid.seek_frame(index)
     
     def resume(self):
-        self.call("_player_resumed")
+        self.call_signal("_player_resumed")
         self.vid.resume()
     
     def stop(self):
-        self.call("_player_stopped")
+        self.call_signal("_player_stopped")
         self.vid.stop()
         self.playing = False
     
@@ -97,9 +108,9 @@ class VideoPlayer(CanvasItem):
     
     def update(self, delta):
         global camera_pos
-        if not self.is_playedyet and self.properties["autostart"]:
+        if not self._autoplay_has_played_yet and self.properties["autostart"]:
             self.play()
-            self.is_playedyet = 1
+            self._autoplay_has_played_yet = True
         
         if self.vid:
             if self.vid.active:

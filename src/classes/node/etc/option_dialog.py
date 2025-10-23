@@ -34,6 +34,10 @@ class OptionDialog(Node):
         "script": None
     }
 
+    node_signals = [
+        "_popup_answer"
+    ]
+
     def __init__(self, data=node_base_data, parent=None):
         super().__init__(data,parent)
         self.result = None
@@ -47,6 +51,6 @@ class OptionDialog(Node):
             func=askretrycancel(self.properties["caption"], self.properties["message"])
         if self.properties["optionindex"] == 4:
             func=askyesnocancel(self.properties["caption"], self.properties["message"])
-        self.call("_popup_answer", func)
+        self.call_signal("_popup_answer", func)
         self.result = func
         return func

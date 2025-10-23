@@ -19,7 +19,7 @@
                 "visible": true,
                 "color":   [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "Back",
             "script":            null,
             "path":              "",
@@ -42,9 +42,9 @@
                 "font_size": 20,
                 "color":     [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {"_clicked": "go_back_without_asking"},
             "name":              "PanelText",
-            "script":            "res://data/backmain.ekl",
+            "script":            "res://data/functions.ekl",
             "path":              "Back",
             "runtimedata":       0
         },
@@ -65,7 +65,7 @@
                 "color":     [255,255,255],
                 "font_size": 20
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "PanelText",
             "script":            null,
             "path":              "Back",
@@ -86,7 +86,7 @@
                 "visible": true,
                 "color":   [5,5,10]
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "Panel",
             "script":            null,
             "path":              "Back",
@@ -109,7 +109,7 @@
                 "color":     [255,255,255],
                 "font_size": 20
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "PanelTextN",
             "script":            null,
             "path":              "Back",
@@ -132,7 +132,7 @@
                 "color":     [255,255,255],
                 "font_size": 20
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "PanelTextP",
             "script":            null,
             "path":              "Back",
@@ -155,7 +155,7 @@
                 "font_size": 20,
                 "color":     [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "PanelText",
             "script":            "res://data/add_new_project.ekl",
             "path":              "Back",

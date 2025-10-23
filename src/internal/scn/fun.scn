@@ -23,69 +23,10 @@
                 },
                 "visible":    true
             },
-            "script_properties": {},
             "name":              "aaaa",
             "script":            null,
             "path":              "",
-            "runtimedata":       0
-        },
-        "Ekl": {
-            "type":       "Sprite2D",
-            "properties": {
-                "transform": {
-                    "scale":  [2,2],
-                    "pos":    [0,0],
-                    "rot":    0,
-                    "anchor": "center",
-                    "layer":  1,
-                    "alpha":  0.5,
-                    "scroll": [0,0]
-                },
-                "visible":1,
-                "sprite":"root://internal/eklips/eklips.png"
-            },
-            "script_properties": {},
-            "name":              "Eclipse",
-            "script":            null,
-            "path":              "",
-            "runtimedata":       0
-        },
-        "aud": {
-            "type":       "AudioPlayer",
-            "properties": {
-                "media":       "root://internal/sfx/load.mp3",
-                "autostart":   true,
-                "loop":        false,
-                "where":       0,
-                "play_global": true
-            },
-            "script_properties": {},
-            "name":              "AudioPlayer",
-            "script":            null,
-            "path":              "",
-            "runtimedata":       0
-        },
-        "Ring": {
-            "type":       "Sprite2D",
-            "properties": {
-                "transform": {
-                    "scale":  [2,2],
-                    "pos":    [0,0],
-                    "rot":    0,
-                    "anchor": "center",
-                    "layer":  2,
-                    "alpha":  0.5,
-                    "scroll": [0,0]
-                },
-                "visible":1,
-                "sprite":       "root://internal/eklips/ring.png",
-                "iwannarotate": 1
-            },
-            "script_properties": {},
-            "name":              "Ring",
-            "script":            null,
-            "path":              "",
-            "runtimedata":       0
+            "signals":           {}
         }
     }
 }

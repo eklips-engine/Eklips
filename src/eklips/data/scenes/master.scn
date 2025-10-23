@@ -19,7 +19,7 @@
                 "visible": true,
                 "color":   [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "Back",
             "script":            "res://data/main_populate_tree.ekl",
             "path":              "",
@@ -40,7 +40,7 @@
                 "visible": true,
                 "color":   [5,5,10]
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "Panel",
             "script":            null,
             "path":              "Back",
@@ -63,7 +63,7 @@
                 "color":     [255,255,255],
                 "font_size": 20
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "PanelText",
             "script":            null,
             "path":              "Back",
@@ -86,7 +86,7 @@
                 "color":     [255,255,255],
                 "font_size": 15
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "TxtPnt",
             "script":            null,
             "path":              "Back",
@@ -109,9 +109,9 @@
                 "font_size": 20,
                 "color":     [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {"_clicked": "open_new_project_dialog"},
             "name":              "PanelText",
-            "script":            "res://data/btnaddnewpj.ekl",
+            "script":            "res://data/functions.ekl",
             "path":              "Back",
             "runtimedata":       0
         }

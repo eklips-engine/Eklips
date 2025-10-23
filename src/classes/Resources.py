@@ -574,7 +574,7 @@ class Loader:
         
         return obj
     
-    def load(self, path, can_cache=1, force_type = None, return_identifier = False, force_new_resource = False):
+    def load(self, path, force_type = None, return_identifier = False, force_new_resource = False):
         """
         Load a resource. Specify path "`user://..`", "`res://..`" or `root://..`"
         - user:// = save directory
@@ -598,196 +598,197 @@ class Loader:
         actual_path = location
         name        = path.split("/")[-1].split(".")[0]
         ext         = path.split(".")[-1].lower()
+        
         if force_type:
             ext      = force_type
             location = f"Ekl{engine.VER}{path}::forced::{ext}".replace('/','.').replace(':',',')
-        if can_cache:
-            if location in self.resource_tree and not force_new_resource:
-                asset = self.resource_tree[location]
-                return asset
+        
+        if location in self.resource_tree and not force_new_resource:
+            asset = self.resource_tree[location]
+            return asset
+        else:
+            print(f"  ~ Loading file {path}")
+            if path.startswith("root://"):
+                actual_path = path.lstrip("root://")
+            elif path.startswith("user://"):
+                actual_path = self.save + path.lstrip("user://")
+            elif path.startswith("res://"):
+                actual_path = self.game_data.get("directory") + "/" + path.lstrip("res://")
             else:
-                print(f"  ~ Loading file {path}")
-                if path.startswith("root://"):
-                    actual_path = path.lstrip("root://")
-                elif path.startswith("user://"):
-                    actual_path = self.save + path.lstrip("user://")
-                elif path.startswith("res://"):
-                    actual_path = self.game_data.get("directory") + "/" + path.lstrip("res://")
-                else:
-                    actual_path = path
-                try:
-                    if IS_EXECUTABLE:
-                        if ext in ("png","jpg","jpeg","webp","bmp"):
-                            try:
-                                asset    = pg.resource.image(actual_path)
-                            except:
-                                asset    = Theme.create_null_texture(Theme)
-                            assetres = Image({
-                                "prop":   {},
-                                "data":   {
-                                    "object": asset,
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Image"
-                                },
-                                "script": None
-                            })
-                        elif ext in ("ttf","otf"):
-                            asset    = pg.resource.add_font(actual_path)
-                            assetres = Media({
-                                "prop":   {},
-                                "data":   {
-                                    "object": asset,
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Media"
-                                },
-                                "script": None
-                            })
-                        elif ext in ("mp3","ogg","wav","mp4","webm","flac","avi","mpeg"):
-                            asset    = Sound(f"{sys._MEIPASS}/{actual_path}")
-                            assetres = Media({
-                                "prop":   {},
-                                "data":   {
-                                    "object": asset,
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Media"
-                                },
-                                "script": None
-                            })
-                        elif ext in ("res", "import"):
-                            asset    = pg.resource.file(actual_path, "rb")
-                            assetres = self.load_from_resf(asset)
-                        elif ext in ("ekl", "py", "scn"):
-                            asset    = pg.resource.file(actual_path).read()
-                            assetres = Script({
-                                "prop":   {},
-                                "data":   {
-                                    "object": asset,
-                                    "lang":   "python/ekl",
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Script/PlainText"
-                                },
-                                "script": None
-                            })
-                        elif ext == "bin":
-                            asset    = pg.resource.file(actual_path, "rb").read()
-                            assetres = asset
-                        elif ext == "std":
-                            asset    = pg.resource.file(actual_path, "rb")
-                            assetres = asset
-                        else:
-                            asset    = pg.resource.file(actual_path, "r").read()
-                            assetres = asset
-                    else:
-                        if ext in ("png","jpg","jpeg","webp","bmp","dds"):
-                            try:
-                                asset    = pg.image.load(actual_path)
-                            except:
-                                asset    = Theme.create_null_texture(Theme)
-                            assetres = Image({
-                                "prop":   {},
-                                "data":   {
-                                    "object": asset,
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Image"
-                                },
-                                "script": None
-                            })
-                        elif ext in ("ttf","otf"):
-                            asset    = pg.font.load(name)
-                            assetres = Media({
-                                "prop":   {},
-                                "data":   {
-                                    "object": asset,
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Media"
-                                },
-                                "script": None
-                            })
-                        elif ext in ("mp3","ogg","wav","mp4","webm","avi","mpeg"):
-                            asset    = Sound(actual_path)
-                            assetres = Media({
-                                "prop":   {},
-                                "data":   {
-                                    "object": asset,
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Media"
-                                },
-                                "script": None
-                            })
-                        elif ext in ("res", "import"):
-                            asset    = open(actual_path,"rb")
-                            assetres = self.load_from_resf(asset)
-                        elif ext in ("ekl", "py", "scn"):
-                            asset    = open(actual_path).read()
-                            assetres = Script({
-                                "prop":   {},
-                                "data":   {
-                                    "object": asset,
-                                    "lang":   "python/ekl",
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Script/PlainText"
-                                },
-                                "script": None
-                            })
-                        elif ext == "bin":
-                            asset    = open(actual_path, "rb").read()
-                            assetres = asset
-                        elif ext == "std":
-                            asset    = open(actual_path, "rb")
-                            assetres = asset
-                        else:
-                            asset    = open(actual_path).read()
-                            assetres = asset
-                except:
-                    if ext == "bin":
-                        assetres = b"Faulty"
-                    elif ext in ("png","jpg","jpeg","webp","bmp","dds"):
-                        assetres = self.resource_tree[f"Ekl{engine.VER}mem,..unknown"]
+                actual_path = path
+            try:
+                if IS_EXECUTABLE:
+                    if ext in ("png","jpg","jpeg","webp","bmp"):
+                        try:
+                            asset    = pg.resource.image(actual_path)
+                        except:
+                            asset    = Theme.create_null_texture(Theme)
+                        assetres = Image({
+                            "prop":   {},
+                            "data":   {
+                                "object": asset,
+                                "path":   path
+                            },
+                            "meta":   {
+                                "kind": "Resource",
+                                "name": "Image"
+                            },
+                            "script": None
+                        })
+                    elif ext in ("ttf","otf"):
+                        asset    = pg.resource.add_font(actual_path)
+                        assetres = Media({
+                            "prop":   {},
+                            "data":   {
+                                "object": asset,
+                                "path":   path
+                            },
+                            "meta":   {
+                                "kind": "Resource",
+                                "name": "Media"
+                            },
+                            "script": None
+                        })
+                    elif ext in ("mp3","ogg","wav","mp4","webm","flac","avi","mpeg"):
+                        asset    = Sound(f"{sys._MEIPASS}/{actual_path}")
+                        assetres = Media({
+                            "prop":   {},
+                            "data":   {
+                                "object": asset,
+                                "path":   path
+                            },
+                            "meta":   {
+                                "kind": "Resource",
+                                "name": "Media"
+                            },
+                            "script": None
+                        })
                     elif ext in ("res", "import"):
-                        asset    = io.BytesIO(b"RES")
+                        asset    = pg.resource.file(actual_path, "rb")
                         assetres = self.load_from_resf(asset)
                     elif ext in ("ekl", "py", "scn"):
-                        asset    = "# Faulty"
+                        asset    = pg.resource.file(actual_path).read()
                         assetres = Script({
                             "prop":   {},
                             "data":   {
                                 "object": asset,
-                                    "lang":   "python/ekl",
-                                    "path":   path
-                                },
-                                "meta":   {
-                                    "kind": "Resource",
-                                    "name": "Script/PlainText"
-                                },
-                                "script": None
-                            })
+                                "lang":   "python/ekl",
+                                "path":   path
+                            },
+                            "meta":   {
+                                "kind": "Resource",
+                                "name": "Script/PlainText"
+                            },
+                            "script": None
+                        })
+                    elif ext == "bin":
+                        asset    = pg.resource.file(actual_path, "rb").read()
+                        assetres = asset
+                    elif ext == "std":
+                        asset    = pg.resource.file(actual_path, "rb")
+                        assetres = asset
                     else:
-                        assetres = "Faulty"                
-                self.resource_tree[location] = assetres
-                if return_identifier:
-                    return assetres, location
-                return assetres
+                        asset    = pg.resource.file(actual_path, "r").read()
+                        assetres = asset
+                else:
+                    if ext in ("png","jpg","jpeg","webp","bmp","dds"):
+                        try:
+                            asset    = pg.image.load(actual_path)
+                        except:
+                            asset    = Theme.create_null_texture(Theme)
+                        assetres = Image({
+                            "prop":   {},
+                            "data":   {
+                                "object": asset,
+                                "path":   path
+                            },
+                            "meta":   {
+                                "kind": "Resource",
+                                "name": "Image"
+                            },
+                            "script": None
+                        })
+                    elif ext in ("ttf","otf"):
+                        asset    = pg.font.load(name)
+                        assetres = Media({
+                            "prop":   {},
+                            "data":   {
+                                "object": asset,
+                                "path":   path
+                            },
+                            "meta":   {
+                                "kind": "Resource",
+                                "name": "Media"
+                            },
+                            "script": None
+                        })
+                    elif ext in ("mp3","ogg","wav","mp4","webm","avi","mpeg"):
+                        asset    = Sound(actual_path)
+                        assetres = Media({
+                            "prop":   {},
+                            "data":   {
+                                "object": asset,
+                                "path":   path
+                            },
+                            "meta":   {
+                                "kind": "Resource",
+                                "name": "Media"
+                            },
+                            "script": None
+                        })
+                    elif ext in ("res", "import"):
+                        asset    = open(actual_path,"rb")
+                        assetres = self.load_from_resf(asset)
+                    elif ext in ("ekl", "py", "scn"):
+                        asset    = open(actual_path).read()
+                        assetres = Script({
+                            "prop":   {},
+                            "data":   {
+                                "object": asset,
+                                "lang":   "python/ekl",
+                                "path":   path
+                            },
+                            "meta":   {
+                                "kind": "Resource",
+                                "name": "Script/PlainText"
+                            },
+                            "script": None
+                        })
+                    elif ext == "bin":
+                        asset    = open(actual_path, "rb").read()
+                        assetres = asset
+                    elif ext == "std":
+                        asset    = open(actual_path, "rb")
+                        assetres = asset
+                    else:
+                        asset    = open(actual_path).read()
+                        assetres = asset
+            except:
+                if ext == "bin":
+                    assetres = b"Faulty"
+                elif ext in ("png","jpg","jpeg","webp","bmp","dds"):
+                    assetres = self.resource_tree[f"Ekl{engine.VER}mem,..unknown"]
+                elif ext in ("res", "import"):
+                    asset    = io.BytesIO(b"RES")
+                    assetres = self.load_from_resf(asset)
+                elif ext in ("ekl", "py", "scn"):
+                    asset    = "# Faulty"
+                    assetres = Script({
+                        "prop":   {},
+                        "data":   {
+                            "object": asset,
+                            "lang":   "python/ekl",
+                            "path":   path
+                        },
+                        "meta":   {
+                            "kind": "Resource",
+                            "name": "Script/PlainText"
+                            },
+                            "script": None
+                        })
+                else:
+                    assetres = "Faulty"                
+            self.resource_tree[location] = assetres
+            if return_identifier:
+                return assetres, location
+            return assetres

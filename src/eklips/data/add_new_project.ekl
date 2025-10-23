@@ -10,7 +10,7 @@ def _clicked(self):
 
     try:
         os.makedirs(pathval)
-        prjs.append([nameval,mygjs['project-ver'],mygjs['eklips-ver'], pathval, gjsl])
+        prjs.append([nameval,mygjs['project_ver'],mygjs['eklips_ver'], pathval, gjsl])
     except:
         if engine.askyesno("Eklips Editor","Do you want to overwrite this project?"):
             shutil.rmtree(pathval)
@@ -20,7 +20,7 @@ def _clicked(self):
     
     with open(gjsl,"w") as f:
        mygjs["game_name"] = nameval
-       mygjs["project-ver"] = "1.0"
+       mygjs["project_ver"] = "1.0"
        mygjs["cvars"]["directory"]["default"] = pathval.split("/")[-1]
        f.write(json.dumps(mygjs,indent=4))
     os.makedirs(f"{pathval}/data/scenes")

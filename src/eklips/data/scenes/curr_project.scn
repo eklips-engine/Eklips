@@ -20,7 +20,7 @@
                 "visible": true,
                 "color":   [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "Back",
             "script":            "res://data/workflow.ekl",
             "path":              "",
@@ -43,9 +43,9 @@
                 "font_size": 20,
                 "color":     [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {"_clicked": "go_back"},
             "name":              "PanelText",
-            "script":            "res://data/backmain_.ekl",
+            "script":            "res://data/functions.ekl",
             "path":              "Back",
             "runtimedata":       0
         },
@@ -64,7 +64,7 @@
                 "visible": true,
                 "color":   [5,5,10]
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "Panel",
             "script":            null,
             "path":              "Back",
@@ -87,7 +87,7 @@
                 "color":     [255,255,255],
                 "font_size": 18
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "PanelTextNm",
             "script":            null,
             "path":              "Back",
@@ -110,7 +110,7 @@
                 "color":     [90,90,120],
                 "font_size": 12
             },
-            "script_properties": {},
+            "signals":           {},
             "name":              "PanelTextPh",
             "script":            null,
             "path":              "Back",
@@ -133,9 +133,9 @@
                 "font_size": 20,
                 "color":     [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {"_clicked": "run_current_project"},
             "name":              "PanelTdext",
-            "script":            "res://data/run_app.ekl",
+            "script":            "res://data/functions.ekl",
             "path":              "Back",
             "runtimedata":       0
         },
@@ -156,9 +156,9 @@
                 "font_size": 20,
                 "color":     [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {"_clicked": "_invoke_menu"},
             "name":              "PanelTeeext",
-            "script":            "res://data/settings_menu.ekl",
+            "script":            "res://data/functions.ekl",
             "path":              "Back",
             "runtimedata":       0
         },
@@ -179,9 +179,9 @@
                 "font_size": 20,
                 "color":     [20,20,30]
             },
-            "script_properties": {},
+            "signals":           {"_clicked": "open_current_project_dir"},
             "name":              "PanelTeext",
-            "script":            "res://data/open_proj_folder.ekl",
+            "script":            "res://data/functions.ekl",
             "path":              "Back",
             "runtimedata":       0
         }

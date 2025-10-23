@@ -5,8 +5,8 @@ def get_curr_project_data():
     gamejsloc = engine.project_info[4]
     gamejs    = json.loads(open(gamejsloc).read())
     title     = gamejs["game_name"]
-    ver       = gamejs["project-ver"]
-    eklver    = gamejs["eklips-ver"]
+    ver       = gamejs["project_ver"]
+    eklver    = gamejs["eklips_ver"]
     path      = engine.project_info[3]
     return path,title,ver,eklver
 

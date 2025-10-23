@@ -30,36 +30,62 @@ class Object:
     def __init__(self, data=obj_base_data):
         global obj_ids
 
-        self.scene            = engine.scene
-        self._data_all        = data
-        self.data             = data["data"]
-        self.metadata         = data["meta"]
-        self.properties       = data["prop"]
-        self.scriptpath       = data["script"]
-        self.stop_running     = False
-        self.hook_script      = {}
-        self.call_deferr_list = []
-        self._obj_id          = engine.obj_ids
-        self.runtime_data     = {}
-        engine.obj_ids    += 1
-        self.script           = None
+        self.scene                = engine.scene
+        self._data_all            = data
+        self.data                 = data["data"]
+        self.metadata             = data["meta"]
+        self.signals              = data.get("signal", {})
+        self.properties           = data["prop"]
+        self.scriptpath           = data["script"]
+        self.stop_running         = False
+        self.hook_script          = {}
+        self.call_deferr_list     = []
+        self.call_sig_deferr_list = []
+        self._obj_id              = engine.obj_ids
+        self.runtime_data         = {}
+        engine.obj_ids           += 1
+        self.script               = None
         self._init_script()
         self._onready()
     
     ## Script related
+    def call_signal(self, signal_method, *args):
+        """Call a signal method from the script, such as: _clicked, _hover, etc.."""
+        
+        # self.signals = {'signal_method': 'method_on_the_script'}
+
+        if not self.script:
+            return
+        if not signal_method in self.signals:
+            return
+        method = self.signals[signal_method]
+        if not method in self.script.namespace:
+            return
+        mobj = types.MethodType(self.script.namespace[method], self)
+        if len(args) == 0:
+            return mobj()
+        else:             
+            return mobj(*args)
+    
     def call(self, method, *args):
         """Call a method from the script"""
-        if self.script:
-            if method in self.script.namespace:
-                mobj = types.MethodType(self.script.namespace[method], self)
-                if len(args) == 0:
-                    return mobj() 
-                else:             
-                    return mobj(*args)
+        if not self.script:
+            return
+        if not method in self.script.namespace:
+            return
+        mobj = types.MethodType(self.script.namespace[method], self)
+        if len(args) == 0:
+            return mobj() 
+        else:             
+            return mobj(*args)
 
     def call_deferred(self, method, args):
         """Call a method from the script after the object is done updating"""
         self.call_deferr_list.append([method, args])
+    
+    def call_signal_deferred(self, method, args):
+        """Call a method from the script after the object is done updating"""
+        self.call_sig_deferr_list.append([method, args])
     
     def _init_script(self):
         """Initialize the script attached to the Object"""
@@ -83,7 +109,10 @@ class Object:
         # Call any deferred functions
         for i in self.call_deferr_list:
             self.call(i[0], i[1])
+        for i in self.call_sig_deferr_list:
+            self.call_signal(i[0], i[1])
         self.call_deferr_list.clear()
+        self.call_sig_deferr_list.clear()
     
     ## Other
     def _free(self):

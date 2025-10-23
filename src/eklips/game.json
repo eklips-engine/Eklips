@@ -1,6 +1,6 @@
 {
-    "project-ver": "4.0A",
-    "eklips-ver": "4.0A",
+    "project_ver": "4.0A",
+    "eklips_ver": "4.0A",
     "game_name": "Eklips Editor",
     "keys": {
         "cursorup": {
@@ -94,9 +94,9 @@
             "default": false,
             "description": "Determine if you can change the size of the screen."
         },
-        "glbl_scripts": {
+        "global_scripts": {
             "type": "list",
-            "default": [],
+            "default": ["res://data/functions.ekl"],
             "description": "Paths of scripts that will be autoloaded into the engine singleton `engine`."
         },
         "directory": {
@@ -176,6 +176,7 @@
         "memcl": "@pointer=root://internal/scr/cmd/memcl.ekl\n# Reload all assets.",
         "chscn": "engine.load_new_scene(args[0])",
         "crash": "engine.interface = None",
-        "impulse": "engine.flags.append(int(args[0]))"
+        "impulse": "engine.flags.append(int(args[0]))",
+        "bind": "engine.Data.game_bdata['keys'][args[0]] = {'keys':[args[1]],'holdable':False}"
     }
 }

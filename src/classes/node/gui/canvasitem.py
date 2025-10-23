@@ -38,6 +38,12 @@ class CanvasItem(Node, Transform):
         },
         "script": None
     }
+    
+    node_signals = [
+        "_hover",
+        "_pressed_down",
+        "_clicked"
+    ]
 
     def __init__(self, data=node_base_data, parent=None):
         super().__init__(data,parent)
@@ -121,13 +127,13 @@ class CanvasItem(Node, Transform):
         self.holding                     = False
 
         if self.get_if_mouse_hovering():
-            self.call("_hover")
+            self.call_signal("_hover")
             if engine.mpressed[0]:
                 self.holding = True
-                self.call("_pressed_down")
+                self.call_signal("_pressed_down")
             if MOUSEUP in engine.events:
                 self.clicked = True
-                self.call("_clicked")
+                self.call_signal("_clicked")
 
         # World-space relative position
         self.runtime_data["relativepos"] = rel_pos
