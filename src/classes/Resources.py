@@ -173,6 +173,7 @@ class Script(Resource):
             f.write(self.get().encode())
 
 class Theme(Resource):
+    """A Theme. Used by widgets (Button, Progressbar..) to know what and how to draw themselves"""
     thm_base_data = {
         "prop":   {},
         "data":   {
@@ -437,6 +438,29 @@ class Theme(Resource):
             raw_data
         )
         return texture
+
+class Tileset(Resource):
+    """A collection of tiles on an atlas, the rules on drawing them, their collisions, etc.. Used by Tilemap node"""
+    til_base_data = {
+        "prop":   {},
+        "data":   {
+            "object": {
+                "tile_size":  [40,40],
+                "padding_se": [0, 0],
+                "padding_nw": [0, 0],
+
+                "tiles":            {}, #'tile': {'collision_rect': [x,y,w,h], 'atlaspos':[x,y], 'scenefile': None}
+
+                "atlas":     "root://internal/tilemap_atlas.png"
+            },
+            "path":   "res://"
+        },
+        "meta":   {
+            "kind": "Resource",
+            "name": "Tileset"
+        },
+        "script": None
+    }
 
 ## Functions
 def img_to_sheet(img, clip = 0):

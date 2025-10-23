@@ -77,7 +77,7 @@ class VideoPlayer(CanvasItem):
             self.vid        = vid.VideoPyglet(tmp_file_path)
             self.og_px_size = self.vid.current_size
 
-        self.vid.set_volume(_AudioHelper.calculate_volume(_, volume, category))
+        self.vid.set_volume(_AudioHelper.calculate_volume(None, volume, category))
         self.vid.seek(0)
         self.vid.play()
         self.playing = True
