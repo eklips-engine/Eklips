@@ -161,7 +161,7 @@ class ConHost:
         shifted = False
         if key == pg.window.key.CAPSLOCK:
             self.is_upper = not self.is_upper
-        if modifier == pg.window.key.MOD_SHIFT:
+        if modifier in [pg.window.key.MOD_SHIFT, 17]: # I don't know why but doing this makes it work
             shifted = True
         
         if key == pg.window.key.BACKSPACE:

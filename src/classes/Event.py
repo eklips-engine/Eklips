@@ -72,7 +72,7 @@ class Event:
         code = []
         self.dmpos        = [0,0]
         self.mouse_scroll = 0
-        self.modifiers    = None
+        #self.modifiers    = None
         for i in events:
             if i[0] == 'quit':
                 code.append(SOFT_QUIT)

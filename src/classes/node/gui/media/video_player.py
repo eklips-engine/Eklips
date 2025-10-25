@@ -146,7 +146,7 @@ class VideoPlayer(CanvasItem):
             anchor                       = self.anchor,
             scale                        = [1, 1],
             layer                        = self.layer,
-            rot                          = self.rot,
+            rot                          = self.rotation,
             opacity                      = self.alpha,
             scroll                       = self.scroll,
             use_pyglet_resource_directly = True,

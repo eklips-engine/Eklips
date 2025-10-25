@@ -38,7 +38,7 @@ def _init():
     else:
         data_directory = cvars.get("directory")
         if data_directory == "point::UseGameJsonParent":
-            # Windows on its way to not use the standard and use the fucking backslash, WHY?!
+            # Windows on its way to not use the standard and use the fucking backwards slash, WHY?!
             data_directory = project_file.replace("\\","/").split("/")[-1]
     game_name      = game_bdata["game_name"]
     return cvars

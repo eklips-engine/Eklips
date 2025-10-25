@@ -122,8 +122,8 @@ class Interface:
             if not layer in self.layers: layer = 0
             if scroll != [0, 0]:
                 img = img.get_region(
-                    int(scroll[0] % img.width), 
-                    int(scroll[1] % img.height),
+                    0, #int(scroll[0] % img.width), 
+                    0, #int(scroll[1] % img.height),
                     img.width,                  
                     img.height                  
                 )

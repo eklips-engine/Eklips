@@ -37,6 +37,10 @@ class HookPopen(ogpopen):
         # Your opinions do not matter
         shell = True
 
+        # Hardcode FFMpeg to use bin/ffmpeg.exe. I know this implementation sucks but i ain't making a second hook
+        if args[0].startswith("ff"):
+            args[0] = args[0].replace("ff", ".\\bin\\ff")
+
         _cleanup()
         # Held while anything is calling waitpid before returncode has been
         # updated to prevent clobbering returncode if wait() or poll() are

@@ -29,4 +29,4 @@ Documentations for Eklips are at the [Wiki](https://github.com/ZeeAyZ/Eklips/wik
 # Requirements
 All of the libraries required to run Eklips are in [here](https://github.com/ZeeAyZ/Eklips/blob/main/requirements.txt).
 <br>
-You need atleast a system running Windows 7/Mac OS X 10.3 or later and OpenGL with a version of 3.3 or higher. FFMpeg is optional but must be installed and be recognizable in PATH if you want to be able to play Video/external sound formats
+You need atleast a system running Windows 7/Mac OS X 10.3 or later and OpenGL with a version of 3.3 or higher.

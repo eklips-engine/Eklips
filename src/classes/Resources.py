@@ -632,6 +632,7 @@ class Loader:
 
         asset       = 0
         typeres     = "mem"
+        path        = str(path)
         location    = f"Ekl{engine.VER}{path}".replace('/','.').replace(':',',')
         actual_path = location
         name        = path.split("/")[-1].split(".")[0]
@@ -809,7 +810,7 @@ class Loader:
                 elif ext in ("res", "import"):
                     asset    = io.TextIOWrapper("{'type':'Resource'}")
                     assetres = self.load_from_resf(asset)
-                elif ext in ("ekl", "py", "scn"):
+                else:
                     asset    = "# Faulty"
                     assetres = Script({
                         "prop":   {},
@@ -823,9 +824,7 @@ class Loader:
                             "name": "Script/PlainText"
                             },
                             "script": None
-                        })
-                else:
-                    assetres = "Faulty"                
+                        })              
             self.resource_tree[location] = assetres
             if return_identifier:
                 return assetres, location

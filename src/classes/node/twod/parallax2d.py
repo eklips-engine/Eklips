@@ -36,13 +36,20 @@ class Parallax2D(Sprite2D):
         "script": None
     }
     
+    node_signals = [
+        "_hover",
+        "_pressed_down",
+        "_clicked",
+        "_reached_end"
+    ]
+    
     def __init__(self, data=node_base_data, parent=None):
         super().__init__(data,parent)
     
     def update(self, delta):
         super().update(delta)
 
-        self.scroll -= self.properties["scroll_speed"]
-        if self.scroll < (-self.image.get().width) + self.properties["scroll_speed"]:
-            self.scroll = -(self.properties["scroll_speed"])
-            self.call("_reached_end")
+        self.scroll[0]    -= self.properties["scroll_speed"]
+        if self.scroll[0]  < (-self.image.get().width) + self.properties["scroll_speed"]:
+            self.scroll[0] = -(self.properties["scroll_speed"])
+            self.call_signal("_reached_end")
