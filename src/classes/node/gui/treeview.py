@@ -41,7 +41,7 @@ class Treeview(CanvasItem):
                 pos     = _pos,
                 anchor  = "",
                 layer   = 10+id,
-                blit_in = self.window_id
+                screen_id= self.window_id
             )
             id      += 1
             _pos[1] += 25

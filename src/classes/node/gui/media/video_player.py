@@ -141,7 +141,7 @@ class VideoPlayer(CanvasItem):
         
         use_img = self.vid.frame_surf
         if self.visible:
-            self.w,self.h=use_img.width,use_img.height
+            self.w,self.h = use_img.width, use_img.height
             self._draw_onto_screen(use_img)
     
     def _draw_onto_screen(self, img):
@@ -151,8 +151,8 @@ class VideoPlayer(CanvasItem):
             anchor                       = self.anchor,
             scale                        = [1, 1],
             layer                        = self.layer,
-            rot                          = self.rotation,
-            opacity                      = self.alpha,
+            rotation                     = self.rotation,
+            alpha                        = self.alpha,
             scroll                       = self.scroll,
             use_pyglet_resource_directly = True,
             custom_id                    = self.media_id,

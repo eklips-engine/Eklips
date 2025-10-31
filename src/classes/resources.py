@@ -4,6 +4,7 @@ import pygame as pyg, json, random
 from pygame.mixer import Sound
 from anytree import NodeMixin
 from classes.constants import *
+from classes.convenience import *
 from classes.object import Object
 from SpecialIsResourceDataLoadable import IS_IT as IS_EXECUTABLE
 import classes.singleton as engine
@@ -219,28 +220,43 @@ class Theme(Resource):
     
     def get_thing(self, name): return self.get()["themed"][name]
     
-    def draw_knob(self, name, pos, size, blit_in, anchor, layer, rot=0,batch=None):
+    def draw_thing(self, name, pos, scale, screen_id, anchor, layer, rot=0,batch=None):
         thing  = self.get_thing(name)
-        margin = thing["margin"]
         tpos   = thing["atlaspos"][:2]
         dpos   = thing["atlaspos"][2:]
-        if size[0] < margin:
-            size[0] = margin*2
-        if size[1] < margin:
-            size[1] = margin*2
         ppos = pos[:]
         pos  = engine.interface.get_anchor(
             ppos,
-            blit_in,
+            screen_id,
             anchor,
-            size[0],
-            size[1]+margin,
+            dpos[0] * scale[0],
+            dpos[1] * scale[1],
             True,
             rot,
             True
         )
+
+        th = engine.interface.blit(
+            self.atlas,
+            [
+                pos[0],
+                pos[1]
+            ],
+            clip=[
+                tpos[0],
+                tpos[1],
+                dpos[0],
+                dpos[1]
+            ],
+            screen_id=screen_id,
+            layer=layer,
+            scale=scale,
+            batchxt=batch
+        )
+
+        return th
         
-    def draw_marginable_thing(self, name, pos, size, blit_in, anchor, layer, rot=0,batch=None):
+    def draw_marginable_thing(self, name, pos, size, screen_id, anchor, layer, alpha=0, rotation=0, batch=None):
         thing  = self.get_thing(name)
         margin = thing["margin"]
         tpos   = thing["atlaspos"][:2]
@@ -251,7 +267,7 @@ class Theme(Resource):
             size[1] = margin*2
 
         ppos = pos[:]
-        pos  = engine.interface.get_anchor(ppos, blit_in, anchor, size[0]+margin, size[1]+margin, True, rot, True)
+        pos  = engine.interface.get_anchor(Transform.new(pos, WHLike(size[0],size[1]), [1,1], alpha, layer, rotation, anchor, [0,0], True))
         
         # Fill
         fl = engine.interface.blit(
@@ -266,7 +282,7 @@ class Theme(Resource):
                 1,
                 1
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             scale=size,
             batchxt=batch
@@ -285,7 +301,7 @@ class Theme(Resource):
                 margin,
                 margin
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             scale=[(size[0])/margin,1],
             batchxt=batch
@@ -302,7 +318,7 @@ class Theme(Resource):
                 margin,
                 margin
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             scale=[(size[0])/margin,1],
             batchxt=batch
@@ -320,7 +336,7 @@ class Theme(Resource):
                 margin,
                 margin
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             scale=[1,(size[1])/margin],
             batchxt=batch
@@ -337,7 +353,7 @@ class Theme(Resource):
                 margin,
                 margin
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             scale=[1,(size[1])/margin],
             batchxt=batch
@@ -353,7 +369,7 @@ class Theme(Resource):
                 margin,
                 margin
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             batchxt=batch
         )
@@ -369,7 +385,7 @@ class Theme(Resource):
                 margin,
                 margin
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             batchxt=batch
         )
@@ -386,7 +402,7 @@ class Theme(Resource):
                 margin,
                 margin
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             batchxt=batch
         )
@@ -402,12 +418,12 @@ class Theme(Resource):
                 margin,
                 margin
             ],
-            blit_in=blit_in,
+            screen_id=screen_id,
             layer=layer,
             batchxt=batch
         )
 
-        return size
+        return fl
 
     def create_null_texture(_, w="rand", color=[255,0,255]):
         if w == "rand":

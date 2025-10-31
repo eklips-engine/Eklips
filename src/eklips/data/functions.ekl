@@ -57,7 +57,7 @@ def run_current_project(self):
     cwd    = os.getcwd()
     result = subprocess.Popen(f"{invoker} -js {info[4]} -dir {info[0]}", cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-def make_new_project(pathval, nameval, loading_include : str):
+def make_new_project(pathval, nameval, loading_include : str, go_edit=False):
     mygjs            = json.loads(engine.resource_loader.load("res://game.json"))
     pathval          = pathval.replace("\\","/")
     gjsl             = f"{pathval}/game.json"
@@ -66,21 +66,19 @@ def make_new_project(pathval, nameval, loading_include : str):
     if os.path.exists(pathval):
         if os.path.isfile(pathval):
             engine.showerror("Eklips Editor","A file with that name already exists.")
-        if not os.path.isdir(pathval+"/game.json"):
-            engine.showerror("Eklips Editor","A folder with that name already exists and it isn't a valid project.")
-        
-        if engine.askyesno("Eklips Editor","Do you want to overwrite this project?"):
-            shutil.rmtree(pathval)
-        else:
             return 1
+        
+        if os.path.isfile(f"{pathval}/game.json"):
+            if engine.askyesno("Eklips Editor","Do you want to overwrite this project?"):
+                shutil.rmtree(pathval)
+            else:
+                return 1
     
     try:
         os.makedirs(pathval)
     except:
         os.makedir(pathval)
     prjs.append([nameval,mygjs['project_ver'],mygjs['eklips_ver'], pathval, gjsl])
-    
-    print(loading_include)
     
     with open(gjsl,"w") as f:
        mygjs["game_name"]                         = nameval
@@ -103,6 +101,12 @@ def make_new_project(pathval, nameval, loading_include : str):
     with open(f"{pathval}/base_save.json", "w") as f:
         f.write(engine.resource_loader.load("res://base_save_temp.json","bin"))
     engine.savefile.set("projects", prjs)
+
+    if go_edit:
+        engine.project_info = prjs[len(prjs)-1]
+        engine.project_id   = len(prjs)-1
+        engine.load_new_scene("res://data/scenes/curr_project.scn")
+
 
 def open_new_project_dialog(self):
     rat = tk.Tk()
@@ -131,7 +135,7 @@ def open_new_project_dialog(self):
                            
     lbln = ttk.Button(rat, text="Make", command=lambda: make_new_project(pth.get(),nam.get(),rnd.get()))
     lbln.place(x=5,y=95)
-    lbln = ttk.Button(rat, text="Make & Edit")#, command=lambda: __chng(self, pth, info, rat))
+    lbln = ttk.Button(rat, text="Make & Edit", command=lambda: make_new_project(pth.get(),nam.get(),rnd.get(), go_edit=True))
     lbln.place(x=85,y=95)
     
     lbln = ttk.Button(rat, text="Cancel", command=rat.destroy)
@@ -184,7 +188,7 @@ def _change_dir(self, root, info):
 
     rat.mainloop()
 
-def pick_project(self):
+def pick_project(self, rpl=[0,0,0]):
     engine.printf("Editing project")
     if broken:
         engine.printf("Error")

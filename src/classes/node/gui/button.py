@@ -46,8 +46,8 @@ class Button(CanvasItem):
     def draw(self, typ="button"):
         if self.visible:
             size   = self._draw_onto_screen(typ)
-            self.w = size[0] / self.scale_x
-            self.h = size[1] / self.scale_y
+            self.w = size[0]
+            self.h = size[1]
     
     def _draw_onto_screen(self, typ="button"):
         lbl = self.screen.render(
@@ -62,11 +62,11 @@ class Button(CanvasItem):
 
         # Check if size property is smaller than it should be
         sz     = self.scale
-        if sz[0] < lbl[0]:
-            sz[0] = lbl[0]+(engine.thm.get_thing(typ)["margin"]*5)
-        if sz[1] < lbl[1]:
-            sz[1] = lbl[1]+7.5
+        if sz[0] < lbl.w:
+            sz[0] = lbl.w+(engine.thm.get_thing(typ)["margin"]*5)
+        if sz[1] < lbl.h:
+            sz[1] = lbl.h+7.5
 
         # Draw the themed button        
-        engine.thm.draw_marginable_thing(typ, self.runtime_data["rendererpos"], sz, self.window_id, self.anchor, self.layer)
+        engine.thm.draw_marginable_thing(typ, self.runtime_data["rendererpos"], sz, self.window_id, self.anchor, self.layer, self.alpha)
         return sz

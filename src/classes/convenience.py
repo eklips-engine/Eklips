@@ -44,6 +44,13 @@ def shift_key(key):
     if nk == ";": nk = ":"
     return nk
 
+class WHLike:
+    def __init__(self, w,h):
+        self.w      = w
+        self.h      = h
+        self.width  = w
+        self.height = h
+
 class Transform:
     def __init__(self):
         self._x = 0
@@ -106,5 +113,23 @@ class Transform:
     def h(self, value): self._h = value
     
     @rect.setter
-    def rect(self, value):
+    def rect(self, value : list[int,int,int,int]):
         self._x,self._y,self._w,self._h = value
+    
+    @pos.setter
+    def pos(self, value : list[int,int]):
+        self._x,self._y = value
+    
+    def new(pos : pos, surface, scale, opacity, layer, rotation, anchor, scroll, visible):
+        transform_obj          = Transform()
+        transform_obj.pos      = pos
+        transform_obj.w        = surface.width
+        transform_obj.h        = surface.height
+        transform_obj.scale    = scale
+        transform_obj.alpha    = opacity
+        transform_obj.layer    = layer
+        transform_obj.rotation = rotation
+        transform_obj.anchor   = anchor
+        transform_obj.scroll   = scroll
+        transform_obj.visible  = visible
+        return transform_obj

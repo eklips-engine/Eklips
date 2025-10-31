@@ -61,7 +61,7 @@ def reload_engine(dir=None):
     """Reload/Load the engine variables."""
     
     cleanup()
-    os.mkdir("tmp")
+    os.makedirs("tmp", exist_ok=True)
 
     ## Save if possible
     if initialized:

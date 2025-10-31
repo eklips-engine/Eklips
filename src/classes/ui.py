@@ -2,6 +2,7 @@
 import pyglet as pg
 import classes.singleton as engine
 from classes.constants import *
+from classes.convenience import *
 
 ## UI Class.
 class Interface:
@@ -42,38 +43,44 @@ class Interface:
         for i in range(-self.layer_amount,self.layer_amount):
             self.layers[i] = pg.graphics.Group(order=i)
     
-    def get_anchor(self,pos,blit_in,anchor,surf_w,surf_h,can_cache,rot,no_y_flip=False):
-        pos         = list(pos)
-        if blit_in == MAIN_SCREEN:
-            blit_in = self.main_surf_id
-        screen = self.surfaces[blit_in]["screen"]
+    def get_anchor(self, transform : Transform, can_cache=True, screen_id = MAIN_SCREEN, no_y_flip=False):
+        pos         = list(transform.pos)
+        
+        if screen_id == MAIN_SCREEN:
+            screen_id = self.main_surf_id
+        
+        screen = self.surfaces[screen_id]["screen"]
+        
         win_w, win_h = screen.get_size()
-        anchor_id   = f"{anchor},win{win_w}x{win_h},surf{surf_w}x{surf_h},pos{pos},rot{True if rot else False}{no_y_flip}"
+        anchor_id    = f"{transform.anchor}{win_w}x{win_h}{transform.w}x{transform.h}{transform.pos}{transform.rotation}{no_y_flip}"
 
         new_pos = pos.copy()
         if can_cache:
             if not anchor_id in self.anchors:
-                if not "bottom" in anchor and not no_y_flip:
-                    new_pos[1] = (win_h - surf_h) - pos[1] # Pyglet uses bottom-left for 0,0 while pygame uses top-left. I'm more familliar with pygame
-                if "right" in anchor:
-                    new_pos[0] = (win_w - surf_w) - pos[0]
-                if "centerX" in anchor:
-                    new_pos[0] = (win_w/2 - surf_w/2) + pos[0]
-                if "centerY" in anchor:
-                    new_pos[1] = (win_h/2 - surf_h/2) + pos[1]
-                if "center" in anchor:
-                    new_pos[0] = (win_w/2 - surf_w/2) + pos[0]
-                    new_pos[1] = (win_h/2 - surf_h/2) + pos[1]
-                if rot:
-                    new_pos[0]+=surf_w/2
-                    new_pos[1]+=surf_h/2
+                if not "bottom" in transform.anchor and not no_y_flip:
+                    new_pos[1] = (win_h - transform.h) - transform.pos[1] # Pyglet uses bottom-left for 0,0 while pygame uses top-left. I'm more familliar with pygame
+                if "right" in transform.anchor:
+                    new_pos[0] = (win_w - transform.w) - transform.pos[0]
+                if "centerX" in transform.anchor:
+                    new_pos[0] = (win_w/2 - transform.w/2) + pos[0]
+                if "centerY" in transform.anchor:
+                    new_pos[1] = (win_h/2 - transform.h/2) + pos[1]
+                if "center" in transform.anchor:
+                    new_pos[0] = (win_w/2 - transform.w/2) + pos[0]
+                    new_pos[1] = (win_h/2 - transform.h/2) + pos[1]
+                if transform.rotation:
+                    new_pos[0]+=transform.w/2
+                    new_pos[1]+=transform.h/2
                 new_pos=[round(new_pos[0]),round(new_pos[1])]
                 self.anchors[anchor_id]=new_pos
             else:
                 new_pos = self.anchors[anchor_id]
         return new_pos
 
-    def blit(self, surface, pos, clip=0, anchor="", opacity = 1, layer = 0, scroll=[0,0], scale=[1,1], blit_in=MAIN_SCREEN, can_cache = 1, rot = 0, use_pyglet_resource_directly = False, custom_id = None, return_obj=False, batchxt=None, sprite=None):
+    def blit(self, surface, pos, clip=0, anchor="", alpha = 1, layer = 0, scroll=[0,0], scale=[1,1], screen_id=MAIN_SCREEN, can_cache = 1, rotation = 0, use_pyglet_resource_directly = False, custom_id = None, return_obj=False, batchxt=None, sprite=None):
+        if alpha*255 < 1:
+            return
+        
         pos         = list(pos)
         new_pos     = list(pos)[:]
         if use_pyglet_resource_directly:
@@ -83,13 +90,11 @@ class Interface:
             path    = surface.get_path()
             img     = surface.get()
         img.subpixel = True
-        new_opacity  = int(opacity * 255)
-        new_clip     = clip
 
         if clip:
             ## Clipping
             cx, cy, cw, ch = clip
-            cy = surface.height - cy - ch
+            cy             = surface.height - cy - ch
 
             if can_cache:
                 id = f"{path}{cx}{cy}{cw}{ch}"
@@ -99,26 +104,19 @@ class Interface:
                 else:
                     img = self.area_cache[id]
         
-        ## Anchoring
-        if blit_in  == MAIN_SCREEN:
-            blit_in =  self.main_surf_id
+        ## Get screen and batch
+        if screen_id  == MAIN_SCREEN:
+            screen_id  =  self.main_surf_id
         
-        batch        = self.surfaces[blit_in]["batch"]
-        if batchxt:
-            batch    = batchxt
-        new_pos      = self.get_anchor(
-            pos,
-            blit_in,
-            anchor,
-            img.width*scale[0],
-            img.height*scale[1],
-            1,
-            rot,
-            False
-        )
+        batch             = self.surfaces[screen_id]["batch"]
+        if batchxt: batch = batchxt
+
+        ## Anchoring
+        transform    = Transform.new(pos, surface, scale, alpha, layer, rotation, anchor, scroll, True)
+        new_pos      = self.get_anchor(transform, screen_id = screen_id)
         
         ## Detect if i'm even visible and change position
-        if not self.cull(img.width, img.height, new_pos, blit_in, scale=scale):
+        if not self.cull(img.width, img.height, new_pos, screen_id, scale=scale):
             if not layer in self.layers: layer = 0
             if scroll != [0, 0]:
                 img = img.get_region(
@@ -165,15 +163,15 @@ class Interface:
             if spr.z        != layer:
                 spr.z        = layer
                 spr.group    = self.layers[layer]
-            if spr.rotation != rot:
-                spr.rotation = rot
-            if spr.opacity  != new_opacity:
-                spr.opacity  = new_opacity
+            if spr.rotation != rotation:
+                spr.rotation = rotation
+            if spr.opacity  != int(alpha*255):
+                spr.opacity  = int(alpha*255)
             if spr.scale_x  != scale[0]:
                 spr.scale_x  = scale[0]
             if spr.scale_y  != scale[1]:
                 spr.scale_y  = scale[1]
-            if rot:
+            if rotation:
                 if spr.image.anchor_x != hsize[0]:
                     spr.image.anchor_x = hsize[0]
                 if spr.image.anchor_y != hsize[1]:
@@ -182,15 +180,15 @@ class Interface:
             self.draw_queue[spr_id] = spr
             self.sprite_used.append(spr_id)
             if return_obj:
-                return img.width*scale[0], img.height*scale[1], spr
+                return transform, spr
         if return_obj:
-            return img.width*scale[0], img.height*scale[1], None
-        return img.width*scale[0], img.height*scale[1]
+            return transform, None
+        return transform
     
-    def cull(self, w, h, pos, blit_in, scale=[1,1]):
-        if blit_in  == MAIN_SCREEN:
-            blit_in  =  self.main_surf_id
-        scr          = self.surfaces[blit_in]["screen"]
+    def cull(self, w, h, pos, screen_id, scale=[1,1]):
+        if screen_id  == MAIN_SCREEN:
+            screen_id  =  self.main_surf_id
+        scr          = self.surfaces[screen_id]["screen"]
         win_w, win_h = scr.width, scr.height
         w           *= scale[0]
         h           *= scale[1]
@@ -202,13 +200,17 @@ class Interface:
             pos[1] < -h
         )
 
-    def render(self, text, pos, blit_in=MAIN_SCREEN, layer=5, anchor="", size=15, rot=0, alpha=1, color=[255,255,255], return_obj=False, batchxt=None):
-        id           = len(self.label_queue)
-        if blit_in  == MAIN_SCREEN:
-            blit_in  =  self.main_surf_id
+    def render(self, text, pos, screen_id=MAIN_SCREEN, layer=5, anchor="", size=15, rotation=0, alpha=1, color=[255,255,255], return_obj=False, batchxt=None):
+        if alpha < 1:
+            return [0,0]
         
-        screen       = self.surfaces[blit_in]["screen"]
-        batch        = self.surfaces[blit_in]["tbatch"]
+        id           = len(self.label_queue)
+        if screen_id  == MAIN_SCREEN:
+            screen_id  =  self.main_surf_id
+        
+        screen       = self.surfaces[screen_id]["screen"]
+        batch        = self.surfaces[screen_id]["tbatch"]
+
         if batchxt:
             batch    = batchxt
         lbl_id       = -1
@@ -227,23 +229,16 @@ class Interface:
             )
             self.label_pool[id] = lbl
             lbl_id              = id
-        new_pos = self.get_anchor(
-            list(pos),
-            blit_in,
-            anchor,
-            lbl.content_width,
-            lbl.content_height,
-            True,
-            rot
-        )
         color_new = [color[0],color[1],color[2],255]
-
         if not lbl.text == text:
             lbl.text = text
         
-        if self.cull(lbl.content_width, lbl.content_height, new_pos, blit_in):
+        transform = Transform.new(pos, WHLike(lbl.content_width, lbl.content_height), [1,1], alpha, layer, rotation, anchor, [0,0], True)
+        new_pos   = self.get_anchor(transform, screen_id = screen_id)
+
+        if self.cull(lbl.content_width, lbl.content_height, new_pos, screen_id):
             self.label_pool[id].visible = False
-            return lbl.content_width, lbl.content_height
+            return transform
 
         if not lbl.z    == layer:
             if not layer in self.layers: layer = 0
@@ -255,8 +250,8 @@ class Interface:
             lbl.y = new_pos[1]
         if not lbl.font_size == size:
             lbl.font_size = size
-        if not lbl.rotation == rot:
-            lbl.rotation = rot
+        if not lbl.rotation == rotation:
+            lbl.rotation = rotation
             hsize        = [lbl.content_width//2, lbl.content_height//2]
             if lbl.anchor_x != hsize[0]:
                 lbl.anchor_x = hsize[0]
@@ -272,9 +267,9 @@ class Interface:
         self.label_queue[id] = lbl
 
         if return_obj:
-            return round(lbl.content_width), round(lbl.content_height), lbl
+            return transform, lbl
         else:
-            return round(lbl.content_width), round(lbl.content_height)
+            return transform
     
     def flip(self):
         ## === 1. Draw batches ===

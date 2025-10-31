@@ -5,10 +5,7 @@ import classes.singleton as engine
 from classes.conhost import printf
 from classes.constants import *
 
-## No initialization code is here. Look at classes/engine.py
-
-## Make Temp dir
-os.makedirs("tmp", exist_ok=True)
+## No initialization code is here. Look at classes/singleton.py
 
 ## Editor values
 held_down = -1

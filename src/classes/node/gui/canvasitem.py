@@ -89,16 +89,7 @@ class CanvasItem(Node, Transform):
     
     def get_if_mouse_hovering(self) -> bool:
         mpos = engine.mpos
-        x,y  = self.screen.get_anchor(
-            [self.x, self.y],
-            self.window_id,
-            self.anchor,
-            self.w,
-            self.h,
-            True,
-            self.rotation,
-            True
-        )
+        x,y  = self.screen.get_anchor(self, no_y_flip=True)
         is_it = (
             mpos[0] < x  + self.w and
             mpos[0] + 20 > x      and
@@ -109,15 +100,15 @@ class CanvasItem(Node, Transform):
     
     def _draw_onto_screen(self, img):
         return self.screen.blit(
-            img,                                   
-            self.runtime_data["rendererpos"],             
-            anchor  = self.anchor,
-            scale   = self.scale,
-            layer   = self.layer,
-            rot     = self.rotation,
-            opacity = self.alpha,
-            scroll  = self.scroll,
-            sprite  = self.sprite
+            img,
+            self.runtime_data["rendererpos"],
+            anchor   = self.anchor,
+            scale    = self.scale,
+            layer    = self.layer,
+            rotation = self.rotation,
+            alpha    = self.alpha,
+            scroll   = self.scroll,
+            sprite   = self.sprite
         )
         
     def update(self, delta):

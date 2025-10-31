@@ -38,21 +38,21 @@ class Label(CanvasItem):
 
     def draw(self):
         if self.visible:
-            size          = self._draw_onto_screen(self.properties["text"])
-            self.w,self.h = size
+            img           = self._draw_onto_screen(self.properties["text"])
+            self.w,self.h = img._w, img._h
         
     def _draw_onto_screen(self, text):
         return self.screen.render(
-            text    = text,
-            pos     = self.runtime_data["rendererpos"],
-
-            anchor  = self.anchor,
-            layer   = self.layer,
-            blit_in = self.window_id,
-            size    = self.properties["font_size"],
-            rot     = self.rotation,
-            alpha   = self.alpha,
-            color   = self.properties["color"]
+            text      = text,
+            pos       = self.runtime_data["rendererpos"],
+ 
+            anchor    = self.anchor,
+            layer     = self.layer,
+            screen_id = self.window_id,
+            size      = self.properties["font_size"],
+            rotation  = self.rotation,
+            alpha     = self.alpha,
+            color     = self.properties["color"]
         )
     
     def update(self, delta):
