@@ -1,0 +1,17 @@
+def make_new_project(self):
+    pass
+
+def load_project(self):
+    pass
+
+def save_metadata(self):
+    pass
+
+def play_project(self):
+    pass
+
+def open_project_directory(self):
+    pass
+
+def close_project(self):
+    pass
