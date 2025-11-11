@@ -6,7 +6,7 @@
     },
     "viewport": {
         "size":  [1152, 648],
-        "color": [0, 0, 0]
+        "color": [20, 20, 30]
     },
     "scenes": {
         "master":  "res://scenes/master.scn",
