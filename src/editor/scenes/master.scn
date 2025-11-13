@@ -1,5 +1,66 @@
 {
-    "nodes":      {},
+    "nodes":      {
+        "panel-obj": {
+            "type": "ColorRect",
+            "name": "Panel",
+            "path": "",
+
+            "color": [25,25,35],
+            "transform": {
+                "position": [10,84],
+                "tsize":    [1132,554],
+                "scale":    [1,1],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "top left",
+                "visible":  true,
+                "skew":     0
+            }
+        },
+        "logo": {
+            "type": "Sprite2D",
+            "name": "LogoEklips",
+            "path": "",
+
+            "sprite": "res://media/logo.png",
+            "transform": {
+                "position": [10,10],
+                "tsize":    [1,1],
+                "scale":    [0.5,0.5],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "top left",
+                "visible":  true,
+                "skew":     0
+            }
+        },
+        "settings_btn": {
+            "type": "Sprite2D",
+            "name": "BtnSettings",
+            "path": "",
+
+            "sprite": "res://media/icosetting.png",
+            "script": "res://data/workflow.ekl",
+            "signals": {"_clicked":"open_editor_settings"},
+            
+            "transform": {
+                "position": [10,25.5],
+                "tsize":    [1,1],
+                "scale":    [0.5,0.5],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "top right",
+                "visible":  true,
+                "skew":     0
+            }
+        }
+    },
     "properties": {
         "inherited": false,
         "inherits":  null

@@ -6,5 +6,6 @@ def _process(self : engine.nodes.CanvasItem, _delta=None):
     if self.rotation > 351:
         self.alpha -= engine.delta * 150
     if self.alpha < 0:
+        self._free()
         engine.scene.load(engine.game.master_scene)
     eklips.alpha   = self.alpha

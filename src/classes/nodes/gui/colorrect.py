@@ -13,6 +13,7 @@ class ColorRect(CanvasItem):
     XXX
     """
     _can_check_layer = True
+    _color           = [0,0,0]
     base_properties  = {
         "name":      "ColorRect",
         "transform": base_transform,
@@ -22,11 +23,22 @@ class ColorRect(CanvasItem):
 
     def __init__(self, properties=base_properties, parent=None):
         super().__init__(properties, parent)
-        self.set_color(*self.get("color", [0,0,0]))
+        self.color = self.get("color", [0,0,0])
         self._make_new_sprite()
     
-    def set_color(self, rgb):
-        self.image = pg.image.ImageData(1,1,'RGB',bytes(rgb))
+    @property
+    def color(self) -> list[int]:
+        return self._color
+    @color.setter
+    def color(self, rgb : list[int]):
+        self._color = rgb
+        self._refresh_image()
+    
+    def _refresh_image(self):
+        self._set_size(self.w,self.h)
+    def _set_size(self,w,h):
+        rw, rh = round(w),round(h)
+        self.image = pg.image.ImageData(rw,rh,'RGB',bytes(self.color*rw*rh))
     
     def update(self):
         super().update()

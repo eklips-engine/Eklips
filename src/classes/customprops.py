@@ -74,7 +74,7 @@ class Transform:
     @property
     def pos(self):  return [self.x,self.y]
     @property
-    def size(self):  return [self.w,self.h]
+    def tsize(self):  return [self.w,self.h]
 
     @property
     def rotation(self): return self._rotation
@@ -134,9 +134,9 @@ class Transform:
         self.x,self.y,self.w,self.h = value
     @pos.setter
     def pos(self, value : list[int,int]): self.x,self.y = value
-    @size.setter
-    def size(self, value : list[int,int]): self.w,self.h = value
-    
+    @tsize.setter
+    def tsize(self, value : list[int,int]): self.w,self.h = value
+
     @rotation.setter
     def rotation(self, value): self._rotation = value
     

@@ -1,12 +1,12 @@
 {
-    "name":    "Eklips Editor",
+    "name":    " ",
     "version": {
         "app": "1.0",
         "ekl": "4.1A"
     },
     "viewport": {
-        "size":  [1152, 648],
-        "color": [20, 20, 30]
+        "size":  [1152,  648],
+        "color": [35, 35, 50]
     },
     "scenes": {
         "master":  "res://scenes/master.scn",

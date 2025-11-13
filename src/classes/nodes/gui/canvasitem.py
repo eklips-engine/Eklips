@@ -9,7 +9,7 @@ from classes.customprops import *
 # Variables
 base_transform = {
     "position": [0,0],
-    "size":     [0,0],
+    "tsize":    [0,0],
     "scale":    [1,1],
     "scroll":   [0,0],
 
@@ -17,7 +17,7 @@ base_transform = {
     "alpha":    255,
     "anchor":   "top left",
     "visible":  True,
-    "skew":     0,
+    "skew":     0
 }
 
 # Classes
@@ -29,6 +29,7 @@ class CanvasItem(Node, Transform):
     For Nodes in a 2D world, use Node2D.
 
     This has relativity only on the position.
+    (NOTE: The reason why `tsize` is called that because anytree's NodeMixin uses a size property..)
     """
     _can_check_layer = True
     base_properties  = {
@@ -71,6 +72,7 @@ class CanvasItem(Node, Transform):
         self.anchor        = transform_property["anchor"]
         self.scroll        = transform_property["scroll"]
         self.visible       = transform_property["visible"]
+        self.tsize         = transform_property["tsize"]
     
     def draw(self, image):
         if image:

@@ -15,3 +15,6 @@ def open_project_directory(self):
 
 def close_project(self):
     pass
+
+def open_editor_settings(self):
+    print(engine.mouse.pos)

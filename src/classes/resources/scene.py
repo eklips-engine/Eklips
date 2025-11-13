@@ -108,14 +108,17 @@ class Scene(Object):
             node   = self.nodes[node_id]["obj"]
             node._free()
         except:
-            pass
+            print("FUCK")
         self.nodes[node_id]["obj"] = None
         self.nodes.pop(node_id)
         gc.collect()
     def _empty(self):
-        for node_id in self.nodes:
-            self.delete_node(node_id)
-        self.nodes = {}
+        while len(self.nodes):
+            try:
+                for node_id in self.nodes:
+                    self._delete_node(node_id)
+            except:
+                pass
     
     def _free(self):
         self._empty()
@@ -129,18 +132,18 @@ class Scene(Object):
                     continue
                 if not node._runnable:
                     node._free()
-                    self.delete_node(node_id)
+                    self._delete_node(node_id)
                     continue
                 node.update()
         except Exception as error:
             raise error
 
-        ## Things you can't do in the for loop above me without causing trouble 
-        for i in self._marked_for_disassembly:
-            self._delete_node(i)
+        ## Things you can't do in the for loop above me without causing trouble
         if self._marked_scene_chng:
             self._empty()
             self.file_path = self._marked_scene_chng
+            self._marked_scene_chng = None
+        for i in self._marked_for_disassembly:
+            self._delete_node(i)
         
-        self._marked_scene_chng = None
         self._marked_for_disassembly.clear()

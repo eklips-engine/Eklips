@@ -25,7 +25,13 @@ def load_engine():
 
     # Initialize display and windows
     display = ui.Display()
-    display.add_window(game.name, game.viewport_size, game.viewport_size, game.viewport_color)
+    display.add_window(
+        game.name, 
+        game.viewport_size, 
+        game.viewport_size, 
+        game.viewport_color,
+        loader.load(cvars.get("icon_file"))
+    )
 
     # Initialize garbage collection
     gc.enable()

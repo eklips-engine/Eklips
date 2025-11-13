@@ -216,7 +216,13 @@ class Display:
     windows            = {}
     main_window_id     = None
 
-    def add_window(self, name=DEFAULT_NAME, size=[640,480], viewport_size=VIEWPORT_EQUAL_WINDOW, viewport_color=black):
+    def add_window(self,
+        name           = DEFAULT_NAME,
+        size           = [640,480],
+        viewport_size  = VIEWPORT_EQUAL_WINDOW,
+        viewport_color = black,
+        icon           = None
+    ) -> int:
         """
         Add a new Window, returns its Window ID.
 
@@ -224,6 +230,7 @@ class Display:
         .. size:: Size of the window.
         .. viewport_size:: Size of the window's viewport. Use constant `VIEWPORT_EQUAL_WINDOW` to make the Viewport size equal the Window size.
         .. viewport_color:: Background color of the viewport.
+        .. icon:: Image resource of the Window Icon, or None.
         """
         wid = len(self.windows)
         print(f" ~ Initialize Window '{name}'")
@@ -238,6 +245,8 @@ class Display:
             height  = size[1],
             caption = name
         )
+        if icon:
+            window.set_icon(icon)
         viewport = Viewport({}, viewport_size, [0,0])
         viewport.set_background(*viewport_color)
         viewport.provide_window(window, master=True)

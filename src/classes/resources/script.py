@@ -21,5 +21,11 @@ class Script(Object):
     file_path        = None
     source_code      = "# Empty.. Please initialize the Script in your Object."
     _can_init_script = False
-    _namespace       = {"engine": engine}
+    _namespace       = {}
     _function_queue  = []
+
+    def __init__(self, properties=...):
+        self._namespace      = {"engine": engine}
+        self.source_code     = "# Empty.. Please initialize the Script in your Object."
+        self._function_queue = []
+        self.file_path       = None

@@ -33,14 +33,17 @@ class Loader:
     def _load(self, path, ext):
         actual_path = self._get_true_path(path)
         
-        if ext in self.extensions["img"]:
-            return pg.image.load(actual_path)
-        if ext in self.extensions["sfx"]:
-            return pygame.Sound(actual_path)
-        if ext in self.extensions["txt"]:
-            return open(actual_path).read()
-        if ext in self.extensions["jsn"]:
-            return json.loads(open(actual_path).read())
+        try:
+            if ext in self.extensions["img"]:
+                return pg.image.load(actual_path)
+            if ext in self.extensions["sfx"]:
+                return pygame.Sound(actual_path)
+            if ext in self.extensions["txt"]:
+                return open(actual_path).read()
+            if ext in self.extensions["jsn"]:
+                return json.loads(open(actual_path).read())
+        except:
+            pass
         
         return None
     

@@ -40,7 +40,7 @@ class Object:
     def script_path(self, path : str):
         self._script_path = path
         try:
-            src  = engine.loader.load(path)
+            src  = engine.loader.load(path, force_new_resource=True)
         except:
             src  = None
             path = None
