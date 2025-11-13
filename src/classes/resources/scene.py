@@ -88,7 +88,7 @@ class Scene(Object):
 
         return nid
     
-    def get_node_from_path(self, nodepath):
+    def get_node_from_path(self, nodepath) -> Node:
         """Get a Node using its path"""
         path = "/".join(nodepath.split("/")[:-1])
         name = nodepath.split("/")[-1]

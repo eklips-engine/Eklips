@@ -4,6 +4,8 @@
             "type": "ColorRect",
             "name": "Panel",
             "path": "",
+            
+            "script": "res://data/workflow.ekl",
 
             "color": [25,25,35],
             "transform": {
@@ -48,7 +50,7 @@
             "signals": {"_clicked":"open_editor_settings"},
             
             "transform": {
-                "position": [10,25.5],
+                "position": [13.5,25.5],
                 "tsize":    [1,1],
                 "scale":    [0.5,0.5],
                 "scroll":   [0,0],
@@ -56,6 +58,49 @@
                 "rotation": 0,
                 "alpha":    255,
                 "anchor":   "top right",
+                "visible":  true,
+                "skew":     0
+            }
+        },
+        "newproje_btn": {
+            "type": "Sprite2D",
+            "name": "BtnNewProje",
+            "path": "",
+
+            "sprite": "res://media/iconew.png",
+            "script": "res://data/workflow.ekl",
+            "signals": {"_clicked":"make_new_project"},
+            
+            "transform": {
+                "position": [60.5,25.5],
+                "tsize":    [1,1],
+                "scale":    [0.5,0.5],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "top right",
+                "visible":  true,
+                "skew":     0
+            }
+        },
+        "version_str": {
+            "type": "Sprite2D",
+            "name": "TxtVer",
+            "path": "",
+
+            "sprite": "res://media/iconew.png",
+            "text": "version_str",
+            
+            "transform": {
+                "position": [2,2],
+                "tsize":    [1,1],
+                "scale":    [0.5,0.5],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "right",
                 "visible":  true,
                 "skew":     0
             }

@@ -5,6 +5,7 @@ import pyglet as pg, gc
 import classes.singleton as engine
 from classes.locals      import *
 from classes.customprops import *
+from pyglet.gl           import *
 
 # Colors
 _r    = [0,0,0]
@@ -43,7 +44,7 @@ class EklipsWindow(pg.window.Window):
 
     def on_mouse_release(self, x, y, button, modifiers):
         engine.mouse.pos           = [x, y]
-        engine.mouse.clk[button-1] = True
+        engine.mouse.clk[button-1] = False
 
 class Viewport:
     _window_is_slave = False
@@ -221,7 +222,10 @@ class Display:
         size           = [640,480],
         viewport_size  = VIEWPORT_EQUAL_WINDOW,
         viewport_color = black,
-        icon           = None
+        icon           = None,
+        resizable      = True,
+        minimum_size   = [648,648],
+        maximum_size   = None,
     ) -> int:
         """
         Add a new Window, returns its Window ID.
@@ -231,6 +235,9 @@ class Display:
         .. viewport_size:: Size of the window's viewport. Use constant `VIEWPORT_EQUAL_WINDOW` to make the Viewport size equal the Window size.
         .. viewport_color:: Background color of the viewport.
         .. icon:: Image resource of the Window Icon, or None.
+        .. resizable:: Allow the window to be resizable if True.
+        .. minimum_size:: List of the minimum size the window can be, or None if you dont want a limit.
+        .. maximum_size:: List of the maximum size the window can be, or None if you dont want a limit.
         """
         wid = len(self.windows)
         print(f" ~ Initialize Window '{name}'")
@@ -241,10 +248,15 @@ class Display:
             self.main_window_id = wid
         
         window   = EklipsWindow(
-            width   = size[0],
-            height  = size[1],
-            caption = name
+            width     = size[0],
+            height    = size[1],
+            caption   = name,
+            resizable = resizable
         )
+        if minimum_size:
+            window.set_minimum_size(*minimum_size)
+        if maximum_size:
+            window.set_maximum_size(*maximum_size)
         if icon:
             window.set_icon(icon)
         viewport = Viewport({}, viewport_size, [0,0])

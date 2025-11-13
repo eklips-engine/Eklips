@@ -1,5 +1,3 @@
-from pyglet.gl import *
-
 USE_GAME_PARENT = "UseFileParent"
 USE_GAME_CV_DIR = "UseFileCVar"
 

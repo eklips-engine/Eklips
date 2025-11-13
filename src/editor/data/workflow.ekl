@@ -1,5 +1,35 @@
+import classes.singleton as engine
+import tkinter           as tk
+from tkinter             import ttk
+from tkinter.messagebox  import *
+from tkinter.filedialog  import *
+
 def make_new_project(self):
     pass
+
+def select_project_file(self): return askopenfilename(
+        filetypes = [
+            ("Eklips project file","game.json"),
+            ("Everything else..", "*.*")
+        ],
+        title     = "Eklips Engine"
+    )
+
+def _onready(self):
+    if self.name == "Panel":
+        try:
+            engine.scene.get_node_from_path("TxtVer").text = f"v{engine.VERSION}"
+        except:
+            pass
+        win = engine.display.get_window()
+        win.set_caption("Eklips Engine - Project Editor")
+
+def _process(self, delta):
+    if self.name  == "Panel":
+        self.w = engine.display.get_window().width-20
+        self.h = engine.display.get_window().height-94
+    else:
+        pass
 
 def load_project(self):
     pass
@@ -17,4 +47,16 @@ def close_project(self):
     pass
 
 def open_editor_settings(self):
-    print(engine.mouse.pos)
+    root = tk.Tk()
+    root.title("Eklips Engine")
+    root.geometry("320x320")
+
+    tabs = ttk.Notebook(root)
+
+    # Construct tabs
+    tab1 = ttk.Frame()
+    tabs.add(tab1, text="General")
+    
+    # Place tab
+    tabs.place(x=0,y=0,relwidth=1,relheight=1)
+    root.mainloop()

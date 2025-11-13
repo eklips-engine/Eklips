@@ -1,0 +1,14 @@
+{
+    "entries": {
+        "general":  "General",
+        "pe_title": "Eklips Engine - Project Editor",
+        "pe_pjfl":  "Eklips project file",
+        "pe_evfl":  "Everything else.."
+    },
+    "properties": {
+        "name":        "English",
+        "description": "It's the.. English language.... what the hell am i supposed to tell you?!",
+        "base":        null,
+        "subset":      null
+    }
+}

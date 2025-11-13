@@ -23,7 +23,10 @@ class GameData:
         self.version_ekl    = self.project_data["version"]["ekl"]
         self.viewport_size  = self.project_data["viewport"]["size"]
         self.viewport_color = self.project_data["viewport"]["color"]
-        
+        self.winresizable   = self.project_data["viewport"]["resizable"]
+        self.winminsize     = self.project_data["viewport"]["minsize"]
+        self.winmaxsize     = self.project_data["viewport"]["maxsize"]
+
         self.master_scene   = self.project_data["scenes"]["master"]
         self.loading_scene  = self.project_data["scenes"]["loading"]
 

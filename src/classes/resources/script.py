@@ -8,10 +8,9 @@ class Script(Object):
     This class handles Python Script files.
     
     A script extends the functionality of all objects that instantiate it.
-    Please do not try initializing a Script by this Object directly. It will throw an error.
+    Please do not try initializing a Script by this Object directly. It will not do anything.
 
     Instead, set your Object's `script_path` property to the path of the Script.
-    If the property `source_code` is a string, it will override the code that `path` has.
     """
     base_properties = {
         "name":        "Script",
