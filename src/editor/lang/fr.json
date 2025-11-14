@@ -1,0 +1,13 @@
+{
+    "entries": {
+        "general":  "General",
+        "pe_title": "Eklips Engine - Projet Editeur",
+        "pe_pjfl":  "Eklips Projet Fichier",
+        "pe_evfl":  "Tout les autres.."
+    },
+    "properties": {
+        "name":        "French (Français)",
+        "description": "Langue français",
+        "base":        "res://lang/en.json"
+    }
+}

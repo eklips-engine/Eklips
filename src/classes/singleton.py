@@ -3,7 +3,9 @@ import pygame, pyglet as pg, json, gc
 import pyvidplayer2   as pvd
 
 # Import components
-from classes             import cvar, ui, resources, nodes, commons_subprchook, crash_screen as error_handler
+from classes             import cvar, ui, resources, nodes, commons_subprchook
+from classes             import crash_screen as error_handler
+from classes             import saving
 from classes.customprops import *
 from classes.locals      import *
 
@@ -12,7 +14,7 @@ pygame.mixer.init()
 
 # Functions
 def load_engine():
-    global running,game,cvars,display,mouse,loader,keyboard,scene
+    global running,game,cvars,display,mouse,loader,keyboard,scene,savefile,lang
 
     # Initialize metadata
     game  = GameData()
@@ -49,6 +51,12 @@ def load_engine():
         scene.load(game.loading_scene)
     else:
         scene.load(game.master_scene)
+    
+    # Initialize savefile
+    savefile = saving.Savefile()
+
+    # Initialize localization
+    lang    = Language(f'{cvars.get("lang_dir", "res://lang")}/{savefile.get("lang", "en")}.json')
 
     # Set running flag to true
     running = True
@@ -58,12 +66,14 @@ display   : ui.Display          = None
 cvars     : cvar.CvarCollection = None
 game      : GameData            = None
 loader    : resources.Loader    = None
-running   : bool                = False
+lang      : Language            = None
+savefile  : saving.Savefile     = None
 mouse     : Mouse               = None
 keyboard  : Keyboard            = None
+scene     : resources.Scene     = None
+running   : bool                = False
 uid       : int                 = 0
 sid       : int                 = 0
-scene     : resources.Scene     = None
 delta     : float               = 0.0
 uptime    : float               = 0.0
 

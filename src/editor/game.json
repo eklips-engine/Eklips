@@ -27,7 +27,17 @@
         "globals": {
             "type":        "list",
             "default":     [],
-            "description": "List of Scripts to be loaded as Nodes 'AUTOL~1'"
+            "description": "List of Scripts to be loaded as Nodes 'AUTOL~X'"
+        },
+        "languages": {
+            "type":        "list",
+            "default":     ["en","fr","foobar"],
+            "description": "List of languages used in the game"
+        },
+        "lang_dir": {
+            "type":        "str",
+            "default":     "res://lang",
+            "description": "Directory where all the language files are"
         }
     }
 }

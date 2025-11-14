@@ -36,3 +36,4 @@ while engine.running:
         engine.error_handler.show_error(error)
         engine.running = False
         engine.display.close_windows()
+engine.savefile.save_data()

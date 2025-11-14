@@ -1,0 +1,11 @@
+{
+    "entries": {
+        "baseappeg":  "Lorem ipsum.."
+    },
+    "properties": {
+        "name":        "English",
+        "description": "It's the.. English language.... what the hell am i supposed to tell you?!",
+        "base":        null,
+        "subset":      null
+    }
+}

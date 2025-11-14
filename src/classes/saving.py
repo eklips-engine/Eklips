@@ -7,10 +7,9 @@ import classes.singleton as engine
 ## Savefile class
 class Savefile:
     def __init__(self):
-        self.data      = engine.Data
-        self.save_dir  = f"{os.path.expanduser('~')}/Eklips Engine/{self.data.game_name}" # Save file directory
-        self.savefpath = f"{self.save_dir}/save.json"                                     # Save file path
-        self.base_save = f"{self.data.data_directory}/base_save.json"                     # Empty save file path
+        self.save_dir  = f"{os.path.expanduser('~')}/Eklips Engine/{engine.game.name}" # Save file directory
+        self.savefpath = f"{self.save_dir}/save.json"                                  # Save file path
+        self.base_save = f"{engine.game.project_dir}/base_save.json"                   # Empty save file path
         self.savefile  = {}
         self.load_data()
     
@@ -25,9 +24,8 @@ class Savefile:
             os.makedirs(self.save_dir, exist_ok=True)
             with open(self.savefpath, "w") as f:
                 f.write(json.dumps(self.savefile))
-            engine.event.on_saved(True)
         except:
-            engine.event.on_saved(False)
+            pass
     
     def get(self, key, fallback=0):
         # Keypath (key/is/here) -> value (self.savefile['key']['is']['here'])

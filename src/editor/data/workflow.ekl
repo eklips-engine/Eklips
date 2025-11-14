@@ -9,8 +9,8 @@ def make_new_project(self):
 
 def select_project_file(self): return askopenfilename(
         filetypes = [
-            ("Eklips project file","game.json"),
-            ("Everything else..", "*.*")
+            (engine.lang.get("pe_pjfl"),"game.json"),
+            (engine.lang.get("pe_evfl"), "*.*")
         ],
         title     = "Eklips Engine"
     )
@@ -22,7 +22,7 @@ def _onready(self):
         except:
             pass
         win = engine.display.get_window()
-        win.set_caption("Eklips Engine - Project Editor")
+        win.set_caption(engine.lang.get("pe_title"))
 
 def _process(self, delta):
     if self.name  == "Panel":
@@ -55,7 +55,11 @@ def open_editor_settings(self):
 
     # Construct tabs
     tab1 = ttk.Frame()
-    tabs.add(tab1, text="General")
+    lcln = tk.StringVar(value="en")
+    tabs.add(tab1, text=engine.lang.get("pe_gnrl"))
+
+    ttk.Label(tab1, text=engine.lang.get("pe_lang")).place(x=5,y=5)
+    ttk.OptionMenu(tab1, lcln, None, *engine.cvars.get("languages", ["en"])).place(x=75,y=2)
     
     # Place tab
     tabs.place(x=0,y=0,relwidth=1,relheight=1)
