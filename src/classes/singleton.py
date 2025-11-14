@@ -63,9 +63,9 @@ def load_engine():
 
 def is_action_pressed(entry) -> bool:
     """Returns true if action `entry` is pressed. Might return False if the entry's settings have `holdable` disabled."""
-    action_entries = game.project_data.get("keys",{})
+    action_entries = game.project_data.get("actions",{})
     if entry in action_entries:
-        action_data = game.project_data["keys"][entry]
+        action_data = action_entries[entry]
         for action in action_data["actions"]:
             # Get action ID (pyglet.window.key.X, MOUSE_X)
             action_id     = action
