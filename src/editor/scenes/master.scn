@@ -90,7 +90,7 @@
             "path": "",
 
             "sprite": "res://media/iconew.png",
-            "text": "version_str",
+            "text":   "version_str",
             
             "transform": {
                 "position": [2,2],

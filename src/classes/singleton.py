@@ -89,6 +89,9 @@ def is_anything_pressed() -> bool:
         if keyboard.held[i]: return True
     return False
 
+def handle_closing():
+    savefile.save_data()
+
 # Variables
 display   : ui.Display          = None
 cvars     : cvar.CvarCollection = None

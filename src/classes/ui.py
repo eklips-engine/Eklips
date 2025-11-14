@@ -70,6 +70,8 @@ class Viewport:
         self._sprite   = pg.sprite.Sprite(self.color_buffer, x=0, y=0)
 
         self.sprites : list[pg.sprite.Sprite] = []
+        self.labels  : list[pg.text.Label]    = []
+        self.used_labels                      = []
         self.used_sprites                     = []
         self._base_img                        = engine.loader.load("root://_assets/error.png")
     
@@ -119,11 +121,22 @@ class Viewport:
         i      = len(self.sprites)
         self.sprites.append(sprite)
         return sprite, i
+    def _make_new_label(self, batch_id=MAIN_BATCH):
+        label = pg.text.Label(batch = self.batches[batch_id])
+        i     = len(self.labels)
+        self.labels.append(label)
+        return label, i
     def delete_sprite(self, sprite_id : int):
         if not sprite_id in self.sprites:
             return
         self.sprites[sprite_id].delete()
         self.sprites.pop(sprite_id)
+        gc.collect()
+    def delete_label(self, label_id : int):
+        if not label_id in self.labels:
+            return
+        self.labels[label_id].delete()
+        self.labels.pop(label_id)
         gc.collect()
     def _allocate_sprite(self, batch_id=MAIN_BATCH):
         i = 0
@@ -136,6 +149,17 @@ class Viewport:
         sprite, i = self._make_new_sprite(batch_id)
         self.used_sprites.append(i)
         return sprite, i
+    def _allocate_label(self, batch_id=MAIN_BATCH):
+        i = 0
+        for label in self.labels:
+            if not i in self.used_labels:
+                self.labels.append(i)
+                return label, i
+            i += 1
+        
+        label, i = self._make_new_label(batch_id)
+        self.labels.append(i)
+        return label, i
     
     def set_background(self, r=0,g=0,b=0, a=1):
         """
@@ -191,6 +215,7 @@ class Viewport:
         for batch in self.batches:
             batch.draw()
         self.used_sprites.clear()
+        self.used_labels.clear()
         self.framebuffer.unbind()
 
         # Window-only 2

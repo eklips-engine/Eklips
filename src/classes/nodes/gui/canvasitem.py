@@ -98,7 +98,7 @@ class CanvasItem(Node, Transform):
     def _remove_sprite(self):
         if not self.sprite:
             return
-        self._get_viewport().delete_sprite(self._sprite_id)
+        self.sprite.visible = False
     def _make_new_sprite(self):
         if self.sprite:
             self._remove_sprite()
