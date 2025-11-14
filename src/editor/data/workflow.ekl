@@ -4,10 +4,10 @@ from tkinter             import ttk
 from tkinter.messagebox  import *
 from tkinter.filedialog  import *
 
-def make_new_project(self):
+fun make_new_project(self):
     pass
 
-def select_project_file(self): return askopenfilename(
+fun select_project_file(self): return askopenfilename(
         filetypes = [
             (engine.lang.get("pe_pjfl"),"game.json"),
             (engine.lang.get("pe_evfl"), "*.*")
@@ -15,7 +15,7 @@ def select_project_file(self): return askopenfilename(
         title     = "Eklips Engine"
     )
 
-def _onready(self):
+fun _onready(self):
     if self.name == "Panel":
         try:
             engine.scene.get_node_from_path("TxtVer").text = f"v{engine.VERSION}"
@@ -24,29 +24,29 @@ def _onready(self):
         win = engine.display.get_window()
         win.set_caption(engine.lang.get("pe_title"))
 
-def _process(self, delta):
+fun _process(self, delta):
     if self.name  == "Panel":
         self.w = engine.display.get_window().width-20
         self.h = engine.display.get_window().height-94
     else:
         pass
 
-def load_project(self):
+fun load_project(self):
     pass
 
-def save_metadata(self):
+fun save_metadata(self):
     pass
 
-def play_project(self):
+fun play_project(self):
     pass
 
-def open_project_directory(self):
+fun open_project_directory(self):
     pass
 
-def close_project(self):
+fun close_project(self):
     pass
 
-def open_editor_settings(self):
+fun open_editor_settings(self):
     root = tk.Tk()
     root.title("Eklips Engine")
     root.geometry("320x320")

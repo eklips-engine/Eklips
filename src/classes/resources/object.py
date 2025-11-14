@@ -55,7 +55,7 @@ class Object:
         self._script : engine.resources.Script = engine.resources.Script()
 
         self._script.file_path   = path
-        self._script.source_code = src.replace("fn", "def")
+        self._script.source_code = src.replace("fun", "def")
         
         exec(self._script.source_code, self._script._namespace, self._script._namespace)
 
