@@ -24,7 +24,7 @@ class Script(Object):
     _function_queue  = []
 
     def __init__(self, properties=...):
-        self._namespace      = {"engine": engine}
+        self._namespace      = {"engine": engine, "null": None, "true": True, "false": False}
         self.source_code     = "# Empty.. Please initialize the Script in your Object."
         self._function_queue = []
         self.file_path       = None

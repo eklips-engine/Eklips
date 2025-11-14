@@ -23,24 +23,17 @@ class CvarCollection:
         if not "w" in self.cvars.get("permissions", {"data":"rw"})["data"]:
             print(f"Cannot write CVar {name} to CVar registry")
             return
-        old_default = self.cvars.get(name, {"default":default})["default"]
-        self.cvars[name] = {
-            "type": type(data).__name__,
-            "default": old_default,
-            "data": data,
+        old_default                     = self.cvars.get(name, {"default":default})["default"]
+        if not description: description = self.cvars.get(name, {"description":"nil"})["description"]
+        self.cvars[name]                = {
+            "type":        type(data).__name__,
+            "default":     old_default,
+            "data":        data,
             "description": description
         }
     
     def init_from(self, config):
-        """
-        Data: {
-            "??": {
-                "type": "bool",
-                "default": false,
-                "description": "??"
-            }
-        }
-        """
+        """Initialize CVars from a dictionary."""
         for entry in config:
             ent_data = config[entry]
             self.set(entry, ent_data["default"], ent_data["default"], ent_data.get("description", None))

@@ -43,7 +43,7 @@ class Object:
         try:
             src  = engine.loader.load(path, force_new_resource=True)
         except:
-            src  = None
+            src  = ""
             path = None
 
         if not path or not src:
@@ -55,7 +55,7 @@ class Object:
         self._script : engine.resources.Script = engine.resources.Script()
 
         self._script.file_path   = path
-        self._script.source_code = src
+        self._script.source_code = src.replace("fn", "def")
         
         exec(self._script.source_code, self._script._namespace, self._script._namespace)
 

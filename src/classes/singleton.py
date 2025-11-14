@@ -28,14 +28,14 @@ def load_engine():
     # Initialize display and windows
     display = ui.Display()
     display.add_window(
-        game.name, 
-        game.viewport_size, 
-        game.viewport_size, 
-        game.viewport_color,
-        loader.load(cvars.get("icon_file")),
-        game.winresizable,
-        game.winminsize,
-        game.winmaxsize
+        name           = game.name, 
+        size           = game.viewport_size, 
+        viewport_size  = game.viewport_size, 
+        viewport_color = game.viewport_color,
+        icon           = loader.load(cvars.get("icon_file")),
+        resizable      = game.winresizable,
+        maximum_size   = game.winminsize,
+        minimum_size   = game.winmaxsize
     )
 
     # Initialize garbage collection
