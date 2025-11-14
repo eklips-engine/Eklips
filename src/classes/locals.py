@@ -20,3 +20,8 @@ ZDE_FIX = 0.00000001
 
 ERROR_ICON = "_assets/error.png"
 EKL_ICON   = "_assets/icon.png"
+
+MOUSE_LEFT    = 1
+MOUSE_MIDDLE  = 2
+MOUSE_RIGHT   = 3
+MOUSE_BUTTONS = [MOUSE_LEFT, MOUSE_MIDDLE, MOUSE_RIGHT]

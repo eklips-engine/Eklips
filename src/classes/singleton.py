@@ -63,7 +63,22 @@ def load_engine():
 
 def is_action_pressed(entry) -> bool:
     """Returns true if action `entry` is pressed. Might return False if the entry's settings have `holdable` disabled."""
-    
+    action_entries = game.project_data.get("keys",{})
+    if entry in action_entries:
+        action_data = game.project_data["keys"][entry]
+        for action in action_data["actions"]:
+            # Get action ID (pyglet.window.key.X, MOUSE_X)
+            action_id     = action
+            
+            # See if action is not just mouse input and handle it
+            action_is_key = (not action in MOUSE_BUTTONS)
+            if action_is_key:
+                if (action_id in keyboard.held and action_data["holdable"]
+                    or 
+                    action_id in keyboard.pressed and not action_data["holdable"]):
+                    return True
+            else:
+                if mouse.buttons[action_id]: return True
     return False
 
 def is_anything_pressed() -> bool:

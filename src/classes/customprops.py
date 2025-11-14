@@ -186,9 +186,9 @@ class Transform:
         return transform_obj
 
 class Mouse:
-    pos  = [0,0]
-    dpos = [0,0]
-    clk  = [0,0,0]
+    pos      = [0,0]
+    dpos     = [0,0]
+    buttons  = [0,0,0]
 
 class Keyboard:
     modifiers = 0

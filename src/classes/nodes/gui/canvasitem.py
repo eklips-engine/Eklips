@@ -113,7 +113,7 @@ class CanvasItem(Node, Transform):
         super().update()
         if self.get_if_mouse_hovering():
             self.call_signal("_hover")
-            if engine.mouse.clk[0]:
+            if engine.mouse.buttons[engine.MOUSE_LEFT]:
                 self.call_signal("_clicked")
     
     def get_if_mouse_hovering(self) -> bool:

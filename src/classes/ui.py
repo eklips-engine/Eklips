@@ -39,12 +39,12 @@ class EklipsWindow(pg.window.Window):
         engine.mouse.dpos = [dx,dy]
     
     def on_mouse_press(self, x, y, button, modifiers):
-        engine.mouse.pos           = [x, y]
-        engine.mouse.clk[button-1] = True
+        engine.mouse.pos             = [x, y]
+        engine.mouse.buttons[button] = True
 
     def on_mouse_release(self, x, y, button, modifiers):
-        engine.mouse.pos           = [x, y]
-        engine.mouse.clk[button-1] = False
+        engine.mouse.pos             = [x, y]
+        engine.mouse.buttons[button] = False
     
     def on_key_press(self, symbol, modifiers):
         engine.keyboard.modifiers       = modifiers
