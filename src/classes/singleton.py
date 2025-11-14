@@ -63,10 +63,15 @@ def load_engine():
 
 def is_action_pressed(entry) -> bool:
     """Returns true if action `entry` is pressed. Might return False if the entry's settings have `holdable` disabled."""
+    
     return False
 
 def is_anything_pressed() -> bool:
     """Returns true if any key is pressed or held down."""
+    for i in keyboard.pressed:
+        if keyboard.pressed[i]: return True
+    for i in keyboard.held:
+        if keyboard.held[i]: return True
     return False
 
 # Variables
