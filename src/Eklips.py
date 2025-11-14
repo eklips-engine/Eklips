@@ -32,6 +32,7 @@ while engine.running:
         # Close if there is no Main Window
         if engine.display.main_window_id == None:
             engine.running = False
+        engine.keyboard.pressed.clear()
     except Exception as error:
         engine.error_handler.show_error(error)
         engine.running = False

@@ -10,11 +10,6 @@ from pyglet.gl           import *
 # Colors
 _r    = [0,0,0]
 _rs   = [1,1,1]
-red   = [255,0,0]
-green = [255,0,0]
-blue  = [0,0,255]
-black = [0,0,0]
-white = [255,255,255]
 def rainbow():
     global _rs
     _r[0] += 15.5  * _rs[0]
@@ -27,6 +22,12 @@ def rainbow():
     if _r[2] > 255 or _r[2] < 0:
         _rs[2] = -_rs[2]
     return _r
+
+red   = [255,0,0]
+green = [255,0,0]
+blue  = [0,0,255]
+black = [0,0,0]
+white = [255,255,255]
 
 # Classes
 class EklipsWindow(pg.window.Window):
