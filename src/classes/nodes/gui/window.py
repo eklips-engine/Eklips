@@ -38,7 +38,9 @@ class Window(CanvasItem):
     wid : int        = -1
 
     def __init__(self, properties=base_properties, parent=None):
-        self._window = None
+        self.wid          = f"{properties['name']};{properties['path']}"
+        self._window      = None
+        self._drawing_wid = None
         super().__init__(properties, parent)
         
     def popup(self):
@@ -46,14 +48,15 @@ class Window(CanvasItem):
         Create the window.
         """
         
-        self.wid           = engine.display.add_window(
+        engine.display.add_window(
             name           = self.title,
             size           = self.tsize,
             minimum_size   = self.tsize,
             maximum_size   = None,
             viewport_color = self.color,
             resizable      = self.get("resizable"),
-            icon           = engine.icon
+            icon           = engine.icon,
+            wid            = self.wid
         )
 
         self._window          = engine.display.get_window(self.wid)

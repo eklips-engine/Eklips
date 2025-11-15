@@ -1,13 +1,15 @@
 USE_GAME_PARENT = "UseFileParent"
 USE_GAME_CV_DIR = "UseFileCVar"
 
-BDATE        = [14, 11, 2025] # DMY
+BDATE        = [15, 11, 2025] # DMY
 MAJOR        = "4"           # Major [4].1 A 
 MINOR        = "1"           # Minor  4.[1]A 
 HOTFIX       = "A"           # Hotfix 4. 1[A]
 VERSION      = f"{MAJOR}.{MINOR}{HOTFIX}"
 VERSION_FULL = f"v{VERSION} ({BDATE[0]}/{BDATE[1]}/{BDATE[2]})"
 print(f"Eklips Engine {VERSION_FULL}")
+
+AUTOMATICALLY_CREATE = 212
 
 MAIN_WINDOW   = 0
 MAIN_BATCH    = 0

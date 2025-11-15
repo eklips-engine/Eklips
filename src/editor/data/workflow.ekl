@@ -69,19 +69,14 @@ def open_editor_settings(self):
     # The main window cannot be interacted with untill this window gets removed.
     if len(engine.display.windows) > 1:
         return
-    wid                 = engine.display.add_window(
-        engine.lang.get("pe_titlesetting"),
-        [320,320],
-        viewport_color = [35,35,50],
-        icon           = engine.icon,
-        maximum_size   = [320,320],
-        minimum_size   = [320,320],
-        resizable      = False
-    )
-    window              = engine.display.get_window(wid)
-    viewport : Viewport = engine.display.get_viewport_from_window(wid)
+    window       = engine.scene.get_node_from_path("SetWindow")
+    window.title = engine.lang.get("pe_titlesetting")
+    window.popup()
+    
+    btnok        = engine.scene.get_node_from_path("SetWindow/OkBtn")
+    btnclose     = engine.scene.get_node_from_path("SetWindow/NoBtn")
 
-    while engine.display.get_window(wid):
-        window.dispatch_events()
-        viewport.clear()
-        viewport.flip()
+    #btnok._drawing_wid    = window.wid
+    btnok.visible         = True
+    btnclose.visible      = True
+    #btnclose._drawing_wid = window.wid

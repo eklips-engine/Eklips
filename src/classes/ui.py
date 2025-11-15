@@ -32,6 +32,7 @@ white = [255,255,255]
 # Classes
 class EklipsWindow(pg.window.Window):
     def __init__(self, *args, **kwargs):
+        self.closed          = True
         super().__init__(*args, **kwargs)
         self.eklips_viewport = None
         self.closed          = False
@@ -244,7 +245,7 @@ class Viewport:
         glClearColor(*self._background)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        # Draw batches for this Window and unbind buffer
+        # Draw batches for this Viewport and unbind buffer
         for batch in self.batches:
             batch.draw()
         self.used_sprites.clear()
@@ -254,7 +255,8 @@ class Viewport:
         # Window-only 2
         if self.window:
             self.window.switch_to()
-            self._sprite.image = self.color_buffer
+            if self._sprite.image != self.color_buffer:
+                self._sprite.image = self.color_buffer
             self._sprite.draw()
     
     def provide_window(self, window, master=False):
@@ -296,6 +298,7 @@ class Display:
         resizable      : bool                   = True,
         minimum_size   : None | list[int]       = [648,648],
         maximum_size   : None | list[int]       = None,
+        wid            : int                    = AUTOMATICALLY_CREATE
     ) -> int:
         """
         Add a new Window, returns its Window ID.
@@ -308,8 +311,10 @@ class Display:
         .. resizable:: Allow the window to be resizable if True.
         .. minimum_size:: List of the minimum size the window can be, or None if you dont want a limit.
         .. maximum_size:: List of the maximum size the window can be, or None if you dont want a limit.
+        .. wid:: Create the window in a predetermined window ID if the argument is not AUTOMATICALLY_CREATE.
         """
-        wid = len(self.windows)
+        if wid == AUTOMATICALLY_CREATE:
+            wid = len(self.windows)
         print(f" ~ Initialize Window '{name}'")
 
         if viewport_size == VIEWPORT_EQUAL_WINDOW:
@@ -528,6 +533,8 @@ class Display:
             return
         if not (self.windows and self.windows.get(window_id, None)):
             return
+        if self.get_window(window_id).closed:
+            return
         
         windata             = self.windows[window_id]
         viewport : Viewport = windata["viewport"]
@@ -606,6 +613,8 @@ class Display:
             return 0,0
         if not (self.windows and self.windows.get(window_id, None)):
             return 0,0
+        if self.get_window(window_id).closed:
+            return
         
         windata             = self.windows[window_id]
         viewport : Viewport = windata["viewport"]

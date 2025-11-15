@@ -125,6 +125,66 @@
                 "visible":  true,
                 "skew":     0
             }
+        },
+        "settings_window": {
+            "type": "Window",
+            "name": "SetWindow",
+            "path": "",
+            
+            "title": "settings_window",
+            
+            "transform": {
+                "position": [0,0],
+                "tsize":    [300,300],
+                "scale":    [1,1],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "",
+                "visible":  true,
+                "skew":     0
+            }
+        },
+        "window_settings_ok": {
+            "type": "Sprite2D",
+            "name": "OkBtn",
+            "path": "SetWindow",
+            
+            "sprite": "res://media/icocorrect.png",
+            
+            "transform": {
+                "position": [50,50],
+                "tsize":    [0,0],
+                "scale":    [1,1],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "left",
+                "visible":  false,
+                "skew":     0
+            }
+        },
+        "window_settings_no": {
+            "type": "Sprite2D",
+            "name": "NoBtn",
+            "path": "SetWindow",
+            
+            "sprite": "res://media/icodelete.png",
+            
+            "transform": {
+                "position": [50,50],
+                "tsize":    [0,0],
+                "scale":    [1,1],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "right",
+                "visible":  false,
+                "skew":     0
+            }
         }
     },
     "properties": {
