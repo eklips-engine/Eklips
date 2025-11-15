@@ -24,18 +24,16 @@ def make_new_project_interface(self):
     # The main window cannot be interacted with untill this window gets removed.
     if len(engine.display.windows) > 1:
         return
-    wid = engine.scene.add_node({
-        "type": "Window",
-        "name": engine.lang.get("pe_titlenewprj"),
-        "path": ""
-    })
+    window       = engine.scene.get_node_from_path("AddWindow")
+    window.title = engine.lang.get("pe_titlenewprj")
+    window.popup()
 
 def select_project_file(self): return askopenfilename(
         filetypes = [
             (engine.lang.get("pe_pjfl"),"game.json"),
             (engine.lang.get("pe_evfl"), "*.*")
         ],
-        title     = "Eklips Engine"
+        title     = engine.lang.get("pe_titleselprj")
     )
 
 def _onready(self):

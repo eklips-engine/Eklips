@@ -105,6 +105,26 @@
                 "visible":  true,
                 "skew":     0
             }
+        },
+        "make_new_project_window": {
+            "type": "Window",
+            "name": "AddWindow",
+            "path": "",
+            
+            "title": "make_new_project_window",
+            
+            "transform": {
+                "position": [0,0],
+                "tsize":    [300,150],
+                "scale":    [1,1],
+                "scroll":   [0,0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "",
+                "visible":  true,
+                "skew":     0
+            }
         }
     },
     "properties": {

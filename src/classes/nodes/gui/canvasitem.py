@@ -37,13 +37,15 @@ class CanvasItem(Node, Transform):
         "transform": base_transform,
         "script":    None
     }
-    _sprite_id : int                          = 0
-    sprite     : pg.sprite.Sprite             = None
-    images     : list[pg.image.AbstractImage] = []
-    image      : pg.image.AbstractImage       = None
-    _canvas_layer                             = None
-    _ignore_size_if_drawing                   = False
-    is_layer                                  = False
+    _drawing_bid : int                          = 0
+    _drawing_wid : int                          = 0
+    _sprite_id   : int                          = 0
+    sprite       : pg.sprite.Sprite             = None
+    images       : list[pg.image.AbstractImage] = []
+    image        : pg.image.AbstractImage       = None
+    _canvas_layer                               = None
+    _ignore_size_if_drawing                     = False
+    is_layer                                    = False
 
     def _find_layer(self):
         while self.parent and not getattr(self.parent, "_is_layer", False):
@@ -52,12 +54,14 @@ class CanvasItem(Node, Transform):
 
     def __init__(self, properties=base_properties, parent=None):
         super().__init__(properties, parent)
+        if self.parent:
+            self._drawing_wid = self.parent._drawing_wid
+        else:
+            self._drawing_wid = MAIN_WINDOW
+        self._drawing_bid     = MAIN_BATCH
         self._find_layer()
 
-        self.batch_id  = MAIN_BATCH
-        self.window_id = MAIN_WINDOW
-
-        self.batch = engine.display.get_batch_from_window(self.window_id, self.batch_id)
+        self.batch = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_bid)
 
         engine.Transform.__init__(self)
         self._convert_transform_property_into_object(properties)
@@ -84,14 +88,14 @@ class CanvasItem(Node, Transform):
         return engine.display.blit(
             surface   = image,
             transform = self,
-            window_id = self.window_id,
+            window_id = self._drawing_wid,
             sprite    = self.sprite,
             group     = self._canvas_layer
         )
 
     def _get_viewport(self) -> ui.Viewport:
         viewport : ui.Viewport = engine.display.get_viewport_from_window(
-            self.window_id,
+            self._drawing_wid,
             MAIN_VIEWPORT
         )
         return viewport
@@ -103,7 +107,7 @@ class CanvasItem(Node, Transform):
         if self.sprite:
             self._remove_sprite()
         viewport = self._get_viewport()
-        self.sprite, self._sprite_id = viewport._allocate_sprite(self.batch_id)
+        self.sprite, self._sprite_id = viewport._allocate_sprite(self._drawing_bid)
     
     def _free(self):
         self._remove_sprite()
@@ -118,11 +122,11 @@ class CanvasItem(Node, Transform):
     
     def get_if_mouse_hovering(self) -> bool:
         """Returns true if the mouse is hovering over self."""
-        mpos   = engine.mouse.pos
-        window = engine.display.windows[self.window_id]["window"]
-        if not window:
+        mpos     = engine.mouse.pos
+        viewport = self._get_viewport()
+        if not viewport:
             return
-        x,y    = self.into_screen_coords(window.size)
+        x,y    = self.into_screen_coords(viewport.size)
         is_it  = (
             mpos[0] < x  + self.w and
             mpos[0] + 20 > x      and

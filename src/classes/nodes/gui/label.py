@@ -40,7 +40,7 @@ class Label(CanvasItem):
         return engine.display.blit_label(
             text      = self.text,
             transform = self,
-            window_id = self.window_id,
+            window_id = self._drawing_wid,
             label     = self.sprite,
             group     = self._canvas_layer
         )
@@ -53,4 +53,4 @@ class Label(CanvasItem):
         if self.sprite:
             self._remove_sprite()
         viewport = self._get_viewport()
-        self.sprite, self._sprite_id = viewport._allocate_label(self.batch_id)
+        self.sprite, self._sprite_id = viewport._allocate_label(self._drawing_bid)

@@ -38,15 +38,17 @@ class Window(CanvasItem):
     wid : int        = -1
 
     def __init__(self, properties=base_properties, parent=None):
+        self._window = None
         super().__init__(properties, parent)
         
+    def popup(self):
         # Create the window.
         self.wid           = engine.display.add_window(
-            name           = self.get("name"),
+            name           = self.title,
             size           = self.tsize,
             minimum_size   = self.tsize,
             maximum_size   = None,
-            viewport_color = self.get("color"),
+            viewport_color = self.color,
             resizable      = self.get("resizable"),
             icon           = engine.icon
         )
@@ -54,15 +56,41 @@ class Window(CanvasItem):
         self._window          = engine.display.get_window(self.wid)
         self._window.on_draw  = self.update
         self._window.on_close = self._free
+        self._drawing_wid     = self.wid
     
+    @property
+    def title(self): return self.get("title", DEFAULT_NAME)
+    @property
+    def color(self): return self.get("color", [0,0,0])
+    
+    @title.setter
+    def title(self, name):
+        self.set("title", name)
+        if self._window:
+            self._window.set_caption(name)
+    
+    @color.setter
+    def color(self, rgb):
+        self.set("color", rgb)
+        if self._window:
+            self._window.set_caption(rgb)
+
     def _free(self):
-        self._window.eklips_viewport.close()
-        engine.display.close_window(self.wid)
-        self._window.closed = True
+        if self._window:
+            self._window.eklips_viewport.close()
+            engine.display.close_window(self.wid)
+            self._window.closed = True
         super()._free()
+    
+    def _set_size(self,w,h):
+        rw, rh = round(w),round(h)
+        if self._window:
+            self._window.width  = rw
+            self._window.height = rh
     
     def update(self):
         super().update()
-        engine.display.clear_window(self.wid)
 
-        engine.display.flip_window(self.wid)
+        if self._window:
+            engine.display.clear_window(self.wid)
+            engine.display.flip_window(self.wid)
