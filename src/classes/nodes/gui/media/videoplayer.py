@@ -42,6 +42,7 @@ class VideoPlayer(CanvasItem):
     
     def update(self):
         super().update()
+        self.w, self.h = self._ogsize
         if self._video.active:
             self._video._update()
             self.draw(self._video.frame_surf)
@@ -54,7 +55,6 @@ class VideoPlayer(CanvasItem):
     
     def draw(self, image):
         if image:
-            self.w, self.h = self._ogsize
             self._draw(image)
     
     def _draw(self, image):
@@ -68,7 +68,8 @@ class VideoPlayer(CanvasItem):
         )
     
     def _set_size(self,w,h):
-        self._video.resize([round(w),round(h)])
+        size = [round(w),round(h)]
+        self._video.resize(size)
     
     @property
     def video(self) -> engine.pvd.VideoPyglet:

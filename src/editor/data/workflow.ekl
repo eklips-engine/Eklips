@@ -49,8 +49,7 @@ def _process(self, delta):
         self.w = engine.display.get_window().width  - 20
         self.h = engine.display.get_window().height - 83 - (engine.scene.get_node_from_path("TxtVer").sprite.content_height)
     if self.name  == "TxtVer":
-        if self.text == "t":
-            self.text = engine.VERSION_FULL
+        self.text = engine.VERSION_FULL
 
 def load_project(self):
     pass

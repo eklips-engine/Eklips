@@ -74,11 +74,14 @@ class Viewport:
             size     : list[int,int] = [640,480],
             position : list[int,int] = [0,0]
         ):
+        self.framebuffer           = None
         self.window : EklipsWindow = None
         self._closing              = False
         self.batches               = batches
-        self.width                 = size[0]
-        self.height                = size[1]
+        self._width                = size[0]
+        self._height               = size[1]
+
+        self._make_framebuffer()
 
         self._sprite   = pg.sprite.Sprite(self.color_buffer, x=position[0], y=position[1])
 
@@ -89,12 +92,22 @@ class Viewport:
         self._base_img                        = engine.loader.load("root://_assets/error.png")
     
     def _make_framebuffer(self):
-        self.color_buffer = pg.image.Texture.create(self.width,      self.height, min_filter=GL_NEAREST, mag_filter=GL_NEAREST)
+        self.color_buffer = pg.image.Texture.create(
+            self.width, self.height,
+            min_filter=GL_NEAREST, mag_filter=GL_NEAREST
+        )
         self.depth_buffer = pg.image.buffer.Renderbuffer(self.width, self.height, GL_DEPTH_COMPONENT)
 
         self.framebuffer = pg.image.Framebuffer()
         self.framebuffer.attach_texture(self.color_buffer, attachment=GL_COLOR_ATTACHMENT0)
         self.framebuffer.attach_renderbuffer(self.depth_buffer, attachment=GL_DEPTH_ATTACHMENT)
+    
+    def _resize_framebuffer(self):
+        self.color_buffer = pg.image.Texture.create(
+            self.width, self.height,
+            min_filter=GL_NEAREST, mag_filter=GL_NEAREST
+        )
+        self.framebuffer.attach_texture(self.color_buffer, attachment=GL_COLOR_ATTACHMENT0)
     
     @property
     def width(self): return self._width
@@ -113,7 +126,7 @@ class Viewport:
     def size(self, value):
         self._width = value[0]
         self._height = value[1]
-        self._make_framebuffer()
+        self._resize_framebuffer()
 
     @x.setter
     def x(self, value): self._sprite.x = value
@@ -123,11 +136,11 @@ class Viewport:
     @width.setter
     def width(self, value):
         self._width = value
-        self._make_framebuffer()
+        self._resize_framebuffer()
     @height.setter
     def height(self, value):
         self._height = value
-        self._make_framebuffer()
+        self._resize_framebuffer()
 
     def _make_new_sprite(self, batch_id=MAIN_BATCH):
         sprite         = pg.sprite.Sprite(self._base_img, batch = self.batches[batch_id])
