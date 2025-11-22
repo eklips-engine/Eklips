@@ -152,9 +152,8 @@ class MediaPlayer(CanvasItem):
         return engine.display.blit(
             surface        = image,
             transform      = self,
-            window_id      = self.window_id,
+            window_id      = self._drawing_wid,
             sprite         = self.sprite,
-            group          = self._canvas_layer,
             ignore_scaling = True
         )
     
