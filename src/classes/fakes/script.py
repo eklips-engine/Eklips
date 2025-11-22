@@ -1,9 +1,6 @@
+from classes.customprops import export
+
 class _ScriptDoc:
-    base_properties = {
-        "name":       "Script",
-        "path":        None,
-        "source_code": None
-    }
     _runnable        = True
     _script_path     = None
     _script          = None
@@ -16,22 +13,24 @@ class _ScriptDoc:
     _function_queue  = []
     @property
     def script(self): ...
-    @property
-    def script_path(self) -> str: ...
+    @export(None,"str","file_path/ekl")
+    def script_path(self) -> str:
+        pass
     
     @script.setter
     def script(self): ...
+    @script_path.setter
     def script_path(self, path : str): ...
-    def __init__(self, properties=base_properties): ...
+    def __init__(self): ...
     def get_class_name(self) -> str: 
         """Return the name of the Object. (e.g. Object, Node...)"""
     def _free(self): ...
     def free(self):
         """Free the object from memory."""
-    def get(self, property, fallback=None):
-        """Get the Object property `property`, if non-existent, return `fallback`."""
-    def set(self, property, value):
-        """Set the Object property `property` into `value`."""
+    def get(self, name, fallback=None):
+        """Get the Object property `name`, if non-existent, return `fallback`."""
+    def set(self, name, value):
+        """Set the Object property `name` into `value`."""
     def call(self, function, *args):
         """Call a function from the attached Script, if it exists."""
     def call_signal(self, signal_name, *args):

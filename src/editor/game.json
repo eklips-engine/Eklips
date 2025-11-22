@@ -5,10 +5,10 @@
         "ekl": "4.1A"
     },
     "viewport": {
-        "size":      [648,   648],
-        "color":     [35, 35, 50],
-        "minsize":   [648,   648],
-        "maxsize":   null,
+        "size":       [648,   648],
+        "color":      [35, 35, 50],
+        "minsize":    [648,   648],
+        "maxsize":    null,
         "resizable": true
     },
     "scenes": {

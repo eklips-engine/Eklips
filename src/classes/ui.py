@@ -1,5 +1,5 @@
 # Import libraries
-import pyglet as pg, gc, time
+import pyglet as pg, gc, time, pygame
 
 # Import components
 import classes.singleton as engine
@@ -39,7 +39,6 @@ class EklipsWindow(pg.window.Window):
     
     def on_close(self):
         self.eklips_viewport.close()
-        engine.display.close_window(self.wid)
         self.closed = True
     
     def on_mouse_motion(self, x, y, dx, dy):
@@ -64,17 +63,17 @@ class EklipsWindow(pg.window.Window):
         engine.keyboard.held[symbol] = False
 
 class Viewport:
-    _window_is_slave = False
-    _width           = 0
-    _height          = 0
-    _background      = [0,0,0,1]
-
     def __init__(
             self,
             batches  : dict          = {},
             size     : list[int,int] = [640,480],
             position : list[int,int] = [0,0]
         ):
+        self._width           = 0
+        self._height          = 0
+        self._background      = [0,0,0,1]
+        self._window_is_slave = False
+
         self.framebuffer           = None
         self.window : EklipsWindow = None
         self._closing              = False
@@ -111,36 +110,36 @@ class Viewport:
         self.framebuffer.attach_texture(self.color_buffer, attachment=GL_COLOR_ATTACHMENT0)
     
     @property
-    def width(self): return self._width
+    def width(self): return int(self._width)
     @property
-    def height(self): return self._height
+    def height(self): return int(self._height)
     
     @property
-    def x(self): return self._sprite.x
+    def x(self): return int(self._sprite.x)
     @property
-    def y(self): return self._sprite.y
+    def y(self): return int(self._sprite.y)
 
     @property
     def size(self): return [self.width,self.height]
 
     @size.setter
     def size(self, value):
-        self._width = value[0]
-        self._height = value[1]
+        self._width  = int(value[0])
+        self._height = int(value[1])
         self._resize_framebuffer()
 
     @x.setter
-    def x(self, value): self._sprite.x = value
+    def x(self, value): self._sprite.x = int(value)
     @y.setter
-    def y(self, value): self._sprite.y = value
+    def y(self, value): self._sprite.y = int(value)
     
     @width.setter
     def width(self, value):
-        self._width = value
+        self._width = int(value)
         self._resize_framebuffer()
     @height.setter
     def height(self, value):
-        self._height = value
+        self._height = int(value)
         self._resize_framebuffer()
 
     def _make_new_sprite(self, batch_id=MAIN_BATCH):
@@ -233,9 +232,9 @@ class Viewport:
         if self.window and self._window_is_slave:
             self.window.switch_to()
             self.window.clear()
-            if self.color_buffer.width != self.window.width:
+            if self.width != self.window.width:
                 self.width = self.window.width
-            if self.color_buffer.height != self.window.height:
+            if self.height != self.window.height:
                 self.height = self.window.height
         
         # Bind buffer
@@ -264,7 +263,7 @@ class Viewport:
         Provide the window `window` to the Viewport to draw to.
 
         .. window:: Window object (engine.ui.EklipsWindow).
-        .. master:: If the viewport is the master.
+        .. master:: If the viewport is the master. Defaults to False.
         """
         self.window           = window
         self._window_is_slave = master
@@ -276,6 +275,7 @@ class Viewport:
         self._closing = True
         if self.window and self._window_is_slave:
             self.window.close()
+            engine.display._close_window(self.window.wid)
         self.window = None
         self.framebuffer.delete()
         self.color_buffer.delete()
@@ -289,6 +289,10 @@ class Display:
     latest_window           = None
     _fontsizecache          = {}
 
+    def get_size(self):
+        """Returns the size of the screen in pixels."""
+        return pygame.display.get_desktop_sizes()[0]
+
     def add_window(self,
         name           : str                    = DEFAULT_NAME,
         size           : list[int]              = [640,480],
@@ -298,7 +302,8 @@ class Display:
         resizable      : bool                   = True,
         minimum_size   : None | list[int]       = [648,648],
         maximum_size   : None | list[int]       = None,
-        wid            : int                    = AUTOMATICALLY_CREATE
+        wid            : int                    = AUTOMATICALLY_CREATE,
+        visible        : bool                   = True
     ) -> int:
         """
         Add a new Window, returns its Window ID.
@@ -312,9 +317,21 @@ class Display:
         .. minimum_size:: List of the minimum size the window can be, or None if you dont want a limit.
         .. maximum_size:: List of the maximum size the window can be, or None if you dont want a limit.
         .. wid:: Create the window in a predetermined window ID if the argument is not AUTOMATICALLY_CREATE.
+        .. visible:: Make the window visible if True. Defaults to True.
         """
+
+        # I don't know why, but making a new window makes
+        # the other window's rendering assume the same
+        # size. So check for other windows and pinch them.
+        for hwid in self.windows:
+            viewport        = self.get_viewport_from_window(hwid)
+            viewport.width += 1
+            viewport.width -= 1
+
+        # Fix properties
         if wid == AUTOMATICALLY_CREATE:
             wid = len(self.windows)
+
         print(f" ~ Initialize Window '{name}'")
 
         if viewport_size == VIEWPORT_EQUAL_WINDOW:
@@ -322,22 +339,34 @@ class Display:
         if self.main_window_id == None:
             self.main_window_id = wid
         
+        # Create Window
         window   = EklipsWindow(
             width     = size[0],
             height    = size[1],
             caption   = name,
-            resizable = resizable
+            resizable = resizable,
+            visible   = False
         )
+
+        # Set Window properties
         if minimum_size:
             window.set_minimum_size(*minimum_size)
         if maximum_size:
             window.set_maximum_size(*maximum_size)
         if icon:
             window.set_icon(icon)
+        
+        # Create Viewport
         viewport = Viewport({}, viewport_size, [0,0])
         viewport.set_background(*viewport_color)
         viewport.provide_window(window, master=True)
 
+        # Set Window's viewport to the one we just made
+        window.eklips_viewport = viewport
+        window.wid             = wid
+        if visible: window.set_visible()
+
+        # Make the Window entry
         self.windows[wid] = {
             "name": name,
 
@@ -347,12 +376,10 @@ class Display:
             "batches":    [],
             "main_batch": None
         }
+        
+        # Create a batch and update the Viewport to match
         self.add_batch(wid)
         viewport.batches = self.windows[wid]["batches"]
-
-        self.latest_window     = wid
-        window.eklips_viewport = viewport
-        window.wid             = wid
 
         return wid
     
@@ -362,6 +389,9 @@ class Display:
 
         .. wid:: ID of Window. Defaults to MAIN_WINDOW.
         """
+        if not (self.windows and self.windows.get(wid, None)):
+            return
+        
         window_data           = self.windows[wid]
         if window_data.get("viewport",None):
             window_data["viewport"].clear()
@@ -371,7 +401,7 @@ class Display:
         Clear all windows and their viewports.
         """
         self._delete_in_queue()
-        for wid in self.windows:
+        for wid in self.windows.copy():
             self.clear_window(wid)
         
     def flip_window(self, wid : int = MAIN_WINDOW):
@@ -380,6 +410,9 @@ class Display:
 
         .. wid:: ID of Window. Defaults to MAIN_WINDOW.
         """
+        if not (self.windows and self.windows.get(wid, None)):
+            return
+        
         window_data           = self.windows[wid]
         if window_data.get("viewport",None):
             window_data["viewport"].flip()
@@ -387,7 +420,6 @@ class Display:
     def _delete_in_queue(self):
         for wid in self._marked_for_disassembly:
             self._close_window(wid)
-            self.windows.pop(wid)
         self._marked_for_disassembly.clear()
     
     def flip_windows(self):
@@ -395,7 +427,7 @@ class Display:
         Flip all windows and their viewports.
         """
         self._delete_in_queue()
-        for wid in self.windows:
+        for wid in self.windows.copy():
             self.flip_window(wid)
         self._delete_in_queue()
     
@@ -413,6 +445,9 @@ class Display:
 
         .. wid:: ID of Window.
         """
+        if not (self.windows and self.windows.get(wid, None)):
+            return
+        
         window_data = self.windows[wid]
         try:
             window_data["window"].close()
@@ -423,13 +458,10 @@ class Display:
         window_data["viewport"]   = None
         window_data["batches"]    = None
         window_data["main_batch"] = None
-        
-        window_data = None
-        del window_data
 
         if wid == self.main_window_id:
             self.main_window_id = None
-        
+        self.windows.pop(wid)
         gc.collect()
     
     def close_windows(self, forced : bool = False):
@@ -438,7 +470,7 @@ class Display:
 
         .. forced:: If true, close the window immediately. This may cause issues.
         """
-        for wid in self.windows:
+        for wid in self.windows.copy():
             if forced:
                 self._close_window(wid)
             else:
@@ -450,6 +482,9 @@ class Display:
 
         .. wid:: ID of Window. Defaults to MAIN_WINDOW.
         """
+        if not (self.windows and self.windows.get(wid, None)):
+            return
+        
         window_data                   = self.windows[MAIN_WINDOW]
         window : pg.window.BaseWindow = window_data["window"]
         if window:
@@ -462,15 +497,15 @@ class Display:
 
         .. wid:: ID of Window. Defaults to MAIN_WINDOW.
         """
+        if not (self.windows and self.windows.get(wid, None)):
+            return
+        
         window_data = self.windows[wid]
-
-        bid = len(window_data["batches"])
+        bid         = len(window_data["batches"])
         if window_data["main_batch"] == None:
             window_data["main_batch"] = bid
-        
         window_data["batches"].append(pg.graphics.Batch())
-
-        self.windows[wid] = window_data
+        self.windows[wid]["batches"] = window_data["batches"]
         return bid
 
     def get_window(self, wid : int = MAIN_WINDOW) -> EklipsWindow:
@@ -488,7 +523,7 @@ class Display:
         .. wid:: ID of Window. Defaults to MAIN_WINDOW.
         .. vid:: ID of Viewport (Unused since Windows can't have multiple viewports for now)
         """
-        return self.windows[wid]["viewport"]
+        return self.windows.get(wid, {"viewport": None})["viewport"]
 
     def get_batch_from_window(self, wid : int = MAIN_WINDOW, bid : int = MAIN_BATCH) -> pg.graphics.Batch:
         """
@@ -497,7 +532,7 @@ class Display:
         .. wid:: ID of Window. Defaults to MAIN_WINDOW.
         .. bid:: ID of Batch. Defaults to MAIN_BATCH.
         """
-        return self.windows[wid]["batches"][bid]
+        return self.windows.get(wid, {"batches": {bid: None}})["batches"][bid]
     
     def blit(
         self,
@@ -614,7 +649,7 @@ class Display:
         if not (self.windows and self.windows.get(window_id, None)):
             return 0,0
         if self.get_window(window_id).closed:
-            return
+            return 0,0
         
         windata             = self.windows[window_id]
         viewport : Viewport = windata["viewport"]

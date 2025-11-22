@@ -23,63 +23,72 @@ class Window(CanvasItem):
     This Node will create a new Window with its own viewport. You can
     get this window by using `engine.display.get_window(wid)` or by 
     using `window._window`.
-    
-    As soon as the Window is made, the other windows are frozen and
-    cannot be used untill this Window is closed.
     """
     _can_check_layer = False
-    base_properties  = {
-        "name":      "Window",
-        "transform": window_transform,
-        "color":     [35,35,50],
-        "resizable": True,
-        "script":    None
-    }
-    wid : int        = -1
 
-    def __init__(self, properties=base_properties, parent=None):
-        self.wid          = f"{properties['name']};{properties['path']}"
+    def __init__(self, properties={}, parent=None, children=None):
         self._window      = None
+        self._color       = [0,0,0]
+        self._autopopup   = False
         self._drawing_wid = None
-        super().__init__(properties, parent)
+        self._title       = None
+        self._resizable   = False
+        super().__init__(properties, parent, children)
+        
+    def _setup_properties(self):
+        super()._setup_properties()
+        
+        if self.auto_popup:
+            self.popup()
+    
+    def _make_window(self):
+        self.wid = engine.display.add_window(
+            name              = " ",
+            size              = [5,5],
+            minimum_size      = [5,5],
+            maximum_size      = None,
+            viewport_color    = self.color,
+            resizable         = self.resizable,
+            icon              = engine.icon,
+            wid               = AUTOMATICALLY_CREATE,
+            visible           = False
+        )
+        self._window          = engine.display.get_window(self.wid)
+        self._window.on_close = self._free
+        self._drawing_wid     = self.wid
         
     def popup(self):
         """
-        Create the window.
+        Make the window.
         """
-        
-        engine.display.add_window(
-            name           = self.title,
-            size           = self.tsize,
-            minimum_size   = self.tsize,
-            maximum_size   = None,
-            viewport_color = self.color,
-            resizable      = self.get("resizable"),
-            icon           = engine.icon,
-            wid            = self.wid
-        )
-
-        self._window          = engine.display.get_window(self.wid)
-        self._window.on_draw  = self.update
-        self._window.on_close = self._free
-        self._drawing_wid     = self.wid
+        if not self._window:
+            self._make_window()
+        self._window.set_size(self.w, self.h)
+        self._window.set_caption(self.title)
+        self._window.set_visible()
     
-    @property
-    def title(self): return self.get("title", DEFAULT_NAME)
-    @property
-    def color(self): return self.get("color", [0,0,0])
+    @export(False,"bool","bool")
+    def auto_popup(self): return self._autopopup
+    @export(True,"bool","bool")
+    def resizable(self): return self._resizable
+    @export(DEFAULT_NAME,"str","str")
+    def title(self): return self._title
+    @export([0,0,0],"list","color")
+    def color(self): return self._color
     
+    @auto_popup.setter
+    def auto_popup(self, value): self._autopopup = value
     @title.setter
     def title(self, name):
-        self.set("title", name)
+        self._title = name
         if self._window:
             self._window.set_caption(name)
     
     @color.setter
     def color(self, rgb):
-        self.set("color", rgb)
+        self._color = rgb
         if self._window:
-            self._window.set_caption(rgb)
+            self._window.eklips_viewport.set_background(*rgb)
 
     def _free(self):
         if self._window:

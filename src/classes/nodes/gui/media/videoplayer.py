@@ -16,28 +16,22 @@ class VideoPlayer(CanvasItem):
     This is a Node that can play video and display it on the screen.
     For playing Audio, see AudioPlayer.
     """
-    base_properties  = {
-        "name":       "VideoPlauer",
-        "transform":  base_transform,
-        "media":      "root://_assets/error.mp4",
-        "loops":      0,
-        "volume":     0.5,
-        "script":     None,
-        "auto_start": False,
-    }
-    _playcounter : int                    = 0
-    _playing     : bool                   = False
-    _video       : engine.pvd.VideoPyglet = None
-    _media       : str                    = ""
-    _ogsize      : list[int]              = [100,100]
-    _tmpfilepath : str                    = None
     _ignore_size_if_drawing               = True
     
-    def __init__(self, properties=base_properties, parent=None):
-        self.media = properties["media"]
-        super().__init__(properties, parent)
+    def __init__(self, properties={}, parent=None, children=None):
+        self._media       : str                    = ""
+        self._volume      : float | int            = 0
+        self._playcounter : int                    = 0
+        self._playing     : bool                   = False
+        self._video       : engine.pvd.VideoPyglet = None
+        self._media       : str                    = ""
+        self._ogsize      : list[int]              = [100,100]
+        self._tmpfilepath : str                    = None
+        self._loops       : int                    = 0
+
+        super().__init__(properties, parent, children)
         self._make_new_sprite()
-        if properties["auto_start"]:
+        if self.get("auto_start"):
             self.play()
     
     def update(self):
@@ -71,6 +65,11 @@ class VideoPlayer(CanvasItem):
         size = [round(w),round(h)]
         self._video.resize(size)
     
+    @export(0,    "int",   "int")
+    def loops(self) -> int: return self._loops
+    @loops.setter
+    def loops(self, value): self._loops = value
+    
     @property
     def video(self) -> engine.pvd.VideoPyglet:
         """Video object. Read-only."""
@@ -78,7 +77,7 @@ class VideoPlayer(CanvasItem):
     @video.setter
     def video(self,_): raise VideoError("Please replace the video using `self.media` instead.")
     
-    @property
+    @export(None, "str",   "file_path/vid")
     def media(self) -> str:
         """Filepath of video. Read-write."""
         return self._media
@@ -95,7 +94,6 @@ class VideoPlayer(CanvasItem):
         """
         self._playing     = True
         self._playcounter = 0
-        self.volume       = None
         self._video.play()
     
     def restart(self):
@@ -123,15 +121,6 @@ class VideoPlayer(CanvasItem):
         """
         self._video.resume()
     
-    def set_volume(self, volume=None):
-        """
-        Set the Video volume. Set volume to None to use Node's properties.
-        """
-        if volume != None:
-            self._video.set_volume(volume)
-            return
-        self._video.set_volume(self.get("volume", 0.5))
-    
     @property
     def busy(self):
         """
@@ -139,7 +128,9 @@ class VideoPlayer(CanvasItem):
         """
         return self._video.active
 
-    @property
-    def volume(self) -> int:                      return self._video.volume
+    @export(1.0, "float", "float")
+    def volume(self) -> int:                      return self._volume
     @volume.setter
-    def volume(self, value : int | float | None): self.set_volume(value)
+    def volume(self, value : int | float | None):
+        self._volume = value
+        self._video.set_volume(value)

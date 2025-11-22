@@ -2,6 +2,7 @@
 from classes.resources.object import *
 from anytree import NodeMixin
 import types
+from typing import Any
 
 # Classes
 class Node(Object, NodeMixin):
@@ -18,24 +19,38 @@ class Node(Object, NodeMixin):
 
     There is nothing to do with this Node. The only useful thing to do with it is run a script with it, and no more.
     """
-    base_properties = {
-        "name":   "Node",
-        "type":   "Node",
-        "path":   "",
-        "script": None
-    }
 
-    def __init__(self, properties=base_properties, parent=None):
+    def __init__(
+            self,
+            properties : dict                   = {}, 
+            parent     : NodeMixin       | None = None,
+            children   : list[NodeMixin] | None = None
+        ):
         super().__init__(properties)
-        self.parent = parent
-        if self._can_init_script:
-            self.script_path = self.properties["script"]
-        
+
+        # Set up family tree
+        # self.parent = parent
+        if children:
+            self.children = children
+    
+    # Update code
     def update(self):
+        # Check if i have to be freed
         if not self._runnable:
             self._free()
             return
+
+        # Run process function
         self._process()
+    
+    # Memory related
+    def _free(self):
+        # Free children
+        for child in self.children:
+            child._free()
+        
+        # Free self
+        super()._free()
     
     def free(self):
         """Free the object from memory."""

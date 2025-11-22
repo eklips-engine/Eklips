@@ -14,19 +14,13 @@ class ColorRect(CanvasItem):
     """
     _can_check_layer = True
     _color           = [0,0,0]
-    base_properties  = {
-        "name":      "ColorRect",
-        "transform": base_transform,
-        "color":     [0,0,0],
-        "script":    None
-    }
 
-    def __init__(self, properties=base_properties, parent=None):
-        super().__init__(properties, parent)
+    def __init__(self, properties={}, parent=None, children=None):
+        super().__init__(properties, parent, children)
         self.color = self.get("color", [0,0,0])
         self._make_new_sprite()
     
-    @property
+    @export([0,0,0],"list","color")
     def color(self) -> list[int]:
         """RGB color of the ColorRect."""
         return self._color

@@ -32,51 +32,37 @@ class CanvasItem(Node, Transform):
     (NOTE: The reason why `tsize` is called that because anytree's NodeMixin uses a size property..)
     """
     _can_check_layer = True
-    base_properties  = {
-        "name":      "CanvasItem",
-        "transform": base_transform,
-        "script":    None
-    }
     _drawing_bid : int                          = 0
     _drawing_wid : int                          = 0
     _sprite_id   : int                          = 0
     sprite       : pg.sprite.Sprite             = None
     images       : list[pg.image.AbstractImage] = []
     image        : pg.image.AbstractImage       = None
-    _canvas_layer                               = None
     _ignore_size_if_drawing                     = False
-    is_layer                                    = False
 
-    def _find_layer(self):
-        while self.parent and not getattr(self.parent, "_is_layer", False):
-            self.parent = getattr(self.parent, "parent", None)
-        return self.parent
-
-    def __init__(self, properties=base_properties, parent=None):
-        super().__init__(properties, parent)
+    def __init__(self, properties={}, parent=None, children=None):
+        engine.Transform.__init__(self)
+        super().__init__(properties, parent, children)
         if self.parent:
             self._drawing_wid = self.parent._drawing_wid
         else:
             self._drawing_wid = MAIN_WINDOW
         self._drawing_bid     = MAIN_BATCH
-        self._find_layer()
 
         self.batch = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_bid)
 
-        engine.Transform.__init__(self)
-        self._convert_transform_property_into_object(properties)
+        self._convert_transform_property_into_object(properties.get("transform", base_transform))
     
-    def _convert_transform_property_into_object(self, properties):
-        transform_property = properties.get("transform", base_transform)
-        self.pos           = transform_property["position"]
-        self.scale         = transform_property["scale"]
-        self.alpha         = transform_property["alpha"]
-        self.skew          = transform_property["skew"]
-        self.rotation      = transform_property["rotation"]
-        self.anchor        = transform_property["anchor"]
-        self.scroll        = transform_property["scroll"]
-        self.visible       = transform_property["visible"]
-        self.tsize         = transform_property["tsize"]
+    def _convert_transform_property_into_object(self, value):
+        self.position = value["position"]
+        self.scale    = value["scale"]
+        self.alpha    = value["alpha"]
+        self.skew     = value["skew"]
+        self.rotation = value["rotation"]
+        self.anchor   = value["anchor"]
+        self.scroll   = value["scroll"]
+        self.visible  = value["visible"]
+        self.tsize    = value["tsize"]
     
     def draw(self, image):
         """Draw the Node's image. This is usually called automatically."""
@@ -89,8 +75,7 @@ class CanvasItem(Node, Transform):
             surface   = image,
             transform = self,
             window_id = self._drawing_wid,
-            sprite    = self.sprite,
-            group     = self._canvas_layer
+            sprite    = self.sprite
         )
 
     def _get_viewport(self) -> ui.Viewport:
@@ -106,7 +91,7 @@ class CanvasItem(Node, Transform):
     def _make_new_sprite(self):
         if self.sprite:
             self._remove_sprite()
-        viewport = self._get_viewport()
+        viewport                     = self._get_viewport()
         self.sprite, self._sprite_id = viewport._allocate_sprite(self._drawing_bid)
     
     def _free(self):

@@ -16,28 +16,26 @@ class AudioPlayer(Node):
     This is a Node that can play audio globally.
     For playing Video, see VideoPlayer.
     """
-    base_properties = {
-        "name":       "AudioPlayer",
-        "media":      "root://_assets/error.mp3",
-        "loops":      0,
-        "volume":     0.5,
-        "script":     None,
-        "auto_start": False,
-    }
-    sound   : Sound   = None
-    channel : Channel = None
-    _media  : str     = ""
-    
-    def __init__(self, properties=base_properties, parent=None):
-        super().__init__(properties, parent)
-        self._media   = properties["media"]
+    def __init__(self, properties={}, parent=None, children=None):
+        self._media  : str         = ""
+        self._volume : float | int = 0
+        self._sound  : Sound       = None
+        self.channel : Channel     = None
+        self._loops  : int         = 0
+
+        super().__init__(properties, parent, children)
         self._sound   = engine.loader.load(self._media)
         self.sound_id = engine.sid
         engine.sid   += 1
         self.channel  = Channel(self.sound_id)
-        if properties["auto_start"]:
+        if self.get("auto_start"):
             self.play()
     
+    @export(0,    "int",   "int")
+    def loops(self) -> int: return self._loops
+    @loops.setter
+    def loops(self, value): self._loops = value
+
     @property
     def sound(self) -> Sound:
         """Sound object. Read-only."""
@@ -45,7 +43,7 @@ class AudioPlayer(Node):
     @sound.setter
     def sound(self,_): raise AudioError("Please replace the audio using `self.media` instead")
     
-    @property
+    @export(None, "str",   "file_path/sfx")
     def media(self) -> str:
         """Filepath of sound. Read-write."""
         return self._media
@@ -58,8 +56,7 @@ class AudioPlayer(Node):
         """
         Play the Sound using the Node's properties.
         """
-        self.volume = None
-        self.channel.play(self.sound, self.get("loops",0))
+        self.channel.play(self._sound, self.loops)
     
     def stop(self):
         """
@@ -79,15 +76,6 @@ class AudioPlayer(Node):
         """
         self.channel.unpause()
     
-    def set_volume(self, volume=None):
-        """
-        Set the Sound volume. Set volume to None to use Node's properties.
-        """
-        if volume != None:
-            self.channel.set_volume(volume)
-            return
-        self.channel.set_volume(self.get("volume", 0.5))
-    
     @property
     def busy(self) -> bool:
         """
@@ -95,7 +83,9 @@ class AudioPlayer(Node):
         """
         return self.channel.get_busy()
 
-    @property
-    def volume(self) -> int:                      return self.channel.get_volume()
+    @export(1.0, "float", "float")
+    def volume(self) -> int:                      return self._volume
     @volume.setter
-    def volume(self, value : int | float | None): self.set_volume(value)
+    def volume(self, value : int | float | None):
+        self._volume = value
+        self.channel.set_volume(value)

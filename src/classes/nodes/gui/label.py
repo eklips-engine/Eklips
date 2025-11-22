@@ -13,19 +13,14 @@ class Label(CanvasItem):
     """
     _can_check_layer       = True
     sprite : pg.text.Label = None
-    base_properties        = {
-        "name":      "Label",
-        "transform": base_transform,
-        "script":    None
-    }
 
-    @property
+    @export("Label","str","str")
     def text(self) -> str: return self.sprite.text
     @text.setter
     def text(self, value): self.sprite.text = value
 
-    def __init__(self, properties=base_properties, parent=None):
-        super().__init__(properties, parent)
+    def __init__(self, properties={}, parent=None, children=None):
+        super().__init__(properties, parent, children)
         self._make_new_sprite()
     
     def update(self):
@@ -41,8 +36,7 @@ class Label(CanvasItem):
             text      = self.text,
             transform = self,
             window_id = self._drawing_wid,
-            label     = self.sprite,
-            group     = self._canvas_layer
+            label     = self.sprite
         )
     
     def _remove_sprite(self):

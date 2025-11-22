@@ -1,9 +1,8 @@
-# Import inherited
-from classes.resources.object import *
-import types
+# Import singleton
+import classes.singleton as engine
 
 # Classes
-class Script(Object):
+class Script:
     """
     This class handles Python Script files.
     
@@ -12,18 +11,13 @@ class Script(Object):
 
     Instead, set your Object's `script_path` property to the path of the Script.
     """
-    base_properties = {
-        "name":        "Script",
-        "path":        None,
-        "source_code": None
-    }
     file_path        = None
     source_code      = "# Empty.. Please initialize the Script in your Object."
     _can_init_script = False
     _namespace       = {}
     _function_queue  = []
 
-    def __init__(self, properties=...):
+    def __init__(self):
         self._namespace      = {"engine": engine, "null": None, "true": True, "false": False}
         self.source_code     = "# Empty.. Please initialize the Script in your Object."
         self._function_queue = []

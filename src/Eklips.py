@@ -15,6 +15,7 @@ main_window    = engine.display.get_window()
 @main_window.event
 def on_close():
     engine.running = False
+    engine.scene.empty()
     engine.display.close_windows(forced=True)
     engine.handle_closing()
 
@@ -35,7 +36,8 @@ def on_draw():
         engine.scene.update()
         
         # Flip window
-        engine.display.flip_window()
+        if len(engine.display.windows) == 1:
+            engine.display.flip_window()
 
         # Clear the list of pressed keys
         engine.keyboard.pressed.clear()

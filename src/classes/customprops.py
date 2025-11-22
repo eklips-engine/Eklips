@@ -1,11 +1,86 @@
 # Import libraries & components
-import json, pyglet as pg
-from classes.locals import *
+import json, pyglet    as pg
+from classes.locals    import *
+from typing_extensions import *
+from typing            import *
 
 # Variables
 _screenc_cache = {}
 
 # Classes
+@disjoint_base
+class _export:
+    def __init__(self, type_=None, default=None, hint=None, fget=None, fset=None):
+        self.type    = type_
+        self.default = default
+        self.hint    = hint
+        self.fget    = fget
+        self.fset    = fset
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        if self.fget:
+            return self.fget(instance)
+        return instance.__dict__.get(self.name, self.default)
+
+    def __set__(self, instance, value):
+        if self.fset:
+            return self.fset(instance, value)
+        instance.__dict__[self.name] = value
+
+    def getter(self, fget):
+        self.fget = fget
+        return self
+
+    def setter(self, fset):
+        self.fset = fset
+        return self
+
+def export(default=None, type_=None, hint=None):
+    """
+    Use this class to expose a value as a property in the editor. This class is similar to the `property` class in Python.
+    
+    .. default:: The default value to use.
+    .. type:: The type that the value should be (int, str...)
+    .. hint:: How to display this property in the editor (int, str, file_path, color, slider, etc..)
+    """
+    def wrapper(func):
+        return _export(
+            fget    = func,
+            default = default,
+            type_   = type_,
+            hint    = hint,
+        )
+    return wrapper
+
+class _exportmeta(type):
+    def __new__(mcs, name, bases, namespace):
+        cls = super().__new__(mcs, name, bases, namespace)
+
+        # Start with parent's properties
+        props = {}
+        for base in reversed(bases):
+            if hasattr(base, "_properties"):
+                props.update(base._properties)
+
+        # Add properties in this class
+        for key, value in namespace.items():
+            if isinstance(value, _export):
+                props[key] = {
+                    "default": value.default,
+                    "type": value.type,
+                    "hint": value.hint,
+                    "getter": value.fget,
+                    "setter": value.fset
+                }
+
+        cls._properties = props
+        return cls
+
 class GameData:
     def __init__(self, settings="settings.json"):
         self.file_data    = json.loads(open(settings).read())
@@ -31,8 +106,6 @@ class GameData:
         self.loading_scene  = self.project_data["scenes"]["loading"]
 
 class Transform:
-    sprite = None
-
     def __init__(self):
         self._x = 0
         self._y = 0
@@ -75,7 +148,7 @@ class Transform:
     @property
     def rect(self): return [self.x,self.y,self.w,self.h]
     @property
-    def pos(self):  return [self.x,self.y]
+    def position(self):  return [self.x,self.y]
     @property
     def tsize(self):  return [self.w,self.h]
 
@@ -135,8 +208,8 @@ class Transform:
     @rect.setter
     def rect(self, value : list[int,int,int,int]):
         self.x,self.y,self.w,self.h = value
-    @pos.setter
-    def pos(self, value : list[int,int]): self.x,self.y = value
+    @position.setter
+    def position(self, value : list[int,int]): self.x,self.y = value
     @tsize.setter
     def tsize(self, value : list[int,int]): self.w,self.h = value
 
@@ -146,7 +219,7 @@ class Transform:
     ## Functions
     def into_screen_coords(self, window_size : list[int,int] = [480,480]):
         anchor = self.anchor
-        cid    = f"{self.pos}{window_size}{self.w};{self.h}{anchor}"
+        cid    = f"{self.position}{window_size}{self.w};{self.h}{anchor}"
         if cid in _screenc_cache:
             return _screenc_cache[cid]
         x        = 0
@@ -169,7 +242,7 @@ class Transform:
     def get_quarter_size(self):
         return [self.w/4,self.h/4]
     
-    def new(pos : pos, surface = None, scale = [1,1], opacity = 255, layer = 0, rotation = 0, anchor = "", scroll = [0,0], visible = True, skew = 0):
+    def new(pos : position, surface = None, scale = [1,1], opacity = 255, layer = 0, rotation = 0, anchor = "", scroll = [0,0], visible = True, skew = 0):
         transform_obj          = Transform()
         transform_obj.pos      = pos
         if surface:

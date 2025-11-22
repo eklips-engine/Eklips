@@ -1,189 +1,176 @@
 {
-    "nodes":      {
-        "panel-obj": {
-            "type": "ColorRect",
-            "name": "Panel",
-            "path": "",
-            
-            "script": "res://data/workflow.ekl",
+    "nodes": {
+        "": {
+            "type":     "Node",
+            "children": {
+                "panel_obj": {
+                    "type": "ColorRect",
+                    "script_path": "res://data/workflow.ekl",
+                    "children": {},
 
-            "color": [25,25,35],
-            "transform": {
-                "position": [10,84],
-                "tsize":    [1132,554],
-                "scale":    [1,1],
-                "scroll":   [0,0],
+                    "color": [25,25,35],
+                    "transform": {
+                        "position": [10,84],
+                        "tsize":    [1132,554],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
 
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "top left",
-                "visible":  true,
-                "skew":     0
-            }
-        },
-        "logo": {
-            "type": "Sprite2D",
-            "name": "LogoEklips",
-            "path": "",
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "logo": {
+                    "type": "Sprite",
+                    "image_path": "res://media/logo.png",
+                    "children": {},
+                    "transform": {
+                        "position": [10,10],
+                        "tsize":    [1,1],
+                        "scale":    [0.5,0.5],
+                        "scroll":   [0,0],
 
-            "sprite": "res://media/logo.png",
-            "transform": {
-                "position": [10,10],
-                "tsize":    [1,1],
-                "scale":    [0.5,0.5],
-                "scroll":   [0,0],
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "settings_btn": {
+                    "type": "Sprite",
+                    "children": {},
+                    "image_path":  "res://media/icosetting.png",
+                    "script_path": "res://data/workflow.ekl",
+                    "signals":     {"_clicked":"open_editor_settings"},
+                    
+                    "transform": {
+                        "position": [13.5,25.5],
+                        "tsize":    [1,1],
+                        "scale":    [0.5,0.5],
+                        "scroll":   [0,0],
 
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "top left",
-                "visible":  true,
-                "skew":     0
-            }
-        },
-        "settings_btn": {
-            "type": "Sprite2D",
-            "name": "BtnSettings",
-            "path": "",
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top right",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "newproje_btn": {
+                    "type": "Sprite",
+                    "children": {},
+                    "image_path":  "res://media/iconew.png",
+                    "script_path": "res://data/workflow.ekl",
+                    "signals":     {"_clicked":"make_new_project_interface"},
+                    
+                    "transform": {
+                        "position": [60.5,25.5],
+                        "tsize":    [1,1],
+                        "scale":    [0.5,0.5],
+                        "scroll":   [0,0],
 
-            "sprite": "res://media/icosetting.png",
-            "script": "res://data/workflow.ekl",
-            "signals": {"_clicked":"open_editor_settings"},
-            
-            "transform": {
-                "position": [13.5,25.5],
-                "tsize":    [1,1],
-                "scale":    [0.5,0.5],
-                "scroll":   [0,0],
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top right",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "version_str": {
+                    "type": "Label",
+                    "children": {},
+                    "script_path": "res://data/workflow.ekl",
+                    "text": "t",
+                    
+                    "transform": {
+                        "position": [2,4],
+                        "tsize":    [1,1],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
 
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "top right",
-                "visible":  true,
-                "skew":     0
-            }
-        },
-        "newproje_btn": {
-            "type": "Sprite2D",
-            "name": "BtnNewProje",
-            "path": "",
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "right",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "make_new_project_window": {
+                    "type": "Window",
+                    "title": "make_new_project_window",
+                    "children": {},
+                    
+                    "transform": {
+                        "position": [0,0],
+                        "tsize":    [300,150],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
 
-            "sprite": "res://media/iconew.png",
-            "script": "res://data/workflow.ekl",
-            "signals": {"_clicked":"make_new_project_interface"},
-            
-            "transform": {
-                "position": [60.5,25.5],
-                "tsize":    [1,1],
-                "scale":    [0.5,0.5],
-                "scroll":   [0,0],
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "settings_window": {
+                    "type": "Window",
+                    "title": "settings_window",
+                    
+                    "transform": {
+                        "position": [0,0],
+                        "tsize":    [300,300],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
 
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "top right",
-                "visible":  true,
-                "skew":     0
-            }
-        },
-        "version_str": {
-            "type": "Label",
-            "name": "TxtVer",
-            "path": "",
-            
-            "script": "res://data/workflow.ekl",
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "",
+                        "visible":  true,
+                        "skew":     0
+                    },
+                    "children": {
+                        "window_settings_ok": {
+                            "type": "Sprite",
+                            "image_path": "res://media/icocorrect.png",
+                            "children": {},
+                            
+                            "transform": {
+                                "position": [50,50],
+                                "tsize":    [0,0],
+                                "scale":    [1,1],
+                                "scroll":   [0,0],
 
-            "text": "t",
-            
-            "transform": {
-                "position": [2,4],
-                "tsize":    [1,1],
-                "scale":    [1,1],
-                "scroll":   [0,0],
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "left",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        },
+                        "window_settings_no": {
+                            "type": "Sprite",
+                            "image_path": "res://media/icodelete.png",
+                            "children": {},
+                            
+                            "transform": {
+                                "position": [50,50],
+                                "tsize":    [0,0],
+                                "scale":    [1,1],
+                                "scroll":   [0,0],
 
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "right",
-                "visible":  true,
-                "skew":     0
-            }
-        },
-        "make_new_project_window": {
-            "type": "Window",
-            "name": "AddWindow",
-            "path": "",
-            
-            "title": "make_new_project_window",
-            
-            "transform": {
-                "position": [0,0],
-                "tsize":    [300,150],
-                "scale":    [1,1],
-                "scroll":   [0,0],
-
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "",
-                "visible":  true,
-                "skew":     0
-            }
-        },
-        "settings_window": {
-            "type": "Window",
-            "name": "SetWindow",
-            "path": "",
-            
-            "title": "settings_window",
-            
-            "transform": {
-                "position": [0,0],
-                "tsize":    [300,300],
-                "scale":    [1,1],
-                "scroll":   [0,0],
-
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "",
-                "visible":  true,
-                "skew":     0
-            }
-        },
-        "window_settings_ok": {
-            "type": "Sprite2D",
-            "name": "OkBtn",
-            "path": "SetWindow",
-            
-            "sprite": "res://media/icocorrect.png",
-            
-            "transform": {
-                "position": [50,50],
-                "tsize":    [0,0],
-                "scale":    [1,1],
-                "scroll":   [0,0],
-
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "left",
-                "visible":  false,
-                "skew":     0
-            }
-        },
-        "window_settings_no": {
-            "type": "Sprite2D",
-            "name": "NoBtn",
-            "path": "SetWindow",
-            
-            "sprite": "res://media/icodelete.png",
-            
-            "transform": {
-                "position": [50,50],
-                "tsize":    [0,0],
-                "scale":    [1,1],
-                "scroll":   [0,0],
-
-                "rotation": 0,
-                "alpha":    255,
-                "anchor":   "right",
-                "visible":  false,
-                "skew":     0
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "right",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        }
+                    }
+                }
             }
         }
     },

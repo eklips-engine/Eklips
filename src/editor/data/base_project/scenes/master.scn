@@ -1,5 +1,10 @@
 {
-    "nodes":      {},
+    "nodes":      {
+        "": {
+            "type":     "Node",
+            "children": {}
+        }
+    },
     "properties": {
         "inherited": false,
         "inherits":  null

@@ -1,9 +1,14 @@
 # Import inherited
 from classes.resources.object import *
 import types
+from functools import reduce
+import operator
 
 # Import nodes
 from classes.nodes import *
+
+# Variables
+EMPTY_SCENE = {"": {"type": "Node", "children": {}}}
 
 # Classes
 class SceneError(Warning):
@@ -18,12 +23,13 @@ class Scene(Object):
     (and thus the current scene) can be paused. Scenes can be loaded, switched and reloaded.
     """
     print(" ~ Initialize Scene")
-    nodes                   = {}
+    nodes                   = EMPTY_SCENE
     _marked_for_disassembly = []
     _marked_scene_chng      = ""
     _file_path              = None
     _inherited_scn          = None
     _marked_for_creation    = []
+    _temp_node_list         = []
 
     @property
     def file_path(self) -> str:
@@ -33,59 +39,91 @@ class Scene(Object):
         self.empty()
         self._file_path = path
         _data           = engine.loader.load(path)
-        self.nodes      = _data["nodes"]
-        if _data["properties"]["inherited"]:
-            self._inherited_scn = _data["properties"]["inherits"]
-            _inherited_nodes    = engine.loader.load(path)["nodes"]
+        if _data["properties"]["inherits"]:
+            self._loadscenefile(_data["properties"]["inherits"])
+        self._loadscenefile(path)
+    
+    def _loadscenefile(self, path):
+        _data      = engine.loader.load(path)
+        self.nodes = _data["nodes"]
+        nodepaths  = self.get_node_paths("")
 
-            for node in _inherited_nodes:
-                self.nodes[f"i@{self._inherited_scn}:{node}"] = _inherited_nodes[node]
+        for nodepath in nodepaths:
+            self._initialize_node_entry(nodepath)
+
+    def get_node_paths(self, nodepath, exclude_self=False, out=None):
+        """Get a list of this Nodes children. (e.g. `["root://foo/bar", ...]`)
         
-        for nid in self.nodes:
-            self._initialize_node_entry(nid)
+        .. nodepath:: Path of the node in the scene tree.
+        .. exclude_self:: Whether to add the passed Node to the list or not.
+        .. out:: The list to place the Nodes children. Defaults to None and SHOULD be None."""
+
+        if out == None: out = []
+        if not exclude_self:
+            out.append(nodepath)
+        
+        node     = self.get_node_entry_from_path(nodepath)
+        children = node.get("children",{}).keys()
+
+        for child in children:
+            self.get_node_paths(f"{nodepath}/{child}", False, out)
+        return out
         
     def load(self, path):
-        """Load a scene file."""
+        """Load a scene file.
+        
+        .. path:: Path of the scene in the filesystem (`res://`, `root://`, `user://`)"""
         self._marked_scene_chng = path
     
-    def _initialize_node_entry(self, nid):
-        # {'type':'Node', 'path':'', 'name':'Node'...}
-        node = self.nodes[nid]
+    def get_node_parent(self, nodepath):
+        """Get a Nodes parent.
+        
+        .. nodepath:: Path of the node in the scene tree."""
+        ppath = "/".join(nodepath.split("/")[:-1])
+        return self.get_node_from_path(ppath)
+    
+    def get_node_children(self, nodepath):
+        """Get a Nodes children. Same as `get_nodes(nodepath, exclude_self=True)`
+        
+        .. nodepath:: Path of the node in the scene tree."""
+        return self.get_nodes(nodepath, exclude_self=True)
+    
+    def _initialize_node_entry(self, nodepath):
+        node = self.get_node_entry_from_path(nodepath)
 
-        # Full path including this node
-        full_path   = f"{node['path']}/{node['name']}".strip("/")
-
-        directories  = full_path.split("/")[:-1]  # Only parents, exclude self
-        parent       = None
-        current_path = ""
-
-        for directory in directories:
-            if len(current_path) == 0:
-                continue
-            existing = self.get_node_from_path(f"{current_path.lstrip('/')/directory}")
-            current_path += f"/{directory}"
-            if not existing:
-                raise SceneError("The parent of the node you are creating does not exist.")
-            else:
-                parent = existing
+        # Get node's parent
+        parent   = self.get_node_parent(nodepath)
+        children = self.get_node_children(nodepath)
 
         # Make Node
         classobj                = globals().get(node["type"])
         obj : engine.nodes.Node = classobj.__new__(classobj)
-        for i in obj.base_properties:
-            if not i in node:
-                node[i] = obj.base_properties[i]
+
+        # Init object and export values
         obj.__init__(node, parent)
+        obj.name = nodepath.split("/")[-1]
+        obj._setup_properties()
+
+        # Set values
+        #obj.set("script_path", node.get("script_path", None))
+        #obj._setup_properties()
 
         # Set obj parameter to Node
         node["obj"] = obj
+
+        # Recompile list of nodes
+        self._temp_node_list = self.get_node_paths("")
     
     def add_node(self, data):
-        """Add a node with parameters."""
+        """Add a node with parameters after the scene has finished updating.
+        
+        .. data:: The node's properties."""
         self._marked_for_creation.append(data)
     
     def _add_node(self, data) -> int:
-        """Add a node with parameters. Returns that Node's ID."""
+        """Add a node with parameters. Returns that Nodes ID.
+        
+        .. data:: The node's properties."""
         nid = f"@:{len(self.nodes)}"
 
         self.nodes[nid] = data
@@ -93,42 +131,78 @@ class Scene(Object):
 
         return nid
     
-    def get_node_from_path(self, nodepath) -> Node:
-        """Get a Node using its path in the scene tree. (e.g. `foo/bar`)"""
-        path = "/".join(nodepath.split("/")[:-1])
-        name = nodepath.split("/")[-1]
-        for i in self.nodes:
-            if self.nodes[i]["path"] == path:
-                if self.nodes[i]["name"] == name:
-                    return self.nodes[i]["obj"]
+    def get_nodes(self, nodepath=USE_SCENE_TREE, exclude_self=False) -> list[str]:
+        """Get a list of each Node in the scene tree or a node entry. (e.g. `[Node2D(path='/'), ...]`)
+        
+        .. node:: The node to get a list of each child of using its node path.
+        .. exclude_self:: Whether to add the passed Node to the list or not."""
+        if nodepath == USE_SCENE_TREE: nodepath = ""
 
-    def delete_node(self, node_id):
-        """Mark a Node to be deleted after the scene is updated using its ID."""
-        if not node_id in self.nodes:
+        nodepaths = self.get_node_paths(nodepath, exclude_self=False)
+        nodes     = []
+
+        for _nodepath in nodepaths:
+            nodes.append(self.get_node_from_path(_nodepath))
+        
+        return nodes
+
+    def get_node_entry_from_path(self, nodepath : str, throw_error_if_failed : bool = False) -> dict:
+        """Get a Node's data using its path in the scene tree. (e.g. `{"type": "Node2D", "transform": {...}, ...}`)
+        
+        .. nodepath:: Path of the node in the scene tree.
+        .. throw_error_if_failed:: Throw an Error if it failed getting the Node."""
+        if nodepath == "": return self.nodes[""]
+
+        parts    = nodepath.split("/")
+        try:
+            current = self.nodes[parts[0]]
+            for name in parts[1:]:
+                try:
+                    current = current["children"][name]
+                except Exception as error:
+                    raise error
+
+            return current
+        except Exception as error:
+            if throw_error_if_failed:
+                raise SceneError(f"Tried to get node entry {nodepath} from Scene but failed")
+            else:
+                raise error
+                return {"obj": None}
+
+    def get_node_from_path(self, nodepath, throw_error_if_failed : bool = False) -> Node:
+        """Get a Node using its path in the scene tree. (e.g. `root://foo/bar`)
+        
+        .. nodepath:: Path of the node in the scene tree.
+        .. throw_error_if_failed:: Throw an Error if it failed getting the Node."""
+        return self.get_node_entry_from_path(nodepath, throw_error_if_failed).get("obj", None)
+
+    def delete_node(self, nodepath):
+        """Mark a Node to be deleted after the scene is updated using its path.
+        
+        .. nodepath:: Path of the node in the scene tree."""
+        if not self.get_node_from_path(nodepath, throw_error_if_failed=False):
             return
-        self._marked_for_disassembly.append(node_id)
+        self._marked_for_disassembly.append(nodepath)
     
-    def _delete_node(self, node_id):
-        """Delete a Node using its ID."""
-        if not node_id in self.nodes:
+    def _delete_node(self, nodepath):
+        """Delete a Node using its path."""
+        if not self.get_node_from_path(nodepath, throw_error_if_failed=False):
             return
         try:
-            node   = self.nodes[node_id]["obj"]
+            node   = self.get_node_from_path(nodepath)
             node._free()
         except:
             pass
-        self.nodes[node_id]["obj"] = None
-        self.nodes.pop(node_id)
+        self.get_node_entry_from_path(nodepath)["obj"] = None
+        # Delete that entry? ^ (it's self.nodes["children"]["something"])
         gc.collect()
+    
     def empty(self):
         """Empty the scene."""
-        while len(self.nodes):
-            try:
-                for node_id in self.nodes:
-                    self._delete_node(node_id)
-            except:
-                pass
-        self.nodes = {}
+        for nodepath in self.get_node_paths(""):
+            self._delete_node(nodepath)
+        self.nodes = EMPTY_SCENE
     
     def _free(self):
         self.empty()
@@ -136,13 +210,12 @@ class Scene(Object):
     
     def update(self):
         try:
-            for node_id in self.nodes:
-                node : Node = self.nodes[node_id].get("obj", None)
+            for nodepath in self._temp_node_list:
+                node = self.get_node_from_path(nodepath)
                 if not node:
                     continue
                 if not node._runnable:
-                    node._free()
-                    self._delete_node(node_id)
+                    self._delete_node(nodepath)
                     continue
                 node.update()
         except Exception as error:

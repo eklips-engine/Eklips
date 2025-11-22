@@ -1,44 +1,79 @@
 # Import components
 import classes.singleton as engine
 import gc, types
+from classes.locals       import *
 from classes.fakes.script import _ScriptDoc
+from classes.customprops  import export, _exportmeta
 
 # Classes
 class ScriptError(Exception):
     pass
 
-class Object:
+class Object(metaclass=_exportmeta):
     """
     Base class for almost all other classes in the engine.
 
     This class is the ancestor for classes that can be programmable and interacts with the Engine's libraries, components, etc..
-    Each class may define new properties, methods or signals, which are available to all inheriting classes. For example, a Sprite2D instance is able to call Node.add_child() because it inherits from Node.
+    Each class may define new properties, methods or signals, which are available to all inheriting classes. For example, a Sprite instance is able to call Object.call_deferred() because it inherits from Object.
 
     You can create new instances, using `Object()`.
     To delete an Object instance, call `free()`. This is necessary for most classes inheriting Object, because they do not manage memory on their own, and will otherwise cause memory leaks when no longer used.
     Objects can have a `Script` resource attached to them. Once the Script is instantiated, it effectively acts as an extension to the base class, allowing it to define and inherit new properties, methods and signals.
     """
-    base_properties = {
-        "name":   "Object",
-        "script": None
-    }
     _runnable        = True
     _script_path     = None
     _script          = None
     _can_init_script = True
     obj_id           = None
+    _properties      = {}   # NOT actual property values, but instead info of this classes properties
+    
+    # Property related functions
+    def get(self, name, fallback=None):
+        """Get the Object property `name`, if non-existent, return `fallback`."""
+        return getattr(self, name, fallback)
+    
+    @classmethod
+    def add(cls, name, default=None, type_=None, hint=DETECT):
+        """Add a new property."""
+        if cls not in Object._properties:
+            Object._properties[cls] = {}
+        Object._properties[cls][name] = export(
+            type_   = type_,
+            default = default,
+            hint    = hint
+        )
+        setattr(Object, name, Object._properties[cls][name])
+
+    def set(self, name, value):
+        """Set the Object property `name` into `value`."""
+        setattr(self, name, value)
+    
+    @classmethod
+    def get_property_list(cls):
+        # Gather all properties from the class hierarchy
+        props = {}
+        for base_cls in reversed(cls.mro()):
+            props.update(Object._class_properties.get(base_cls, {}))
+        return props
+    
+    # Properties
+    @export(None,"str","str")
+    def name(self) -> str: return self._name
+    
     @property
     def script(self) -> _ScriptDoc:
         return self._script
-    @property
-    def script_path(self) -> str:
-        return self._script_path
-    
+    @export(None,"str","file_path/ekl")
+    def script_path(self) -> str: return self._script_path
+
+    @name.setter
+    def name(self, value):   self._name = value
     @script.setter
-    def script(self):
-        raise ScriptError("Object property 'script' does not have a setter. Instead, set the 'script_path' property to the path of the script needed.")
+    def script(self, value): raise ScriptError("Object property 'script' does not have a setter. Instead, set the 'script_path' property to the path of the script needed.")
     @script_path.setter
     def script_path(self, path : str):
+        if not path: return
+
         self._script_path = path
         try:
             src  = engine.loader.load(path, force_new_resource=True)
@@ -61,17 +96,24 @@ class Object:
 
         self._onready()
 
-    def __init__(self, properties=base_properties):
-        self.properties  = properties
-        engine.uid      += 1
-        self.name        = properties.get("name", self.get_class_name())
-        self.uid         = engine.uid
-        self.signals     = properties.get("signals", {})
+    # Init
+    def __init__(self, properties={}):
+        self._name               = self.get_class_name()
+        self._properties_onready = properties
 
+        # Set Unique ID
+        self.uid    = engine.uid
+        engine.uid += 1
+
+        # Add signals
+        self.signals = properties.get("signals", {})
+
+    # Get class name
     def get_class_name(self) -> str: 
         """Return the name of the Object. (e.g. Object, Node...)"""
         return self.__class__.__name__
-
+    
+    # Memory related
     def _free(self):
         del self
         gc.collect()
@@ -80,15 +122,8 @@ class Object:
         """Free the object from memory."""
         self._runnable = False
         self._free()
-    
-    def get(self, property, fallback=None):
-        """Get the Object property `property`, if non-existent, return `fallback`."""
-        return self.properties.get(property,fallback)
-    
-    def set(self, property, value):
-        """Set the Object property `property` into `value`."""
-        self.properties[property] = value
 
+    # Script related
     def call(self, function, *args):
         """Call a function from the attached Script, if it exists."""
         if not self._script:
@@ -124,11 +159,13 @@ class Object:
     def _process(self):
         """Run the `_process()` function on the Script. This is called every frame of the Object/Node's existence."""
         if not self._script:
-            return 
+            return
+        
         try:
             self.call("_process", engine.delta)
         except:
             pass
+
         for info in self._script._function_queue:
             if info[2]:
                 self.call_signal(info[0], info[1])
@@ -142,3 +179,10 @@ class Object:
             self.call("_onready")
         except:
             pass
+    
+    def _setup_properties(self):
+        # Setup properties
+        for key in self._properties_onready:
+            if key in ["children","parent","signals","type"]:
+                continue
+            self.set(key, self._properties_onready[key])
