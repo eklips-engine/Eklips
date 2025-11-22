@@ -19,6 +19,11 @@ class Label(CanvasItem):
     @text.setter
     def text(self, value): self.sprite.text = value
 
+    @export("Times New Roman","str","font")
+    def font(self) -> str: return self.sprite.font_name
+    @font.setter
+    def font(self, value): self.sprite.font_name = value
+
     def __init__(self, properties={}, parent=None, children=None):
         super().__init__(properties, parent, children)
         self._make_new_sprite()
