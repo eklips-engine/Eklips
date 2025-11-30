@@ -100,6 +100,7 @@ class CanvasItem(Node, Transform):
         self.sprite.opacity = round(deg)
         
     def _draw(self):
+        # Draw the Sprite
         return engine.display.blit(
             transform = self,
             window_id = self._drawing_wid,

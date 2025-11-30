@@ -51,7 +51,7 @@ def export(default=None, type_=None, hint=None):
     wanna make an export property instead of just `@export(..)`?
     
     .. default:: The default value to use.
-    .. type_:: The type that the value should be (int, str, list, bool...)
+    .. type:: The type that the value should be (int, str, list, bool...)
     .. hint:: How to display this property in the editor (int, float, int/float, float/int, str, file_path/xxx, color, slider, font, bool)
     """
     def wrapper(func):

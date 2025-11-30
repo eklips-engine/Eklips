@@ -449,7 +449,7 @@ class Display:
             self.main_window_id = wid
         
         # Create Window
-        window   = EklipsWindow(
+        window        = EklipsWindow(
             width     = size[0],
             height    = size[1],
             caption   = name,
@@ -464,6 +464,9 @@ class Display:
             window.set_maximum_size(*maximum_size)
         if icon:
             window.set_icon(icon)
+        if visible:
+            window.set_visible()
+        window.wid = wid
         
         # Create Viewport
         viewport = Viewport([], viewport_size, [0,0])
@@ -472,8 +475,6 @@ class Display:
 
         # Set Window's viewport to the one we just made
         window.eklips_viewport = viewport
-        window.wid             = wid
-        if visible: window.set_visible()
 
         # Make the Window entry
         self.windows[wid] = {
@@ -630,7 +631,7 @@ class Display:
         Get the viewport `vid` from the window `wid`.
 
         .. wid:: ID of Window. Defaults to MAIN_WINDOW.
-        .. vid:: ID of Viewport (Unused since Windows can't have multiple viewports for now)
+        .. vid:: ID of Viewport. Defaults to MAIN_VIEWPORT. (Unused since Windows can't have multiple viewports for now)
         """
         return self.windows.get(wid, {"viewport": None})["viewport"]
 
@@ -648,7 +649,8 @@ class Display:
         transform      : Transform,
         sprite         : pg.sprite.Sprite,
         window_id      : int               = MAIN_WINDOW,
-        group          : pg.graphics.Group = None
+        group          : pg.graphics.Group = None,
+        region         : list | None       = None
     ) -> None:
         """
         Draw a Sprite to a Window's main viewport.
@@ -674,18 +676,22 @@ class Display:
         if self.get_window(window_id).closed:
             return
         
-        windata             = self.windows[window_id]
-        viewport : Viewport = windata["viewport"]
+        viewport : Viewport = self.get_viewport_from_window(window_id)
         if not viewport:
             return
 
         x, y = transform.into_screen_coords(viewport.size)
         
-        # Set properties for sprite
+        # Get sprite's dimensions
         w,h             = transform.tsize
         scale_x,scale_y = transform.scale
         
-        # | Set the others
+        # Set image's region (if it isn't None)
+        if region != None:
+            cropped      = sprite.image.get_region(*region)
+            sprite.image = cropped
+        
+        # Set sprite's properites
         if transform.rotation:
             sprite.image.anchor_x = w/4
             sprite.image.anchor_y = h/4

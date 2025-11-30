@@ -4,11 +4,13 @@
             "type":     "Node",
             "children": {
                 "panel_obj": {
-                    "type": "ColorRect",
+                    "type":        "ColorRect",
                     "script_path": "res://data/workflow.ekl",
+
                     "children": {},
 
                     "color": [25,25,35],
+
                     "transform": {
                         "position": [10,84],
                         "tsize":    [1132,554],
@@ -23,9 +25,11 @@
                     }
                 },
                 "logo": {
-                    "type": "Sprite",
+                    "type":       "Sprite",
                     "image_path": "res://media/logo.png",
-                    "children": {},
+
+                    "children":  {},
+                    
                     "transform": {
                         "position": [10,10],
                         "tsize":    [1,1],

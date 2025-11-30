@@ -1,5 +1,5 @@
 # Import libraries
-import pygame, pyglet as pg, json, gc
+import pyglet as pg
 from classes import ui
 
 # Import inherited
