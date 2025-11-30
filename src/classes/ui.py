@@ -128,6 +128,10 @@ class EklipsWindow(pg.window.Window):
         self.closed = True
         engine.display._close_window(self.wid)
     
+    def close(self):
+        super().close()
+        self.closed = True
+    
     def on_context_lost(self):
         self._focused = False
     
