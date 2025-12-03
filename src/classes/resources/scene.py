@@ -20,6 +20,7 @@ class Scene(Object):
     (and thus the current scene) can be paused. Scenes can be loaded, switched and reloaded.
     """
     print(" ~ Initialize Scene")
+    paused                  = False       # If the update() function can laze around and do nothing
     nodes                   = EMPTY_SCENE # Scene tree
     _doomed                 = []          # List of nodes that are about to be deleted
     _marked_scene_chng      = ""          # Filepath of the scene that's about to be loaded
@@ -201,7 +202,11 @@ class Scene(Object):
         self.empty()
         super()._free()
     
+    def pause(self):  self.paused = True
+    def resume(self): self.paused = False
     def update(self):
+        if self.paused:
+            return
         try:
             for nodepath in self._temp_node_list:
                 node = self.get_node_from_path(nodepath)
