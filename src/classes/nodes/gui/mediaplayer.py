@@ -48,7 +48,7 @@ class MediaPlayer(CanvasItem):
 
     @export(None, "str",   "file_path/med")
     def media(self) -> str:
-        """Filepath of media. Read-write."""
+        """Filepath of the attached media file. Read-write."""
         return self._media
     
     @media.setter
@@ -68,13 +68,13 @@ class MediaPlayer(CanvasItem):
             self._video = None
             self._sound = engine.loader.load(value)
         else:
-            raise PlayerError(f"what the hell is an .{extension} file")
+            raise PlayerError(f"File format {extension} unknown")
 
     def play(self, keep_play_counter=False):
         """
-        Play the Media using the Node's properties.
+        Play the attached Media file using the Node's properties.
 
-        .. keep_play_counter:: Internal argument to decide if the Node should play the Media while keeping the `self._playcounter` value and not reset it.
+        .. keep_play_counter:: Internal argument to decide if the Node should play the attached Media file while keeping the `self._playcounter` value and not resetting it. This is manually used by the `loops` property.
         """
         self._playing     = True
         if not keep_play_counter:
@@ -85,7 +85,7 @@ class MediaPlayer(CanvasItem):
             self._video.play()
         
     def restart(self):
-        """Restart the Media."""
+        """Restart the attached Media file."""
         if self._sound:
             self.channel.stop()
             self.channel.play()
@@ -93,7 +93,7 @@ class MediaPlayer(CanvasItem):
             self._video.restart()
     
     def stop(self):
-        """Stop the Media."""
+        """Stop the attached Media file."""
         self._playing = False
         if self._sound:
             self.channel.stop()
@@ -101,14 +101,14 @@ class MediaPlayer(CanvasItem):
             self._video.stop()
     
     def pause(self):
-        """Pause the Media."""
+        """Pause the attached Media file."""
         if self._sound:
             self.channel.pause()
         if self._video:
             self._video.pause()
     
     def resume(self):
-        """Resume the Media."""
+        """Resume the attached Media file."""
         if self._sound:
             self.channel.unpause()
         if self._video:
@@ -157,7 +157,7 @@ class MediaPlayer(CanvasItem):
 
     @export(1.0, "float", "float")
     def volume(self) -> int:
-        """Volume of the Media"""
+        """Volume of the attached Media file."""
         return self._volume
     @volume.setter
     def volume(self, value : int | float | None):

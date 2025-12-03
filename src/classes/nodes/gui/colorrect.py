@@ -38,9 +38,6 @@ class ColorRect(CanvasItem):
 
         # Make the image
         self.image = pg.image.ImageData(rw,rh,'RGB',bytes(self.color*rw*rh))
-        
-        # Set the Sprite's image
-        self.sprite.image = self.image
     
     def update(self):
         super().update()

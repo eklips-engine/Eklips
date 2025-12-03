@@ -39,8 +39,16 @@ class CanvasItem(Node, Transform):
     _sprite_id   : int                          = 0
     sprite       : pg.sprite.Sprite             = None
     images       : list[pg.image.AbstractImage] = []
-    image        : pg.image.AbstractImage       = None
+    _image       : pg.image.AbstractImage       = None
     _ignore_size_if_drawing                     = False
+
+    @property
+    def image(self): return self._image
+    @image.setter
+    def image(self, value):
+        self._image = value
+        if self.sprite:
+            self.sprite.image = value
 
     def __init__(self, properties={}, parent=None, children=None):
         engine.Transform.__init__(self)
