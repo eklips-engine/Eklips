@@ -3,7 +3,7 @@ import pygame, pyglet as pg, json, gc
 import pyvidplayer2   as pvd
 
 # Import components
-from classes             import cvar, hooks, ui, resources, nodes
+from classes             import hooks, ui, resources, nodes
 from classes             import crash_screen as error_handler
 from classes             import saving
 from classes.customprops import *
@@ -14,30 +14,29 @@ pygame.mixer.init()
 
 # Functions
 def load_engine():
-    global running,game,cvars,display,mouse,loader,keyboard,scene,savefile,lang,icon,clock
+    global running,game,display,mouse,loader,keyboard,scene,savefile,lang,icon,clock
 
     # Initialize metadata
-    game  = GameData()
-
-    cvars = cvar.CvarCollection()
-    cvars.init_from(game.project_data["cvars"])
+    game = GameData()
     
     # Initialize resource loader
     loader = resources.Loader()
 
     # Initialize display and windows
-    icon    = loader.load(cvars.get("icon_file"))
+    icon    = loader.load(game.win.icofile)
     display = ui.Display()
     clock   = pg.clock.Clock()
     display.add_window(
         name           = game.name, 
-        size           = game.viewport_size, 
-        viewport_size  = game.viewport_size, 
-        viewport_color = game.viewport_color,
-        icon           = icon,
-        resizable      = game.winresizable,
-        minimum_size   = game.winminsize,
-        maximum_size   = game.winmaxsize
+        
+        size           = game.win.vsize, 
+        viewport_size  = game.win.vsize, 
+        viewport_color = game.win.color,
+        resizable      = game.win.resizable,
+        minimum_size   = game.win.minsize,
+        maximum_size   = game.win.maxsize,
+
+        icon           = icon
     )
 
     # Initialize user input sections
@@ -55,10 +54,10 @@ def load_engine():
     savefile = saving.Savefile()
 
     # Initialize localization
-    lang    = Language(f'{cvars.get("lang_dir", "res://lang")}/{savefile.get("lang", "en")}.json')
+    lang = Language(f'{game.langdir}/{savefile.get("lang", "en")}.json')
 
     # See if anti-aliasing should be on
-    ui.set_anti_aliasing(cvars.get("anti_aliasing", False))
+    ui.set_anti_aliasing(game.win.antialiasing)
 
     # Set running flag to true
     running = True
@@ -99,7 +98,6 @@ def handle_closing():
 # Variables
 clock     : pg.clock.Clock         = None
 display   : ui.Display             = None
-cvars     : cvar.CvarCollection    = None
 game      : GameData               = None
 loader    : resources.Loader       = None
 lang      : Language               = None

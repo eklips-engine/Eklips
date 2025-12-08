@@ -3,7 +3,7 @@ import pyglet as pg
 USE_GAME_PARENT = "UseFileParent"
 USE_GAME_CV_DIR = "UseFileCVar"
 
-BDATE        = [22, 11, 2025] # DMY
+BDATE        = [3, 12, 2025] # DMY
 MAJOR        = "5"           # Major [5].0 A 
 MINOR        = "0"           # Minor  5.[0]A 
 HOTFIX       = "A"           # Hotfix 5. 0[A]

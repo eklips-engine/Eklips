@@ -9,7 +9,8 @@
         "color":      [35, 35, 50],
         "minsize":    [648,   648],
         "maxsize":    null,
-        "resizable": true
+        "resizable":  true,
+        "icon_file":  "res://media/icon.png"
     },
     "scenes": {
         "master":  "res://scenes/master.scn",
@@ -25,26 +26,14 @@
         }
     },
 
-    "cvars": {
-        "icon_file": {
-            "type":        "str",
-            "default":     "res://media/icon.png",
-            "description": "Image file to use for the icon"
-        },
-        "globals": {
-            "type":        "list",
-            "default":     [],
-            "description": "List of Scripts to be loaded as Nodes 'AUTOL~X'"
-        },
-        "languages": {
-            "type":        "list",
-            "default":     ["en","fr","foobar"],
-            "description": "List of languages used in the game"
-        },
-        "lang_dir": {
-            "type":        "str",
-            "default":     "res://lang",
-            "description": "Directory where all the language files are"
-        }
+    "behavior": {
+        "autoloads":     [],
+        "autoload_name": "Autoload!~X",
+
+        "antialiasing": false
+    },
+    "language": {
+        "langs": ["en","fr","foobar"],
+        "dir":   "res://lang"
     }
 }

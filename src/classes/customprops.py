@@ -51,7 +51,7 @@ def export(default=None, type_=None, hint=None):
     wanna make an export property instead of just `@export(..)`?
     
     .. default:: The default value to use.
-    .. type:: The type that the value should be (int, str, list, bool...)
+    .. type:: The name of the type that the value should be (int, str, list, bool...)
     .. hint:: How to display this property in the editor (int, float, int/float, float/int, str, file_path/xxx, color, slider, font, bool)
     """
     def wrapper(func):
@@ -87,27 +87,49 @@ class _exportmeta(type):
         cls._properties = props
         return cls
 
+class WindowProperties:
+    maxsize      : list = [0,0]
+    minsize      : list = [0,0]
+    color        : list = [0,0,0]
+    resizable    : bool = False
+    antialiasing : bool = False
+    vsize        : list = [0,0]
+    icofile      : str  = ""
+
 class GameData:
     def __init__(self, settings="settings.json"):
+        # Load settings
         self.file_data    = json.loads(open(settings).read())
 
+        # Get data about what project to use
         self.metadata     = self.file_data["project"]
 
+        # Get locations of everything
         self.project_file = self.metadata["file"]
         self.project_data = json.loads(open(self.project_file).read())
         self.project_dir  = self.metadata["dir"]
         if self.project_dir == USE_GAME_PARENT:
             self.project_dir = "/".join(self.project_file.split("/")[:-1])
         
+        # Get basic metadata
         self.name           = self.project_data["name"]
         self.version        = self.project_data["version"]["app"]
         self.version_ekl    = self.project_data["version"]["ekl"]
-        self.viewport_size  = self.project_data["viewport"]["size"]
-        self.viewport_color = self.project_data["viewport"]["color"]
-        self.winresizable   = self.project_data["viewport"]["resizable"]
-        self.winminsize     = self.project_data["viewport"]["minsize"]
-        self.winmaxsize     = self.project_data["viewport"]["maxsize"]
 
+        # Initialize window properties
+        self.win              = WindowProperties()
+        self.win.vsize        = self.project_data["viewport"]["size"]
+        self.win.color        = self.project_data["viewport"]["color"]
+        self.win.resizable    = self.project_data["viewport"]["resizable"]
+        self.win.minsize      = self.project_data["viewport"]["minsize"]
+        self.win.maxsize      = self.project_data["viewport"]["maxsize"]
+        self.win.icofile      = self.project_data["viewport"]["icon_file"]
+        self.win.antialiasing = self.project_data["behavior"]["antialiasing"]
+
+        # Get language info
+        self.langdir        = self.project_data["language"]["dir"]
+
+        # Get scenes info
         self.master_scene   = self.project_data["scenes"]["master"]
         self.loading_scene  = self.project_data["scenes"]["loading"]
 

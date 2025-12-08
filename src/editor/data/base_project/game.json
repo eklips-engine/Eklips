@@ -9,7 +9,8 @@
         "color":      [0,  0,  0],
         "minsize":    [1152, 648],
         "maxsize":    [1152, 648],
-        "resizable":  false
+        "resizable":  false,
+        "icon_file":  "res://media/icon.png"
     },
     "scenes": {
         "master":  "res://scenes/master.scn",
@@ -18,26 +19,14 @@
     
     "directory": "dolorem",
 
-    "cvars": {
-        "icon_file": {
-            "type":        "str",
-            "default":     "res://media/icon.png",
-            "description": "Image file to use for the icon"
-        },
-        "globals": {
-            "type":        "list",
-            "default":     [],
-            "description": "List of Scripts to be loaded as Nodes 'AUTOL~X'"
-        },
-        "languages": {
-            "type":        "list",
-            "default":     [],
-            "description": "List of languages used in the game"
-        },
-        "lang_dir": {
-            "type":        "str",
-            "default":     "res://lang",
-            "description": "Directory where all the language files are"
-        }
+    "behavior": {
+        "autoloads":     [],
+        "autoload_name": "Autoload!~X",
+
+        "antialiasing": false
+    },
+    "language": {
+        "langs": [],
+        "dir":   "res://lang"
     }
 }

@@ -1,5 +1,6 @@
 # Import singleton
 import classes.singleton as engine
+from classes.customprops import *
 
 # Classes
 class Script:
@@ -17,7 +18,15 @@ class Script:
     _can_init_script = False
 
     def __init__(self):
-        self._namespace      = {"engine": engine, "null": None, "true": True, "false": False}
+        self._namespace      = {
+            "engine": engine,
+            "null": None, "true": True, "false": False,
+            
+            "Transform": Transform,
+            "export":    export,
+            "GameData":  GameData,
+            "export_":   export_
+        }
         self.source_code     = "# Empty.. Please initialize the Script in your Object."
         self._function_queue = []
         self.file_path       = None
