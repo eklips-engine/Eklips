@@ -59,6 +59,12 @@ def load_engine():
     # See if anti-aliasing should be on
     ui.set_anti_aliasing(game.win.antialiasing)
 
+    # Load custom fonts
+    for i in game.fonts:
+        name, path = i
+        loader.load(path)
+        pg.font.load(name)
+    
     # Set running flag to true
     running = True
 

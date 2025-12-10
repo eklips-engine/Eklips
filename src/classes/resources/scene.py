@@ -158,6 +158,9 @@ class Scene(Object):
 
         # Recompile list of nodes
         self._temp_node_list = self.get_node_paths("")
+
+        # Return Node if needed
+        return obj
     
     def add_node(self, data, nodepath="/test", throw_error_if_failed=False):
         """Add a node with parameters after the scene has finished updating.
@@ -168,7 +171,7 @@ class Scene(Object):
         self._blessed.append([data, nodepath, throw_error_if_failed])
     
     def _add_node(self, data, nodepath="", throw_error_if_failed=False) -> int:
-        """Add a node with parameters.
+        """Add a node with parameters. Returns the Node object.
         
         .. data:: The node's properties.
         .. nodepath:: The node's path in the scene tree. (etc, `/father/me`, `/me`)
@@ -189,7 +192,7 @@ class Scene(Object):
             return
         
         # Initialize Node object and recompile Node list
-        self._initialize_node_entry(nodepath)
+        return self._initialize_node_entry(nodepath)
     
     def get_nodes(self, nodepath=USE_SCENE_TREE, exclude_self=False) -> list[str]:
         """Get a list of each Node in the scene tree or a node entry. (e.g. `[Node2D(path='/'), ...]`)

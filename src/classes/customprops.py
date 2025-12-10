@@ -112,9 +112,9 @@ class GameData:
             self.project_dir = "/".join(self.project_file.split("/")[:-1])
         
         # Get basic metadata
-        self.name           = self.project_data["name"]
-        self.version        = self.project_data["version"]["app"]
-        self.version_ekl    = self.project_data["version"]["ekl"]
+        self.name        = self.project_data["name"]
+        self.version     = self.project_data["version"]["app"]
+        self.version_ekl = self.project_data["version"]["ekl"]
 
         # Initialize window properties
         self.win              = WindowProperties()
@@ -126,12 +126,13 @@ class GameData:
         self.win.icofile      = self.project_data["viewport"]["icon_file"]
         self.win.antialiasing = self.project_data["behavior"]["antialiasing"]
 
-        # Get language info
-        self.langdir        = self.project_data["language"]["dir"]
+        # Text-related
+        self.fonts   = self.project_data["behavior"]["fonts"]
+        self.langdir = self.project_data["language"]["dir"]
 
         # Get scenes info
-        self.master_scene   = self.project_data["scenes"]["master"]
-        self.loading_scene  = self.project_data["scenes"]["loading"]
+        self.master_scene  = self.project_data["scenes"]["master"]
+        self.loading_scene = self.project_data["scenes"]["loading"]
 
 class Transform:
     def __init__(self):

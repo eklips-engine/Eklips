@@ -21,7 +21,8 @@ class Loader:
         "sfx": ["mp3","ogg","wav"],
         "txt": ["py","txt","ekl"],
         "jsn": ["json","scn","res"],
-        "vid": ["mp4","webm","gif"]
+        "vid": ["mp4","webm","gif"],
+        "fnt": ["ttf","otf"]
     }
 
     def _get_true_path(self, path : str):
@@ -45,6 +46,9 @@ class Loader:
                 return json.loads(open(actual_path).read())
             if ext in self.extensions["vid"]:
                 return engine.pvd.VideoPyglet(actual_path)
+            if ext in self.extensions["fnt"]:
+                pg.font.add_file(actual_path)
+                return 
         except:
             pass
         

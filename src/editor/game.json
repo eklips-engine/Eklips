@@ -30,7 +30,9 @@
         "autoloads":     [],
         "autoload_name": "Autoload!~X",
 
-        "antialiasing": false
+        "antialiasing": false,
+
+        "fonts": []
     },
     "language": {
         "langs": ["en","fr","foobar"],
