@@ -108,7 +108,7 @@ class CanvasItem(Node, Transform):
         self.sprite.opacity = round(deg)
         
     def _draw(self):
-        # Draw the Sprite
+        """Draw the Sprite"""
         return engine.display.blit(
             transform = self,
             window_id = self._drawing_wid,
@@ -116,6 +116,7 @@ class CanvasItem(Node, Transform):
         )
 
     def _get_viewport(self) -> ui.Viewport:
+        """Get the Viewport that the CanvasItem will be drawn to."""
         viewport : ui.Viewport = engine.display.get_viewport_from_window(
             self._drawing_wid,
             MAIN_VIEWPORT
@@ -126,6 +127,7 @@ class CanvasItem(Node, Transform):
             return
         self.sprite.visible = False
     def _make_new_sprite(self):
+        """Request a new Sprite from the Viewport to use."""
         if self.sprite:
             self._remove_sprite()
         viewport                     = self._get_viewport()
@@ -150,9 +152,10 @@ class CanvasItem(Node, Transform):
             return
         x,y    = self.into_screen_coords(viewport.size)
         is_it  = (
-            mpos[0] < x  + self.w and
-            mpos[0] + 20 > x      and
-            mpos[1] < y  + self.h and
-            mpos[1] + 20 > y
+            mpos[0] >= x          and
+            mpos[0] <= x + self.w and
+            mpos[1] >= y          and
+            mpos[1] <= y + self.h
         )
+        
         return is_it

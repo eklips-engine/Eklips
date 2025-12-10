@@ -46,6 +46,7 @@ class Node(Object, NodeMixin):
     # Memory related
     def _free(self):
         # Free children
+        self._runnable = False
         for child in self.children:
             child._free()
         
@@ -53,5 +54,8 @@ class Node(Object, NodeMixin):
         super()._free()
     
     def free(self):
-        """Free the object from memory."""
+        """Free the Node from memory.
+        
+        Freeing a Node does not delete it from the scene tree, but the
+        Scene can automatically detect this and delete it."""
         self._runnable = False

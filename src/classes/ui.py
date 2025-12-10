@@ -757,9 +757,6 @@ class Display:
         viewport : Viewport = windata["viewport"]
         if not viewport:
             return 0,0
-
-        x, y = transform.into_screen_coords(viewport.size)
-        y   += 4
         
         # Set properties for label
         if label.text != text:
@@ -771,6 +768,13 @@ class Display:
         
         # | Adjustments
         w,h = label.content_width, label.content_height
+
+        # | Fix transform
+        transform.w = w
+        transform.h = h
+        
+        # | Get XY position
+        x,y = transform.into_screen_coords(viewport.size)
 
         # | Set the others
         if transform.rotation:

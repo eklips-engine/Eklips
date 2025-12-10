@@ -6,26 +6,28 @@ from classes import ui
 from classes.nodes.gui.canvasitem import *
 
 # Classes
-class ColorRect(CanvasItem):
+class ColorRect(CanvasItem, Color):
     """
     ## A single-color rectangle on the screen.
     
     XXX
     """
     _can_check_layer = True
-    _color           = [0,0,0]
 
     def __init__(self, properties={}, parent=None, children=None):
+        Color.__init__(self, 255,255,255)
+
         super().__init__(properties, parent, children)
         self._make_new_sprite()
     
-    @export([0,0,0],"list","color")
-    def color(self) -> list[int]:
-        """RGB color of the ColorRect."""
-        return self._color
+    @export([255,255,255],"list","color")
+    def color(self) -> tuple[int, int, int]:
+        """RGBA Color value of the Label. Modifying a single item will do nothing."""
+        return self.color_as_tuple()
     @color.setter
     def color(self, rgb : list[int]):
-        self._color = rgb
+        self.rgb = rgb
+    def _update_color(self, r, g, b, a):
         self._refresh_image()
     
     def _refresh_image(self):
@@ -37,7 +39,7 @@ class ColorRect(CanvasItem):
         if rh == 0: rh = 1
 
         # Make the image
-        self.image = pg.image.ImageData(rw,rh,'RGB',bytes(self.color*rw*rh))
+        self.image = pg.image.ImageData(rw,rh,'RGB',bytes(self.rgb*rw*rh))
     
     def update(self):
         super().update()

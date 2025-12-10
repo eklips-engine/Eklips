@@ -4,7 +4,7 @@ import pyvidplayer2   as pvd
 
 # Import components
 from classes             import hooks, ui, resources, nodes
-from classes             import crash_screen as error_handler
+from classes             import crash_screen as error_handler, debug
 from classes             import saving
 from classes.customprops import *
 from classes.locals      import *
@@ -89,6 +89,11 @@ def is_anything_pressed() -> bool:
     return False
 
 def handle_closing():
+    """
+    Saves the game, frees the scene and sets `running` to False.
+
+    Only call this function when you are closing the game engine.
+    """
     global running, savefile, scene
     
     running = False
