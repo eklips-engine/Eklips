@@ -23,6 +23,10 @@ class CollisionManager:
         sid              = self.amount
         self.shapes[sid] = shape
         return sid
+
+    def delete(self, sid):
+        """Delete shape `sid` from the world."""
+        self.shapes.pop(sid)
     
     def colliderect(self, shape, other):
         """Check if `shape` is colliding with `other`."""

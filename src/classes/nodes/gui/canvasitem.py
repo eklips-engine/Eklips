@@ -28,8 +28,6 @@ class CanvasItem(Node, Transform):
     This is a Node that has properties for transformation,
     and is meant for rendering items in the window.
 
-    This has relativity only on the position.
-
     (NOTE: The reason why `tsize` is called that because
     anytree's NodeMixin uses a size property..)
     """
