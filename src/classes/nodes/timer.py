@@ -85,4 +85,3 @@ class Timer(Node):
     @auto_start.setter
     def auto_start(self, value):
         self._autostart = value
-    

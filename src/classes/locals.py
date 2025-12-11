@@ -3,13 +3,14 @@ import pyglet as pg
 USE_GAME_PARENT = "UseFileParent"
 USE_GAME_CV_DIR = "UseFileCVar"
 
+NAME         = "Eklips Engine"
 BDATE        = [3, 12, 2025] # DMY
 MAJOR        = "5"           # Major [5].0 A 
 MINOR        = "0"           # Minor  5.[0]A 
 HOTFIX       = "A"           # Hotfix 5. 0[A]
 VERSION      = f"{MAJOR}.{MINOR}{HOTFIX}"
 VERSION_FULL = f"v{VERSION} ({BDATE[0]}/{BDATE[1]}/{BDATE[2]})"
-print(f"Eklips Engine {VERSION_FULL}")
+print(f"{NAME} {VERSION_FULL}")
 
 AUTOMATICALLY_CREATE = 1
 DETECT               = 2
