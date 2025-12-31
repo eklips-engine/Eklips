@@ -81,10 +81,11 @@ def is_action_pressed(entry) -> bool:
             # action = pyglet.window.key.X, MOUSE_LEFT, ...
             # See if action is not just mouse input and handle it
             action_is_key = (not action in MOUSE_BUTTONS)
+
             if action_is_key:
-                if (action in keyboard.held and action_data["holdable"]
-                    or 
-                    action in keyboard.pressed and not action_data["holdable"]):
+                if (action in keyboard.held and action_data["holdable"]):
+                    return keyboard.held[action]
+                if (action in keyboard.pressed and not action_data["holdable"]):
                     return True
             else:
                 if mouse.buttons[action]: return True

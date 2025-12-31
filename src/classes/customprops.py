@@ -216,16 +216,6 @@ class Transform:
     @property
     def alpha(self): return self._alpha
     
-    # Aliases (Because some people prefer `w` or `width`)
-    @property
-    def width(self): return self.w
-    @property
-    def height(self): return self.h
-    @width.setter
-    def width(self, value): self.w = value
-    @height.setter
-    def height(self, value): self.h = value
-
     # Setters
     @alpha.setter
     def alpha(self, value):

@@ -72,7 +72,7 @@ class Scene(Object):
     _temp_node_list                  = []          # List of nodepaths in the scene tree
     _collisionman : CollisionManager = None        # Collision Manager
 
-    @property
+    @export(None, "str", "file_path/scn")
     def file_path(self) -> str:
         return self._file_path
     @file_path.setter
@@ -284,7 +284,7 @@ class Scene(Object):
         .. nodepath:: The node's path in the scene tree. (etc, `/father/me`, `/me`)
         .. throw_error_if_failed:: Throw an Error if it failed deleting the Node."""
         if nodepath == "":
-            return print("I fear your intentions.")
+            return
         
         parts    = nodepath.split("/")
         if len(nodepath.split("/")) == 1:
@@ -349,3 +349,6 @@ class Scene(Object):
             self._add_node(*i)
         self._blessed.clear()
         self._doomed.clear()
+
+# Import PackedScene here to not have any trouble
+from classes.nodes.packedscene import *

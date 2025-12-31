@@ -175,8 +175,9 @@ class EklipsWindow(pg.window.Window):
         engine.keyboard.pressed[symbol] = True
         
     def on_key_release(self, symbol, modifiers):
-        engine.keyboard.modifiers    = modifiers
-        engine.keyboard.held[symbol] = False
+        engine.keyboard.modifiers       = modifiers
+        engine.keyboard.held[symbol]    = False
+        engine.keyboard.pressed[symbol] = False
     
     def on_file_drop(self, x, y, paths):
         engine.mouse.pos   = [x, y]
@@ -191,6 +192,9 @@ class Viewport:
         ):
         self._width           = size[1]
         self._height          = size[0]
+        self.camx             = 0
+        self.camy             = 0
+        self.camzoom          = 1
         self._x               = position[0]
         self._y               = position[1]
         self._background      = [0,0,0,1]
@@ -374,6 +378,7 @@ class Viewport:
         if self.window.closed:
             return
 
+        # Init viewport
         self.window.switch_to()
         self.framebuffer.bind()
         glViewport(self.x, self.y, self.width, self.height)
@@ -381,14 +386,56 @@ class Viewport:
         if self._background[:3] != [0,0,0]:
             glClearColor(*self._background)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        
+        # Move camera
+        self._move_camera()
 
         # Draw batches for this Viewport and unbind buffer
         for batch in self.batches:
             batch.draw()
+        
+        # Unbind viewport
         self.framebuffer.unbind()
         
+        # Reset camera
+        self._reset_camera()
+
         # Draw Viewport to Window
         self.color_buffer.blit(self.x, self.y)
+    
+    def _reset_camera(self):
+        view_matrix = self.window.view.scale(
+            (
+                1 / self.camzoom,
+                1 / self.camzoom,
+                1
+            )
+        )
+        view_matrix = view_matrix.translate(
+            (
+                self.camx,
+                self.camy,
+                0
+            )
+        )
+        self.window.view = view_matrix
+    def _move_camera(self):
+        view_matrix = self.window.view.scale(
+            (
+                self.camzoom,
+                self.camzoom,
+                1
+            )
+        )
+        view_matrix = view_matrix.translate(
+            (
+                -self.camx,
+                -self.camy,
+                0
+            )
+        )
+
+        self.window.view = view_matrix
     
     def close(self):
         """

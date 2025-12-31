@@ -3,7 +3,9 @@ print(" ~ Importing all nodes")
 from classes.nodes.node         import *
 from classes.nodes.timer        import *
 from classes.nodes.collisionbox import *
+# from classes.nodes.packedscene  import *
 
+from classes.nodes.gui.camera         import *
 from classes.nodes.gui.canvasitem     import *
 from classes.nodes.gui.colorrect      import *
 from classes.nodes.gui.label          import *

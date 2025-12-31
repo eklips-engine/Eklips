@@ -48,6 +48,13 @@ class CanvasItem(Node, Transform):
         self._image = value
         if self.sprite:
             self.sprite.image = value
+    
+    @export([False, False], "list", "vector2/wh")
+    def imgflip(self): return self._imgflip
+    @imgflip.setter
+    def imgflip(self, value : list):
+        self._imgflip = value
+        # XXX to be implemented because pyglet Images just don't want to have `flip_x` ARGHH
 
     def __init__(self, properties={}, parent=None, children=None):
         engine.Transform.__init__(self)
@@ -56,6 +63,7 @@ class CanvasItem(Node, Transform):
             self._drawing_wid = self.parent._drawing_wid
         else:
             self._drawing_wid = MAIN_WINDOW
+        self._imgflip         = [False, False]
         self._drawing_bid     = MAIN_BATCH
 
         self.batch = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_bid)
