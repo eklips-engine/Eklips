@@ -33,6 +33,10 @@ def on_draw():
         # Update scene
         engine.scene.update()
 
+        # Check if fullscreen is wanted
+        if engine.keyboard.pressed.get(pg.window.key.F11):
+            main_window.set_fullscreen(not main_window.fullscreen)
+
         # Clear the list of pressed keys
         engine.keyboard.pressed.clear()
     except Exception as error:

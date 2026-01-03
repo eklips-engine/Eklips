@@ -1,0 +1,5 @@
+{
+  "type": "ScreenShader",
+  "vertex": "#version 150 core\nin vec2 position;\nin vec4 colors;\nout vec4 vertex_colors;\nuniform WindowBlock\n{\nmat4 projection;\nmat4 view;\n} window;\nvoid main()\n{\ngl_Position = window.projection * window.view * vec4(position, 0.0, 1.0);\nvertex_colors = colors;\n}",
+  "fragment": "#version 150 core\nin vec4 vertex_colors;\nout vec4 final_color;\nvoid main()\n{\nfinal_color = vertex_colors;\n}"
+}
