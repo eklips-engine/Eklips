@@ -88,7 +88,7 @@ def is_action_pressed(entry) -> bool:
                     or
                     (action in keyboard.pressed and not action_data["holdable"])
                    ):
-                    return keyboard.held[action]
+                    if keyboard.held[action]: return True
             else:
                 if mouse.buttons[action]: return True
     return False
