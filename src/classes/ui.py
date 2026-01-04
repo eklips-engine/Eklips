@@ -54,13 +54,13 @@ class EklWindow(pg.window.Window):
         context    : pg.gl.Context         | None = None,
 
         mode       : pg.display.base.ScreenMode | None = None
-        ) -> None:
+    ) -> None:
 
         # Setup variables
-        self._focused        = False
-        self.closed          = True
-        self.eklips_viewport = None
-        self.wid             = -1
+        self._focused  = False
+        self.closed    = True
+        self.viewports = []
+        self.wid       = -1
         
         # Init
         ## Code taken from pyglet/window/base/__init__.py line 508-546
@@ -148,8 +148,8 @@ class EklWindow(pg.window.Window):
     def on_resize(self, width, height):
         self._focused = True
 
-        self.eklips_viewport.width  = width
-        self.eklips_viewport.height = height
+        self.viewports[0].width  = width
+        self.viewports[0].height = height
     
     def on_draw(self):
         self.switch_to()
@@ -158,7 +158,9 @@ class EklWindow(pg.window.Window):
     def flip(self):
         if not self.invalid:
             return
-        self.eklips_viewport.flip()
+
+        for viewport in self.viewports:
+            viewport.flip()
         super().flip()
     
     def on_mouse_motion(self, x, y, dx, dy):
@@ -190,10 +192,12 @@ class EklWindow(pg.window.Window):
 class Viewport:
     def __init__(
             self,
+            id,
             batches  : list          = [],
             size     : list[int,int] = [640,480],
             position : list[int,int] = [0,0]
         ):
+        self.id               = id
         self._width           = size[1]
         self._height          = size[0]
         self.camx             = 0
@@ -217,6 +221,12 @@ class Viewport:
         self.used_sprites                     = {}
         self._base_img                        = engine.loader.load("root://_assets/error.png")
 
+    def add_batch(self):
+        bid      = len(self.batches)
+        batch    = pg.graphics.Batch()
+
+        self.batches.append(batch)
+        return bid
     def _make_framebuffer(self):
         if self.window:
             self.window.switch_to()
@@ -372,14 +382,14 @@ class Viewport:
             a: Alpha of the background color (0-255).
         """
         self._background = [
-            (r+ZDE_FIX) / 255,
-            (g+ZDE_FIX) / 255,
-            (b+ZDE_FIX) / 255,
-            (a+ZDE_FIX) / 255
+            r / 255,
+            g / 255,
+            b / 255,
+            a / 255
         ]
     def flip(self):
         """
-        Draw viewport contents to the window and flip it if the viewport is its master.
+        Draw viewport contents to the window.
         """
         # If you or the window is closed, don't bother
         if self._closing:
@@ -412,7 +422,7 @@ class Viewport:
         self._reset_camera()
 
         # Draw Viewport to Window
-        self.color_buffer.blit(self.x, self.y)
+        self.color_buffer.blit(self.x, self.y, self.id)
     
     def _reset_camera(self):
         view_matrix = self.window.view.scale(
@@ -531,30 +541,28 @@ class Display:
         if visible:
             window.set_visible()
         window.wid = wid
-        
-        # Create Viewport
-        viewport = Viewport([], viewport_size, [0,0])
+
+        # Create viewport
+        viewport = Viewport(MAIN_VIEWPORT, [], viewport_size, [0,0])
         viewport.set_background(*viewport_color)
         viewport.provide_window(window, master=True)
-
-        # Set Window's viewport to the one we just made
-        window.eklips_viewport = viewport
         
         # Make the Window entry
         self.windows[wid] = {
             "name":       name,
 
             "window":     window,
-            "viewport":   viewport,
             "fpsd":       None,
 
-            "batches":    [],
-            "main_batch": None
+            "batches":    []
         }
         
+        # Set Window's viewport to the one we just made
+        window.viewports.append(viewport)
+
         # Create a batch and update the Viewport to match
+        self.add_viewport(MAIN_WINDOW, [32,32], blue)
         self.add_batch(wid)
-        viewport.batches = self.windows[wid]["batches"]
 
         # Add FPS Display
         if fpsvisible or engine.debug.fps_visible:
@@ -564,6 +572,49 @@ class Display:
         # Return Window ID
         return wid
     
+    def add_viewport(
+        self,
+        wid            : int             = MAIN_WINDOW,
+        viewport_size  : list[int] | int = VIEWPORT_EQUAL_WINDOW,
+        viewport_color                   = black,
+    ):
+        """
+        Add a viewport to Window `wid`. Returns its ID.
+
+        Args:
+            wid: ID of Window. Defaults to MAIN_WINDOW.
+            viewport_size: Size of the window's viewport. Use constant `VIEWPORT_EQUAL_WINDOW` to make the Viewport size equal the Window size.
+            viewport_color: Background color of the viewport.
+        """
+
+        window   = self.get_window(wid)
+        if viewport_size == VIEWPORT_EQUAL_WINDOW:
+            viewport_size = window.size
+
+        vid = len(window.viewports)
+
+        viewport = Viewport(vid, [], viewport_size, [0,0])
+        viewport.set_background(*viewport_color)
+        viewport.provide_window(window)
+
+        window.viewports.append(viewport)
+
+        return vid
+
+    def add_batch(self, wid : int = MAIN_WINDOW, vid : int = MAIN_VIEWPORT):
+        """
+        Add a batch to Window `wid`. Returns its ID.
+
+        Args:
+            wid: ID of Window. Defaults to MAIN_WINDOW.
+            vid: ID of Window's viewport. Defaults to MAIN_VIEWPORT.
+        """
+        if not (self.windows and self.windows.get(wid, None)):
+            return
+        
+        viewport = self.get_viewport_from_window(wid, vid)
+        return viewport.add_batch()
+
     def clear_window(self, wid : int = MAIN_WINDOW):
         """
         Clear the window `wid`.
@@ -661,40 +712,6 @@ class Display:
                 self._close_window(wid)
             else:
                 self.close_window(wid)
-    
-    def dispatch_events(self, wid : int = MAIN_WINDOW):
-        """
-        Dispatch the window `wid`.
-
-        Args:
-            wid: ID of Window. Defaults to MAIN_WINDOW.
-        """
-        if not (self.windows and self.windows.get(wid, None)):
-            return
-        
-        window_data                   = self.windows[MAIN_WINDOW]
-        window : pg.window.BaseWindow = window_data["window"]
-        if window:
-            window.switch_to()
-            window.dispatch_events()
-    
-    def add_batch(self, wid : int = MAIN_WINDOW):
-        """
-        Add a batch to Window `wid`.
-
-        Args:
-            wid: ID of Window. Defaults to MAIN_WINDOW.
-        """
-        if not (self.windows and self.windows.get(wid, None)):
-            return
-        
-        window_data = self.windows[wid]
-        bid         = len(window_data["batches"])
-        if window_data["main_batch"] == None:
-            window_data["main_batch"] = bid
-        window_data["batches"].append(pg.graphics.Batch())
-        self.windows[wid]["batches"] = window_data["batches"]
-        return bid
 
     def get_window(self, wid : int = MAIN_WINDOW) -> EklWindow:
         """
@@ -711,19 +728,20 @@ class Display:
 
         Args:
             wid: ID of Window. Defaults to MAIN_WINDOW.
-            vid: ID of Viewport. Defaults to MAIN_VIEWPORT. (Unused since Windows can't have multiple viewports for now)
+            vid: ID of Viewport. Defaults to MAIN_VIEWPORT.
         """
-        return self.windows.get(wid, {"viewport": None})["viewport"]
+        return self.get_window(wid).viewports[vid]
 
-    def get_batch_from_window(self, wid : int = MAIN_WINDOW, bid : int = MAIN_BATCH) -> pg.graphics.Batch:
+    def get_batch_from_window(self, wid : int = MAIN_WINDOW, vid: int = MAIN_VIEWPORT, bid : int = MAIN_BATCH) -> pg.graphics.Batch:
         """
-        Get the batch `bid` from the window `wid`.
+        Get the batch `bid` from the viewport `vid` which is from the window `wid`.
 
         Args:
             wid: ID of Window. Defaults to MAIN_WINDOW.
-            bid: ID of Batch. Defaults to MAIN_BATCH.
+            vid: ID of Window's viewport. Defaults to MAIN_VIEWPORT.
+            bid: ID of Batch from viewport. Defaults to MAIN_BATCH.
         """
-        return self.windows.get(wid, {"batches": {bid: None}})["batches"][bid]
+        return self.get_viewport_from_window(wid, vid).batches[bid]
     
     def blit(
         self,
@@ -848,8 +866,7 @@ class Display:
         if self.get_window(window_id).closed:
             return 0,0
         
-        windata             = self.windows[window_id]
-        viewport : Viewport = windata["viewport"]
+        viewport : Viewport = self.get_viewport_from_window(window_id)
         if not viewport:
             return 0,0
         
