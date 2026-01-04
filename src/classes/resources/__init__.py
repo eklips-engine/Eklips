@@ -7,10 +7,11 @@ import classes.singleton as engine
 
 # Import resources
 print(" ~ Importing all resources")
-from classes.resources.object import *
-from classes.resources.script import *
-from classes.resources.scene  import *
-from classes.resources.image  import *
+from classes.resources.object  import *
+from classes.resources.script  import *
+from classes.resources.scene   import *
+from classes.resources.image   import *
+from classes.resources.tileset import *
 
 # Classes
 class Loader:

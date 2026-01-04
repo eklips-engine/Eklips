@@ -1,5 +1,5 @@
 <center>
-    <img src="img/logo.png" alt="Eklips Engine logo">
+    <img src="img/logo.svg" alt="Eklips Engine logo">
 </center>
 
 <hr>
