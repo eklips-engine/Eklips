@@ -561,7 +561,6 @@ class Display:
         window.viewports.append(viewport)
 
         # Create a batch and update the Viewport to match
-        self.add_viewport(MAIN_WINDOW, [32,32], blue)
         self.add_batch(wid)
 
         # Add FPS Display
