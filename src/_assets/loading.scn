@@ -28,6 +28,8 @@
                     "media":      "root://_assets/load.mp3",
                     "auto_start": true,
 
+                    "volume":     0.3,
+
                     "children":   {}
                 },
                 "Ring": {

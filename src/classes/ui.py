@@ -34,6 +34,7 @@ green = [255,0,0]
 blue  = [0,0,255]
 black = [0,0,0]
 white = [255,255,255]
+f = 1
 
 # Classes
 class EklWindow(pg.window.Window):
@@ -750,6 +751,7 @@ class Display:
         group          : pg.graphics.Group = None,
         region         : list | None       = None
     ) -> None:
+        global f
         """
         Draw a Sprite to a Window's main viewport.
         
@@ -804,11 +806,14 @@ class Display:
         
         # Set sprite's properites
         if transform.rotation:
-            sprite.image.anchor_x = w/4
-            sprite.image.anchor_y = h/4
-            x += w/2
-            y += h/2
-
+            sprite.image.anchor_x = w / 4
+            sprite.image.anchor_y = h / 4
+            x += w / 2
+            y += h / 2
+        else:
+            sprite.image.anchor_x = 0
+            sprite.image.anchor_y = 0
+        
         if sprite.rotation != transform.rotation:
             sprite.rotation = transform.rotation
         if sprite.x != x:
@@ -821,8 +826,8 @@ class Display:
             sprite.scale_x = scale_x
         if sprite.scale_y != scale_y:
             sprite.scale_y = scale_y
-        if sprite.opacity != int(transform.alpha):
-            sprite.opacity = int(transform.alpha)
+        if sprite.opacity != transform.alpha:
+            sprite.opacity = transform.alpha
         sprite.visible = True
     
     def blit_label(
@@ -889,8 +894,15 @@ class Display:
 
         # | Set the others
         if transform.rotation:
-            label.anchor_x = w/4
-            label.anchor_y = h/4
+            label.anchor_x = w / 4
+            label.anchor_y = h / 4
+            x += w / 2
+            y += h / 2
+        else:
+            label.anchor_x = 0
+            label.anchor_y = 0
+        
+        if transform.rotation:
             x += w/2
             y += h/2
 
@@ -902,7 +914,7 @@ class Display:
             label.y = y
         if label.group != group:
             label.group = group
-        if label.opacity != int(transform.alpha):
-            label.opacity = int(transform.alpha)
+        if label.opacity != transform.alpha:
+            label.opacity = transform.alpha
         label.visible = True
         return w,h

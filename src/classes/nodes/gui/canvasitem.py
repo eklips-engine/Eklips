@@ -106,9 +106,6 @@ class CanvasItem(Node, Transform):
         if not self.sprite:
             return
         self.sprite.rotation = deg
-        if deg:
-            self.sprite.image.anchor_x = self.w/4
-            self.sprite.image.anchor_y = self.h/4 
     def _set_alpha(self, deg):
         if not self.sprite:
             return

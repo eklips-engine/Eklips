@@ -1,0 +1,64 @@
+<svg
+	xmlns="http://www.w3.org/2000/svg" width="1247" height="1247">
+	<style>
+#Circleelement {
+    -webkit-animation-name: rotate; 
+    -webkit-animation-duration: 2s; 
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: rotate; 
+    -moz-animation-duration: 2s; 
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    animation-name: rotate; 
+    animation-duration: 2s; 
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+@-webkit-keyframes rotate {
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(360deg);}
+}
+@-moz-keyframes rotate {
+    from {-moz-transform: rotate(0deg);}
+    to {-moz-transform: rotate(360deg);}
+}
+@keyframes rotate {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+</style>
+	<g name="SunMoon">
+		<circle r="272.2625" cx="623.5" cy="623.5" fill="#ffff83" stroke-width="23.675" stroke="#ffff83" stroke-opacity=".5"/>
+		<circle r="260.425" cx="623.5" cy="623.5" fill="#00007c"/>
+	</g>
+	<g name="90">
+		<line x1="623.5" y1="244.7" y2="310.99" x2="623.5" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+		<line x1="623.5" y1="1002.3" y2="936.01" x2="623.5" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+	</g>
+	<g name="67.5">
+		<line x1="410.425" y1="292.05" y2="351.2375" x2="457.775" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+		<line x1="410.425" y1="954.95" y2="895.7625" x2="457.775" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+		<line x1="836.575" y1="292.05" y2="351.2375" x2="789.225" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+		<line x1="836.575" y1="954.95" y2="895.7625" x2="789.225" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+	</g>
+	<g name="45">
+		<line x1="285.8945" y1="438.3615" y2="469.6125" x2="345.082" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+		<line x1="285.8945" y1="808.6385" y2="777.3875" x2="345.082" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+		<line x1="961.1055" y1="438.3615" y2="469.6125" x2="901.918" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+		<line x1="961.1055" y1="808.6385" y2="777.3875" x2="901.918" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+	</g>
+	<g name="0">
+		<line x1="230.0215" y1="623.5" y2="623.5" x2="310.99" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+		<line x1="1016.9785" y1="623.5" y2="623.5" x2="936.01" stroke="#ffff83" opacity="1" stroke-linecap="round" stroke-width="23.675"/>
+	</g>
+	<g transform="translate(623.5 623.5)">
+		<g cx="150" cy="150" id="Circleelement">
+			<g transform="translate(-623.5 -623.5)">
+				<circle r="108" cx="971" cy="297" fill="#00007c"/>
+				<circle r="31" cx="1014.8" cy="250.8" fill="#fff"/>
+				<path fill="none" stroke="#888" stroke-width="10.8612" stroke-miterlimit="10" stroke-dasharray="40.8475" d="M1040.6 411c33.5 65.8 51 138.6 51 212.5 0 258.4-209.7 468.1-468.1 468.1S155 881.9 155.4 623.5C155.4 365.1 365.1 155.4 613.5 155.4c83.1 0 164.6 22.1 236.2 63.9" />
+			</g>
+		</g>
+	</g>
+</svg>

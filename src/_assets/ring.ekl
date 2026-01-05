@@ -5,7 +5,7 @@ def _process(self : engine.nodes.CanvasItem, delta):
     if self.alpha < 0:
         if engine.game.master_scene:
             engine.scene.load(engine.game.master_scene)
-        self.visible = false
+        self.visible = False
         return
     
     # Get Eklips Node
@@ -15,7 +15,7 @@ def _process(self : engine.nodes.CanvasItem, delta):
         eklips = None
     
     # Rotate the ring
-    self.rotation += delta * 150
+    self.rotation   += delta * 150
 
     # Check if rotated fully, then start fading out
     if self.rotation > 351:

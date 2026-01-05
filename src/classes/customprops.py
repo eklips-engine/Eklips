@@ -218,7 +218,7 @@ class Transform:
     def rotation(self): return self._rotation
     
     @property
-    def alpha(self): return self._alpha
+    def alpha(self): return round(self._alpha)
 
     @property
     def flip_w(self): return self._flip_w
