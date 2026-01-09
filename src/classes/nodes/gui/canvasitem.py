@@ -158,10 +158,10 @@ class CanvasItem(Node, Transform):
             return
         x,y    = self.into_screen_coords(viewport.size)
         is_it  = (
-            mpos[0] >= x          and
-            mpos[0] <= x + self.w and
-            mpos[1] >= y          and
-            mpos[1] <= y + self.h
+            mpos[0] >= (x - viewport.camx)          and
+            mpos[0] <= (x - viewport.camx) + self.w and
+            mpos[1] >= (y - viewport.camy)          and
+            mpos[1] <= (y - viewport.camy) + self.h
         )
         
         return is_it

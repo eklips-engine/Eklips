@@ -139,6 +139,7 @@ icon      : pg.image.AbstractImage = None
 keyboard  : Keyboard               = None
 scene     : resources.Scene        = None
 running   : bool                   = False
+spronscr  : int                    = 0
 uid       : int                    = 0
 sid       : int                    = 0
 delta     : float                  = 0.0

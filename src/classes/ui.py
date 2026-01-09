@@ -162,6 +162,7 @@ class EklWindow(pg.window.Window):
 
         for viewport in self.viewports:
             viewport.flip()
+        engine.spronscr = 0
         super().flip()
     
     def on_mouse_motion(self, x, y, dx, dy):
@@ -222,6 +223,24 @@ class Viewport:
         self.used_sprites                     = {}
         self._base_img                        = engine.loader.load("root://_assets/error.png")
 
+    def get_screen_pos(self, transform : Transform):
+        return transform.x - self.camx, transform.y + self.camy
+    
+    def is_onscreen(self, transform : Transform):
+        if engine.debug.sprite_always_visible:
+            return True
+        
+        if not (
+            (transform.x - self.camx) + transform.w < 0           or
+            (transform.x - self.camx)               > self.width  or
+            (transform.y + self.camy) + transform.h < 0           or
+            (transform.y + self.camy)               > self.height
+        ):  
+            if engine.debug.track_visible_sprites:
+                engine.spronscr += 1
+            return True
+        return False
+    
     def add_batch(self):
         bid      = len(self.batches)
         batch    = pg.graphics.Batch()
@@ -794,10 +813,6 @@ class Display:
         # Set image's flip values properly
         if transform.flip_w or transform.flip_h:
             sprite.image = sprite.image.flip(transform.flip_w, transform.flip_h)
-            if transform.flip_w:
-                x += w
-            if transform.flip_h:
-                y += h
         
         # Set image's region (if it isn't None)
         if region != None:
@@ -828,7 +843,7 @@ class Display:
             sprite.scale_y = scale_y
         if sprite.opacity != transform.alpha:
             sprite.opacity = transform.alpha
-        sprite.visible = True
+        sprite.visible = viewport.is_onscreen(transform)
     
     def blit_label(
         self,
@@ -893,19 +908,6 @@ class Display:
         x,y = transform.into_screen_coords(viewport.size)
 
         # | Set the others
-        if transform.rotation:
-            label.anchor_x = w / 4
-            label.anchor_y = h / 4
-            x += w / 2
-            y += h / 2
-        else:
-            label.anchor_x = 0
-            label.anchor_y = 0
-        
-        if transform.rotation:
-            x += w/2
-            y += h/2
-
         if label.rotation != transform.rotation:
             label.rotation = transform.rotation
         if label.x != x:
@@ -916,5 +918,5 @@ class Display:
             label.group = group
         if label.opacity != transform.alpha:
             label.opacity = transform.alpha
-        label.visible = True
+        label.visible = viewport.is_onscreen(transform)
         return w,h

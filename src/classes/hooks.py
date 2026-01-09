@@ -31,7 +31,7 @@ class HookFPSDisplay(pg.window.FPSDisplay):
         super().__init__(window, color, samples)
 
         self.window   : EklWindow = window
-        self.viewport : Viewport  = window.eklips_viewport
+        self.viewport : Viewport  = window.viewports[0]
         self.label                = pg.text.Label(batch = self.viewport.batches[MAIN_BATCH])
         self.label.color          = color
 
@@ -67,7 +67,9 @@ class HookFPSDisplay(pg.window.FPSDisplay):
 
         if self._elapsed >= self.update_period:
             self._elapsed = 0
-            self.label.text = f'{1 / self._mean(self._delta_times):.2f} FPS with {engine.uid} objects'
+            self.label.text = f'{1 / self._mean(self._delta_times):.2f} FPS with {engine.spronscr} visible sprites'
+        self.transform.x = self.viewport.camx+5
+        self.transform.y = -self.viewport.camy
     
     def _hook_flip(self) -> None:
         self.update()
