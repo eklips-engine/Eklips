@@ -225,17 +225,19 @@ class Viewport:
         self._base_img                        = engine.loader.load("root://_assets/error.png")
 
     def get_screen_pos(self, transform : Transform):
-        return transform.x - self.camx, transform.y + self.camy
+        x,y = transform.into_screen_coords(self.size)
+        return x - self.camx, y - self.camy
     
     def is_onscreen(self, transform : Transform):
         if engine.debug.sprite_always_visible:
             return True
         
+        x,y = transform.into_screen_coords(self.size)
         if not (
-            (transform.x - self.camx) + transform.w < 0           or
-            (transform.x - self.camx)               > self.width  or
-            (transform.y + self.camy) + transform.h < 0           or
-            (transform.y + self.camy)               > self.height
+            (x - self.camx) + transform.w < 0           or
+            (x - self.camx)               > self.width  or
+            (y - self.camy) + transform.h < 0           or
+            (y - self.camy)               > self.height
         ):  
             if engine.debug.track_visible_sprites:
                 engine.spronscr += 1

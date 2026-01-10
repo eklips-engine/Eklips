@@ -67,7 +67,10 @@ class HookFPSDisplay(pg.window.FPSDisplay):
 
         if self._elapsed >= self.update_period:
             self._elapsed = 0
-            self.label.text = f'{1 / self._mean(self._delta_times):.2f} FPS with {engine.spronscr} visible sprites'
+            if engine.debug.track_visible_sprites:
+                self.label.text = f'{1 / self._mean(self._delta_times):.2f} FPS with {engine.spronscr} visible sprites'
+            else:
+                self.label.text = f'{1 / self._mean(self._delta_times):.2f} FPS with {engine.uid} objects'
         self.transform.x = self.viewport.camx+5
         self.transform.y = -self.viewport.camy
     
