@@ -30,7 +30,8 @@ def load_engine():
         name           = game.name, 
         
         size           = game.win.vsize, 
-        viewport_size  = game.win.vsize, 
+        viewport_size  = game.win.vsize,
+        viewport_flags = [VIEWPORT_EQUAL_WINDOW], 
         viewport_color = game.win.color,
         resizable      = game.win.resizable,
         minimum_size   = game.win.minsize,

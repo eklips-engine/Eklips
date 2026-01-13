@@ -13,6 +13,8 @@ def set_anti_aliasing(yn : bool):
     else:  value = GL_NEAREST
     pg.image.Texture.default_mag_filter = pg.image.Texture.default_min_filter = value
 
+glEnable(GL_CULL_FACE)
+
 # Colors
 _r    = [0,0,0]
 _rs   = [1,1,1]
@@ -150,8 +152,10 @@ class EklWindow(pg.window.Window):
     def on_resize(self, width, height):
         self._focused = True
 
-        self.viewports[0].width  = width
-        self.viewports[0].height = height
+        for viewport in self.viewports:
+            if VIEWPORT_EQUAL_WINDOW in viewport.flags:
+                viewport.width  = width
+                viewport.height = height
     
     def on_draw(self):
         self.switch_to()
@@ -205,19 +209,20 @@ class CameraTransform(Transform):
 class Viewport:
     def __init__(
             self,
-            id,
+            vid,
+            flags    : list          = [],
             batches  : list          = [],
             size     : list[int,int] = [640,480],
             position : list[int,int] = [0,0]
         ):
-        self.id               = id
+        self.flags            = flags
+        self.id               = vid
         self.cam              = CameraTransform()
         self._width           = size[1]
         self._height          = size[0]
         self._x               = position[0]
         self._y               = position[1]
         self._background      = [0,0,0,1]
-        self._window_is_slave = False
 
         self.framebuffer        = None
         self.color_buffer       = None
@@ -286,11 +291,9 @@ class Viewport:
 
         Args:
             window: Window object (engine.ui.EklWindow).
-            master: If the Window is linked to the Viewport. Defaults to False.
         """
         # Set variables
         self.window           = window
-        self._window_is_slave = master
 
         # Remake framebuffer to be happy
         self._delete_buffer()
@@ -433,11 +436,10 @@ class Viewport:
         # Init viewport
         self.window.switch_to()
         self.framebuffer.bind()
-        glViewport(self.x, self.y, self.width, self.height)
-        glEnable(GL_CULL_FACE)
-        if self._background[:3] != [0,0,0]:
+        if self._background[:3] != [0,0,0] and not NO_CLEAR_BACKGROUND in self.flags:
             glClearColor(*self._background)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        if not NO_CLEAR in self.flags:
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
         # Move camera
         self._move_camera()
@@ -514,6 +516,7 @@ class Display:
     def add_window(self,
         name           : str                    = DEFAULT_NAME,
         size           : list[int]              = [640,480],
+        viewport_flags : list                   = [],
         viewport_size  : list[int] | int        = VIEWPORT_EQUAL_WINDOW,
         viewport_color                          = black,
         icon           : pg.image.AbstractImage = None,
@@ -530,7 +533,8 @@ class Display:
         Args:
             name: Title of the window.
             size: Size of the window.
-            viewport_size: Size of the window's viewport. Use constant `VIEWPORT_EQUAL_WINDOW` to make the Viewport size equal the Window size.
+            viewport_size: Size of the window's viewport. This can be replaced with the flag `VIEWPORT_EQUAL_WINDOW`.
+            viewport_flags: Flags to be passed to the viewport.
             viewport_color: Background color of the viewport.
             icon: Image resource of the Window Icon, or None.
             resizable: Allow the window to be resizable if True.
@@ -539,6 +543,11 @@ class Display:
             wid: Create the window in a predetermined window ID if the argument is not AUTOMATICALLY_CREATE.
             visible: Make the window visible if True. Defaults to True.
             fpsvisible: Show the FPS if True.
+        
+        Flags:
+            VIEWPORT_EQUAL_WINDOW: Used to make the Viewport size equal the Window size.
+            NO_CLEAR: Do not clear the Viewport before rendering.
+            NO_CLEAR_BACKGROUND: Ignore the set background color.
         """
 
         # Fix properties
@@ -548,7 +557,9 @@ class Display:
         print(f" ~ Initialize Window '{name}'")
 
         if viewport_size == VIEWPORT_EQUAL_WINDOW:
+            viewport_flags.append(VIEWPORT_EQUAL_WINDOW)
             viewport_size = size
+        
         if self.main_window_id == None:
             self.main_window_id = wid
         
@@ -561,6 +572,27 @@ class Display:
             visible   = False
         )
 
+        # Create viewport
+        viewport = Viewport(MAIN_VIEWPORT, viewport_flags, [], viewport_size, [0,0])
+        viewport.set_background(*viewport_color)
+        viewport.provide_window(window)
+        viewport.add_batch()
+        
+        # Make the Window entry
+        self.windows[wid] = {
+            "name":       name,
+            "window":     window,
+            "fpsd":       None
+        }
+        
+        # Set Window's viewport to the one we just made
+        window.viewports.append(viewport)
+
+        # Add FPS Display
+        if fpsvisible or engine.debug.fps_visible:
+            fpsd = engine.hooks.HookFPSDisplay(window, [255,255,255,127])
+            self.windows[wid]["fpsd"] = fpsd
+
         # Set Window properties
         if minimum_size:
             window.set_minimum_size(*minimum_size)
@@ -572,32 +604,6 @@ class Display:
             window.set_visible()
         window.wid = wid
 
-        # Create viewport
-        viewport = Viewport(MAIN_VIEWPORT, [], viewport_size, [0,0])
-        viewport.set_background(*viewport_color)
-        viewport.provide_window(window, master=True)
-        
-        # Make the Window entry
-        self.windows[wid] = {
-            "name":       name,
-
-            "window":     window,
-            "fpsd":       None,
-
-            "batches":    []
-        }
-        
-        # Set Window's viewport to the one we just made
-        window.viewports.append(viewport)
-
-        # Create a batch and update the Viewport to match
-        self.add_batch(wid)
-
-        # Add FPS Display
-        if fpsvisible or engine.debug.fps_visible:
-            fpsd = engine.hooks.HookFPSDisplay(window, [255,255,255,127])
-            self.windows[wid]["fpsd"] = fpsd
-
         # Return Window ID
         return wid
     
@@ -606,6 +612,7 @@ class Display:
         wid            : int             = MAIN_WINDOW,
         viewport_size  : list[int] | int = VIEWPORT_EQUAL_WINDOW,
         viewport_color                   = black,
+        flags          : int             = 0
     ):
         """
         Add a viewport to Window `wid`. Returns its ID.
@@ -614,17 +621,20 @@ class Display:
             wid: ID of Window. Defaults to MAIN_WINDOW.
             viewport_size: Size of the window's viewport. Use constant `VIEWPORT_EQUAL_WINDOW` to make the Viewport size equal the Window size.
             viewport_color: Background color of the viewport.
+            flags: Viewport flags. Ex (`NO_CLEAR | NO_CLEAR_BACKGROUND`..)
         """
 
         window   = self.get_window(wid)
         if viewport_size == VIEWPORT_EQUAL_WINDOW:
+            flags.append(VIEWPORT_EQUAL_WINDOW)
             viewport_size = window.size
 
         vid = len(window.viewports)
 
-        viewport = Viewport(vid, [], viewport_size, [0,0])
+        viewport = Viewport(vid, flags, [], viewport_size, [0,0])
         viewport.set_background(*viewport_color)
         viewport.provide_window(window)
+        viewport.add_batch()
 
         window.viewports.append(viewport)
 
