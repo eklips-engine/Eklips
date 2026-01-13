@@ -27,11 +27,11 @@ def load_engine():
     display = ui.Display()
     clock   = pg.clock.Clock()
     display.add_window(
-        name           = game.name, 
+        name           = game.name,
         
-        size           = game.win.vsize, 
+        size           = game.win.vsize,
         viewport_size  = game.win.vsize,
-        viewport_flags = [VIEWPORT_EQUAL_WINDOW], 
+        viewport_flags = [VIEWPORT_EQUAL_WINDOW],
         viewport_color = game.win.color,
         resizable      = game.win.resizable,
         minimum_size   = game.win.minsize,
