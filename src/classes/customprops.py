@@ -107,8 +107,8 @@ class GameData:
         self.metadata     = self.file_data["project"]
 
         ## Get project itself
-        self.project_file = self.metadata["file"]
-        self.project_dir  = self.metadata["dir"]
+        self.project_file = self.metadata["file"].replace("\\", "/")
+        self.project_dir  = self.metadata["dir"].replace("\\", "/")
         
         # Check if arguments decide otherwise ("-file ...", "-dir ...")
         words = sys.argv
@@ -125,13 +125,12 @@ class GameData:
                 if after == None:
                     wrid += 1
                 elif current == "-dir":
-                    self.project_dir = after
+                    self.project_dir  = after.replace("\\", "/")
                 elif current == "-file":
-                    self.project_file = after
+                    self.project_file = after.replace("\\", "/")
             
             wrid += 1
 
-        # Actually
         if self.project_dir == USE_GAME_PARENT:
             self.project_dir = "/".join(self.project_file.split("/")[:-1])
         self.project_data = json.loads(open(self.project_file).read())

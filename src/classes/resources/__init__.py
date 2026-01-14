@@ -29,6 +29,8 @@ class Loader:
     }
 
     def _get_true_path(self, path : str):
+        path = path.replace("\\", "/")
+        
         if path.startswith("res://"):  return f"{engine.game.project_dir}/{path.removeprefix('res://')}"
         if path.startswith("root://"): return f"{path.removeprefix('root://')}"
         if path.startswith("user://"): return f"{path.removeprefix('user://')}"
