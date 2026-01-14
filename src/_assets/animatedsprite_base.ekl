@@ -1,0 +1,9 @@
+timer = 0
+
+def _process(self, delta):
+    global timer
+    timer += delta
+    if timer > 0.2:
+        print("e")
+        self.step()
+        timer = 0

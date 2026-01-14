@@ -48,8 +48,8 @@ class AnimatedSprite(CanvasItem):
     def step(self):
         self._imagesid    += 1
         if self._imagesid  < 0:
-            self._imagesid = len(self._imagesid) - 1
-        if self._imagesid  > len(self._imagesid) - 1:
+            self._imagesid = len(self._images) - 1
+        if self._imagesid  > len(self._images) - 1:
             self._imagesid = 0
 
     def update(self):
