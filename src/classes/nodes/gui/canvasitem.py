@@ -33,6 +33,7 @@ class CanvasItem(Node, Transform):
     """
     _can_check_layer                            = True
     _drawing_bid : int                          = 0
+    _drawing_vid : int                          = 0
     _drawing_wid : int                          = 0
     _sprite_id   : int                          = 0
     sprite       : pg.sprite.Sprite             = None
@@ -123,7 +124,7 @@ class CanvasItem(Node, Transform):
         """Get the Viewport that the CanvasItem will be drawn to."""
         viewport : ui.Viewport = engine.display.get_viewport_from_window(
             self._drawing_wid,
-            MAIN_VIEWPORT
+            self._drawing_vid
         )
         return viewport
     def _remove_sprite(self):

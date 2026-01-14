@@ -95,10 +95,11 @@ class Window(CanvasItem):
             self._window.width  = rw
             self._window.height = rh
     
-    def _get_viewport(self):
+    def _get_viewport(self, vid=0):
         if not self._window:
             return
-        return self._window.eklips_viewport
+        viewport : ui.Viewport = self._window.viewports[vid]
+        return viewport
     
     def get_if_mouse_hovering(self):
         """Returns true if the mouse is hovering over self."""
