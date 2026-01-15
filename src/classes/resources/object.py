@@ -2,7 +2,6 @@
 import classes.singleton as engine
 import gc, types
 from classes.locals       import *
-from classes.fakes.script import _ScriptDoc
 from classes.customprops  import export, _exportmeta
 from classes.log          import *
 
@@ -33,36 +32,19 @@ class Object(metaclass=_exportmeta):
         """Get the Object property `name`, if non-existent, return `fallback`."""
         return getattr(self, name, fallback)
     
-    @classmethod
-    def add(cls, name, default=None, type_=None, hint=DETECT):
-        """Add a new property."""
-        if cls not in Object._properties:
-            Object._properties[cls] = {}
-        Object._properties[cls][name] = export(
-            type_   = type_,
-            default = default,
-            hint    = hint
-        )
-        setattr(Object, name, Object._properties[cls][name])
-
     def set(self, name, value):
         """Set the Object property `name` into `value`."""
         setattr(self, name, value)
     
-    @classmethod
-    def get_property_list(cls):
-        # Gather all properties from the class hierarchy
-        props = {}
-        for base_cls in reversed(cls.mro()):
-            props.update(Object._class_properties.get(base_cls, {}))
-        return props
+    def get_property_list(self):
+        return self._properties.keys()
     
     # Properties
     @export(None,"str","str")
     def name(self) -> str: return self._name
     
     @property
-    def script(self) -> _ScriptDoc:
+    def script(self):
         return self._script
     @export(None,"str","file_path/ekl")
     def script_path(self) -> str: return self._script_path

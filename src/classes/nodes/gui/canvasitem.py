@@ -79,6 +79,13 @@ class CanvasItem(Node, Transform):
 
         self.batch = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_vid, self._drawing_bid)
 
+    @export(base_transform, "dict", "transform")
+    def transform(self):
+        return TRANSFORM_WARNING_EDITOR
+    @transform.setter
+    def transform(self, value):
+        self._convert_transform_property_into_object(value)
+
     @export(MAIN_VIEWPORT, "int", "viewportid")
     def viewport_id(self):
         """ID of the viewport to draw to."""
@@ -103,10 +110,6 @@ class CanvasItem(Node, Transform):
         self._make_new_sprite()
         self.batch = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_vid, self._drawing_bid)
 
-    def _setup_properties(self):
-        super()._setup_properties()
-        self._convert_transform_property_into_object(self._properties_onready.get("transform", base_transform))
-    
     def _convert_transform_property_into_object(self, value):
         self.position = value["position"]
         self.scale    = value["scale"]

@@ -52,3 +52,5 @@ INTERNET_IP        = "localhost"
 INTERNET_PORT      = 9283
 INTERNET_ADDRESS   = (INTERNET_IP, INTERNET_PORT)
 PACKET_BASIC       = "hBas"
+
+TRANSFORM_WARNING_EDITOR = "This property is used only for the editor to recognize this property is a CanvasItem-like object. To get the transform of a CanvasItem, use `self.x`, `self.y`, etc... However, you can set this property and it will actually work."

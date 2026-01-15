@@ -4,16 +4,30 @@ from tkinter             import ttk
 from tkinter.messagebox  import *
 from tkinter.filedialog  import *
 from classes.ui          import *
+from classes.customprops import *
+from classes.nodes       import *
 
 window_created = False
 
-def populate_frame():
+def populate_frame(self : ColorRect):
     # This checks for all projects' game.json file in your savefile,
     # and populates the "Panel" Node with entries of those projects.
     #
-    # The "projects" list is formatted like this:
-    # projects: ['editor/game.json', ...]
-    project = engine.savefile.get("projects", [])
+    # The "project_list" list is formatted like this:
+    # project_list: ['editor/game.json', ...]
+    project_list = engine.savefile.get("projects", [])
+    print(f" ~ [editor] Populate Panel with projects")
+    for project in project_list:
+        gamedata = GameData({
+            "project": {
+                "file": project,
+                "dir":  "UseFileParent"
+            },
+            "name": "Eklips 5.0A"
+        }, is_file=False)
+
+        engine.projects[project] = gamedata
+        print(f" |~ {gamedata.name} v{gamedata.version}")
 
 def make_new_project(name, directory):
     # This makes a new project.
@@ -35,9 +49,10 @@ def select_project_file(self): return askopenfilename(
 
 def _onready(self):
     if self.name == "panel_obj":
+        engine.projects = {}
         win = engine.display.get_window()
         win.set_caption(engine.lang.get("pe_title"))
-        populate_frame()
+        populate_frame(self)
 
 def _process(self, delta):
     if self.name  == "panel_obj":

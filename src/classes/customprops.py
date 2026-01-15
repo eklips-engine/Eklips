@@ -98,10 +98,13 @@ class WindowProperties:
     icofile      : str  = ""
 
 class GameData:
-    def __init__(self, settings="settings.json"):
+    def __init__(self, settings="settings.json", is_file = True):
         #### Settings file related
         ### Load settings
-        self.file_data    = json.loads(open(settings).read())
+        if is_file:
+            self.file_data = json.loads(open(settings).read())
+        else:
+            self.file_data = settings
 
         ### Get data about what project to use
         self.metadata     = self.file_data["project"]
@@ -180,8 +183,8 @@ class Transform:
         self.scroll    = [0,0]
         self.visible   = True
         
-        self._scale_x = 0
-        self._scale_y = 0
+        self._scale_x = 1
+        self._scale_y = 1
 
         self._window_size = [0,0]
     
