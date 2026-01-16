@@ -14,8 +14,10 @@ class Node(Object, NodeMixin):
     
     You can make a script have an `_onready(self)` function. This will only run when a Node is fully loaded.
     You can make a script have a `_process(self, delta)` function. This will run every frame after `_onready`. The argument `delta` is the delta time variable.
-    
+
     The `self` value in these functions is.. the node the script is attached to. You cannot replace Node functions with a script.
+
+    In a Script, `engine.scene` is the main scene being run. the variable `self.scene` is the scene the Node is located in as multiple scenes can exist thanks to the PackedScene node.
 
     There is nothing to do with this Node. The only useful thing to do with it is run a script with it, and no more.
     """
@@ -29,10 +31,18 @@ class Node(Object, NodeMixin):
         super().__init__(properties)
 
         # Set up family tree
-        # self.parent = parent
+        self.parent = parent
         if children:
             self.children = children
-    
+        
+        # Setup Scene property
+        self._scene = None
+
+    @property
+    def scene(self):
+        """The scene the Node is located in as multiple scenes can exist thanks to the PackedScene node."""
+        return self._scene
+
     # Update code
     def update(self):
         # Check if i have to be freed
@@ -52,6 +62,10 @@ class Node(Object, NodeMixin):
         
         # Free self
         super()._free()
+    
+    def _setup_properties(self, scene=None):
+        self._scene = scene
+        super()._setup_properties()
     
     def free(self):
         """Free the Node from memory.

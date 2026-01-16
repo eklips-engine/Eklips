@@ -58,6 +58,8 @@ class Scene(Resource):
     As one of the most important classes, the Scene manages the hierarchy of nodes in a scene,
     as well as scenes themselves. Nodes can be added, fetched and removed. The whole scene tree
     (and thus the current scene) can be paused. Scenes can be loaded, switched and reloaded.
+    There can be multiple Scenes running in the game loop thanks to the `PackedScene` node,
+    but ultimately is in this class (exposed as `engine.scene`) 
 
     The scene class also contains a CollisionManager.
     """
@@ -212,7 +214,7 @@ class Scene(Resource):
         # Init object and export values
         obj.__init__(node, parent)
         obj.name = nodepath.split("/")[-1]
-        obj._setup_properties()
+        obj._setup_properties(scene=self)
 
         # Set obj parameter to Node
         node["obj"] = obj

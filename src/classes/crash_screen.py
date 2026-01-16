@@ -8,6 +8,7 @@ def get_info(error : Exception):
 
 def show_error(error : Exception):
     info = get_info(error)
+    print(f"Crashed! See dialog for more info.")
     if askyesno(
         "Eklips Engine", 
         f"""Eklips has crashed with the traceback:

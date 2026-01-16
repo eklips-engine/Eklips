@@ -35,8 +35,8 @@ class MediaPlayer(CanvasItem):
         engine.sid   += 1
         self.channel  = Channel(self.media_id)
     
-    def _setup_properties(self):
-        super()._setup_properties()
+    def _setup_properties(self, scene=None):
+        super()._setup_properties(scene)
         if self.auto_start:
             self.play()
     

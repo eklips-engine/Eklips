@@ -4,13 +4,13 @@ def _process(self : engine.nodes.CanvasItem, delta):
     # Load master scene if Sprite is fully invisible or halt if not found
     if self.alpha < 0:
         if engine.game.master_scene:
-            engine.scene.load(engine.game.master_scene)
+            self.scene.load(engine.game.master_scene)
         self.visible = False
         return
     
     # Get Eklips Node
     try:
-        eklips = engine.scene.get_node_from_path("/Eklips")
+        eklips = self.scene.get_node_from_path("/Eklips")
     except:
         eklips = None
     

@@ -58,26 +58,21 @@ class CanvasItem(Node, Transform):
     def flip(self, value : list):
         self.flip_w, self.flip_h = value
 
-    def __init__(self, properties={}, parent=None, children=None):
+    def __init__(self, properties={}, parent = None, children=None):
         engine.Transform.__init__(self)
         super().__init__(properties, parent, children)
+
         if self.parent:
-            self._drawing_wid = self.parent._drawing_wid
+            self._drawing_wid = self.parent.get("_drawing_wid", MAIN_WINDOW)
+            self._drawing_vid = self.parent.get("_drawing_vid", MAIN_WINDOW)
+            self._drawing_bid = self.parent.get("_drawing_bid", MAIN_WINDOW)
         else:
             self._drawing_wid = MAIN_WINDOW
-        if self.parent:
-            self._drawing_vid = self.parent._drawing_vid
-        else:
             self._drawing_vid = MAIN_VIEWPORT
-        if self.parent:
-            self._drawing_bid = self.parent._drawing_bid
-        else:
             self._drawing_bid = MAIN_BATCH
         
-        self.debugisfirstvalue = 0
-        self._imgflip         = [False, False]
-
-        self.batch = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_vid, self._drawing_bid)
+        self._imgflip = [False, False]
+        self.batch    = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_vid, self._drawing_bid)
 
     @export(base_transform, "dict", "transform")
     def transform(self):
@@ -92,9 +87,9 @@ class CanvasItem(Node, Transform):
         return self._drawing_vid
     @viewport_id.setter
     def viewport_id(self, value):
-        self._drawing_vid = value
         if self.sprite:
             self._remove_sprite()
+        self._drawing_vid = value
         self._make_new_sprite()
         self.batch = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_vid, self._drawing_bid)
     

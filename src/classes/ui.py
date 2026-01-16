@@ -343,21 +343,7 @@ class Viewport:
         self.labels.append(label)
         self.used_labels[i] = False
         return label, i
-
-    def delete_label(self, label_id : int):
-        if not label_id in self.labels:
-            return
-        self.labels[label_id].delete()
-        self.used_labels[sprite_id] = False
-        gc.collect()
-    def delete_sprite(self, sprite_id : int):
-        if not sprite_id in self.sprites:
-            return
-        self.sprites[sprite_id].delete()
-        self.used_sprites.pop(sprite_id)
-        self.used_sprites[sprite_id] = False
-        gc.collect()
-    
+ 
     def _allocate_label(self, batch_id=MAIN_BATCH):
         i = 0
         for label in self.labels:
@@ -382,13 +368,13 @@ class Viewport:
         return sprite, i
     
     def _deallocate_sprite(self, sprite_id):
-        if not sprite_id in self.sprites:
-            return
+        if not sprite_id in self.used_sprites:
+            raise ValueError(f"Tried to deallocate but Sprite of ID {sprite_id} does not exist.")
         self.sprites[sprite_id].visible = False
         self.used_sprites[sprite_id] = False
     def _deallocate_label(self, label_id):
-        if not label_id in self.labels:
-            return
+        if not label_id in self.used_labels:
+            raise ValueError(f"Tried to deallocate but Label of ID {label_id} does not exist.")
         self.labels[label_id].visible = False
         self.used_labels[label_id] = False
     
