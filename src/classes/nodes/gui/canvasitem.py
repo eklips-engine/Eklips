@@ -32,7 +32,7 @@ class CanvasItem(Node, Transform):
     anytree's NodeMixin uses a size property..)
     """
     _can_check_layer                            = True
-    _iswindoworviewportlikeobject               = False
+    _isdisplayobject                            = False
     _drawing_bid : int                          = 0
     _drawing_vid : int                          = 0
     _drawing_wid : int                          = 0
@@ -88,7 +88,7 @@ class CanvasItem(Node, Transform):
         return self._drawing_wid
     @window_id.setter
     def window_id(self, value):
-        if self._iswindoworviewportlikeobject:
+        if self._isdisplayobject:
             return
         if self.sprite:
             self._remove_sprite()
@@ -100,7 +100,7 @@ class CanvasItem(Node, Transform):
         return self._drawing_vid
     @viewport_id.setter
     def viewport_id(self, value):
-        if self._iswindoworviewportlikeobject:
+        if self._isdisplayobject:
             return
         if self.sprite:
             self._remove_sprite()
@@ -113,7 +113,7 @@ class CanvasItem(Node, Transform):
         return self._drawing_vid
     @batch_id.setter
     def batch_id(self, value):
-        if self._iswindoworviewportlikeobject:
+        if self._isdisplayobject:
             return
         if self.sprite:
             self._remove_sprite()
@@ -124,10 +124,10 @@ class CanvasItem(Node, Transform):
         if self.sprite:
             self._remove_sprite()
         self._make_new_sprite()
-        self.batch = engine.display.get_batch_from_window(self._drawing_wid, self._drawing_vid, self._drawing_bid)
+        self.batch = engine.display.get_batch_from_window(self.window_id, self.viewport_id, self.batch_id)
     
     def draw(self, image):
-        """Draw the Node's image. This is usually called automatically."""
+        """Draw the CanvasItem. This is usually called automatically."""
         if image:
             if image != self.sprite.image:
                 self.sprite.image = image
@@ -157,16 +157,16 @@ class CanvasItem(Node, Transform):
         """Draw the Sprite"""
         return engine.display.blit(
             transform   = self,
-            window_id   = self._drawing_wid,
-            viewport_id = self._drawing_vid,
+            window_id   = self.window_id,
+            viewport_id = self.viewport_id,
             sprite      = self.sprite
         )
 
     def _get_viewport(self) -> ui.Viewport:
         """Get the Viewport that the CanvasItem will be drawn to."""
         viewport : ui.Viewport = engine.display.get_viewport_from_window(
-            self._drawing_wid,
-            self._drawing_vid
+            self.window_id,
+            self.viewport_id
         )
         return viewport
     def _remove_sprite(self):
@@ -176,10 +176,10 @@ class CanvasItem(Node, Transform):
         viewport._deallocate_sprite(self._sprite_id)
         self.sprite = None
     def _make_new_sprite(self):
-        """Request a new Sprite from the Viewport to use."""
+        """Request a new Item from the Viewport to use."""
         if self.sprite:
             self._remove_sprite()
-        viewport                     = self._get_viewport()
+        viewport = self._get_viewport()
         self.sprite, self._sprite_id = viewport._allocate_sprite(self._drawing_bid)
     
     def _free(self):

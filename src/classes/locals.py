@@ -19,7 +19,12 @@ MAIN_WINDOW           = 0
 MAIN_BATCH            = 0
 MAIN_VIEWPORT         = 0
 UI_VIEWPORT           = 1
-DEFAULT_NAME          = "Window"
+DEFAULT_NAME          = """
+Fuck you. I hate you. You suck. Why is managing TWO windows so hard.
+First i add a Window, the framerate drops to 30 FPS,
+then for some ungodly reason, when i close the second window i get
+INVALID OPERATION BLAH BLAH BLAH. GO FUCK YOURSELF OPENGL.
+"""
 VIEWPORT_EQUAL_WINDOW = 8346
 NO_CLEAR_BACKGROUND   = 641
 NO_CLEAR              = 215

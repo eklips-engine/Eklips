@@ -42,5 +42,5 @@ def _process(self : ColorRect, delta : float):
         scnready(self)
     if engine.mouse.buttons[MOUSE_LEFT] and htbx.get_if_mouse_hovering():
         askokcancel(engine.lang.get("ee_title"), engine.lang.get(f"pe_warngotoprj{lid}"))
-        if lid == "":  lid = "2"
-        if lid == "2": lid = "3"
+        if   lid == "":  lid = "2"
+        elif lid == "2": lid = "3"

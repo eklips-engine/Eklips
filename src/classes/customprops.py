@@ -181,7 +181,7 @@ class Transform:
         self._alpha    = 255
         self._anchor   = "top left"
         self.scroll    = [0,0]
-        self.visible   = True
+        self._visible  = True
         
         self._scale_x = 1
         self._scale_y = 1
@@ -189,6 +189,8 @@ class Transform:
         self._window_size = [0,0]
     
     # Getters
+    @property
+    def visible(self): return self._visible
     @property
     def anchor(self): return self._anchor
 
@@ -228,6 +230,10 @@ class Transform:
     def flip_h(self): return self._flip_h
 
     # Setters
+    @visible.setter
+    def visible(self, val):
+        self._visible = val
+        self._set_visible(val)
     @flip_w.setter
     def flip_w(self, val): self._flip_w = val
     @flip_h.setter
@@ -277,15 +283,17 @@ class Transform:
         self.scale_x, self.scale_y = value
     
     # Visual functions.
-    def _set_pos(self,   x,y):
+    def _set_visible(self, val):
         pass
-    def _set_scale(self, x,y):
+    def _set_pos(self,     x,y):
         pass
-    def _set_rot(self,   deg):
+    def _set_scale(self,   x,y):
         pass
-    def _set_alpha(self, deg):
+    def _set_rot(self,     deg):
         pass
-    def _set_size(self,  w,h):
+    def _set_alpha(self,   deg):
+        pass
+    def _set_size(self,    w,h):
         # This is affected by scaling
         pass
     

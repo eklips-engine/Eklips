@@ -1,5 +1,6 @@
 # Import inherited
 from classes.nodes.gui.canvasitem import *
+from classes.ui                   import *
 
 # Variables
 window_transform = {
@@ -16,19 +17,98 @@ window_transform = {
 }
 
 # Classes
-class ExtraWindow(CanvasItem):
+class ExtraWindow(CanvasItem, Color):
     """
     A Window Node.
     
     This Node will create a new Window with its own viewport. You can
     get this window by using `engine.display.get_window(node.window_id)`
-    or by using `node` itself.
-
-    XXX not implemented
+    or by using `node._window`.
     """
-    _iswindoworviewportlikeobject = True
+    _isdisplayobject = True
 
     def __init__(self, properties={}, parent=None, children=None):
+        ## Setup CanvasItem
+        self._title = DEFAULT_NAME
         super().__init__(properties, parent, children)
 
-        self.window_id = engine.display._create_window_entry()
+        ## Setup BG color
+        Color.__init__(self)
+
+        ## Claim an empty slot for use
+        self._drawing_wid        = engine.display._create_window_entry()
+        self._window : EklWindow = None
+    
+    @export([255,255,255],"list","color")
+    def color(self) -> tuple[int, int, int]:
+        """RGBA Color value of the Window's main viewport. Modifying a single item will do nothing."""
+        return self.color_as_tuple()
+    @color.setter
+    def color(self, rgb : list[int]):
+        self.rgb = rgb
+    
+    @export(DEFAULT_NAME,"list","color")
+    def title(self) -> str: return self._title
+    @title.setter
+    def title(self, val):
+        self._title = val
+        if self._window:
+            self._window.set_caption(val)
+    
+    def _set_alpha(self, deg):
+        # Any desktop environment does not have support for opacity, unless i manage the window frame and shit
+        # myself. Which i am NOT doing.
+        return
+    def _set_rot(self, deg):
+        # Unless you're FlyTech, Microsoft Windows does not have support for rotating windows
+        return
+    def _set_scale(self, x, y):
+        # Unless there's some way to magically set the user's DPI scale on one window in particular,
+        # this shit is not happening, unless i manage the window frame and shit myself. Which i am NOT doing.
+        return
+    def _update_color(self, r, g, b, a):
+        self._window.viewports[MAIN_VIEWPORT].set_background(r,g,b,a)
+    
+    def _make_new_sprite(self):
+        if self._window:
+            self._window.set_visible(True)
+            return
+        
+        ## Make Window
+        engine.display.add_window(
+            name = self.title,
+            size = self.tsize,
+
+            viewport_flags = [],
+            viewport_size  = VIEWPORT_EQUAL_WINDOW,
+            viewport_color = self.color,
+            
+            icon = None,
+
+            resizable    = True,
+            minimum_size = None,
+            maximum_size = None,
+
+            visible    = self.visible,
+            fpsvisible = False,
+
+            wid = self.window_id
+        )
+
+        ## Get Window
+        self._window          = engine.display.get_window(self.window_id)
+    
+    def _remove_sprite(self):
+        if not self._window:
+            return
+        
+        if self._window.closed: return
+        self._window.close()
+        self._window                                     = None
+        engine.display.windows[self.window_id]["window"] = None
+    
+    def _set_visible(self, val):
+        if val:
+            self._make_new_sprite()
+        else:
+            self._remove_sprite()

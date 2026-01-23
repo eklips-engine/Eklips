@@ -138,42 +138,6 @@
                         "skew":     0
                     },
                     "children": {
-                        "window_settings_ok": {
-                            "type": "Sprite",
-                            "image_path": "res://media/icocorrect.png",
-                            "children": {},
-                            
-                            "transform": {
-                                "position": [50,50],
-                                "tsize":    [0,0],
-                                "scale":    [1,1],
-                                "scroll":   [0,0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "left",
-                                "visible":  true,
-                                "skew":     0
-                            }
-                        },
-                        "window_settings_no": {
-                            "type": "Sprite",
-                            "image_path": "res://media/icodelete.png",
-                            "children": {},
-                            
-                            "transform": {
-                                "position": [50,50],
-                                "tsize":    [0,0],
-                                "scale":    [1,1],
-                                "scroll":   [0,0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "right",
-                                "visible":  true,
-                                "skew":     0
-                            }
-                        }
                     }
                 }
             }

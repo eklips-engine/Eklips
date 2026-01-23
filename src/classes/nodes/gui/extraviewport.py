@@ -25,7 +25,7 @@ class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass no
     by using `engine.display.get_viewport(node.viewport_id, wid)`
     or by using `node` itself.
     """
-    _iswindoworviewportlikeobject = True
+    _isdisplayobject = True
 
     def _get_viewport(self):
         return self
@@ -42,7 +42,7 @@ class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass no
         # Viewport objects don't have an alpha property yet
         return
     def _set_rot(self, deg):
-        # Viewport objects cannot rotate as of January 20th 2026
+        # Viewport objects cannot rotate yet
         return
     def _set_scale(self, x, y):
         # No effect
@@ -79,10 +79,7 @@ class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass no
         Viewport.flip(self)
 
     def get_if_mouse_hovering(self):
-        mpos     = engine.mouse.pos
-        viewport = self._get_viewport()
-        if not viewport:
-            return
+        mpos   = engine.mouse.pos
         x,y    = self.into_screen_coords(self.window.size)
         is_it  = (
             mpos[0] >= x          and
@@ -94,12 +91,7 @@ class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass no
         return is_it
     
     def _make_new_sprite(self, batch_id=MAIN_BATCH):
-        sprite         = pg.sprite.Sprite(self._base_img, batch = self.batches[batch_id])
-        sprite.visible = False
-        i              = len(self.sprites)
-        self.sprites.append(sprite)
-        self.used_sprites[i] = False
-        return sprite, i
+        return Viewport._make_new_sprite(self, batch_id)
     
     def _remove_sprite(self):
         self.close()

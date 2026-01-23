@@ -24,8 +24,12 @@ class ScrollingViewport(ExtraViewport):
     This Node will create a new Viewport. You can get this Viewport
     by using `engine.display.get_viewport(node.viewport_id, wid)`
     or by using `node` itself.
+
+    You can use the scroll wheel on the mouse to move the Viewport's
+    contents (or rather Camera, but that doesn't sound so magical
+    now, does it?), or use the (non-existent?) scrollbar instead.
     """
-    _iswindoworviewportlikeobject = True
+    _isdisplayobject = True
 
     @export(1200.0,"float","slider")
     def speed(self):

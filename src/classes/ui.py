@@ -25,7 +25,26 @@ white       = [255, 255, 255, 255]
 transparent = [0,   0,   0,     1]
 
 # Classes
-class EklWindow(pg.window.Window):
+class EklWinBase:
+    def __init__(self) -> None:
+        # Setup variables
+        self._focused  = False
+        self.closed    = False
+        self.viewports = []
+        self.wid       = -1
+    
+    @property
+    def focused(self):
+        """If the Window is focused. Read-only."""
+        return self._focused
+
+    def toggle_fullscreen(self):
+        """Toggle fullscreen mode."""
+    
+    def screenshot(self):
+        """Say cheese!"""
+
+class EklWindow(pg.window.Window, EklWinBase):
     def __init__(
         self,
         width      : int | None                   = None,
@@ -44,12 +63,8 @@ class EklWindow(pg.window.Window):
 
         mode       : pg.display.base.ScreenMode | None = None
     ) -> None:
-
-        # Setup variables
-        self._focused  = False
-        self.closed    = True
-        self.viewports = []
-        self.wid       = -1
+        # Init Base
+        EklWinBase.__init__(self)
         
         # Init
         ## Code taken from pyglet/window/base/__init__.py line 508-546
@@ -96,40 +111,29 @@ class EklWindow(pg.window.Window):
             context,    mode
         )
 
-        # Set validity to true
-        self.closed = False
-
     def toggle_fullscreen(self):
         """Toggle fullscreen mode."""
         self.set_fullscreen(not self.fullscreen)
+    
+    def __repr__(self):
+        return f"{self.__class__.__name__}(size={self.width}x{self.height}, id={self.id})"
 
-    @property
-    def focused(self):
-        """If the Window is focused. Read-write."""
-        return self._focused
-    
-    @focused.setter
-    def focused(self, value):
-        if value:
-            self.activate()
-        else:
-            self.minimize()
-    
     def screenshot(self):
         """Say cheese!"""
         os.makedirs("screenshots", exist_ok=True)
         pg.image.get_buffer_manager().get_color_buffer().save(f"screenshots/{engine.get_date()}.png")
     
     def on_close(self):
-        if self.closed: return
+        if self.closed:
+            return
+        self.closed = True
         for viewport in self.viewports:
             viewport.close()
-        self.closed = True
         engine.display._close_window(self.wid)
     
     def close(self):
-        super().close()
         self.closed = True
+        super().close()
     
     def on_context_lost(self):
         self._focused = False
@@ -272,14 +276,15 @@ class Viewport(Transform):
         self.depth_buffer = pg.image.buffer.Renderbuffer(self.w, self.h, GL_DEPTH_COMPONENT)
         self.framebuffer.attach_texture(self.color_buffer, attachment=GL_COLOR_ATTACHMENT0)
         self.framebuffer.attach_renderbuffer(self.depth_buffer, attachment=GL_DEPTH_ATTACHMENT)
-        
+    
     def _resize_framebuffer(self):
         if self.window:
             self.window.switch_to()
+        self.framebuffer = pg.image.Framebuffer()
         self.color_buffer = pg.image.Texture.create(
             self.w, self.h,
             min_filter=GL_NEAREST, mag_filter=GL_NEAREST,
-            internalformat=GL_RGBA
+            internalformat=GL_RGBA8
         )
         self.framebuffer.attach_texture(self.color_buffer, attachment=GL_COLOR_ATTACHMENT0)
     def provide_window(self, window):
@@ -300,6 +305,8 @@ class Viewport(Transform):
     def _delete_buffer(self):
         if not self.framebuffer:
             return
+        if self.window:
+            self.window.switch_to()
         self.framebuffer.delete()
         self.color_buffer.delete()
         self.depth_buffer.delete()
@@ -396,7 +403,6 @@ class Viewport(Transform):
         
         # Init viewport
         glDisable(GL_BLEND)
-        self.window.switch_to()
         self.framebuffer.bind()
         if not NO_CLEAR_BACKGROUND in self.flags:
             glClearColor(*self._background)
@@ -498,7 +504,8 @@ class Display:
         minimum_size   : None | list[int]       = [648,648],
         maximum_size   : None | list[int]       = None,
         visible        : bool                   = True,
-        fpsvisible     : bool                   = False
+        fpsvisible     : bool                   = False,
+        wid            : None | int             = None
     ) -> int:
         """
         Add a new Window, returns its Window ID.
@@ -513,9 +520,9 @@ class Display:
             resizable: Allow the window to be resizable if True.
             minimum_size: List of the minimum size the window can be, or None if you dont want a limit.
             maximum_size: List of the maximum size the window can be, or None if you dont want a limit.
-            wid: Create the window in a predetermined window ID if the argument is not AUTOMATICALLY_CREATE.
             visible: Make the window visible if True. Defaults to True.
             fpsvisible: Show the FPS if True.
+            wid: Create the window in a predetermined window ID if the argument is not None.
         
         Flags:
             VIEWPORT_EQUAL_WINDOW: Used to make the Viewport size equal the Window size.
@@ -531,7 +538,8 @@ class Display:
             viewport_size = size
         
         # Reserve window slot
-        wid = self._create_window_entry()
+        if wid == None:
+            wid = self._create_window_entry()
         if self.main_window_id == None:
             self.main_window_id = wid
         
@@ -543,22 +551,15 @@ class Display:
             resizable = resizable,
             visible   = False
         )
+        window.wid    = wid
 
         # Fill in information for the Window slot
         self.windows[wid]["window"] = window
         self.windows[wid]["name"]   = name
 
-        # Create viewport
-        viewport = Viewport(MAIN_VIEWPORT, viewport_flags, [], viewport_size, [0,0])
-        viewport.set_background(*viewport_color)
-        viewport.provide_window(window)
-        viewport.add_batch()
-        
-        # Set Window's main viewport to the one we just made
-        window.viewports.append(viewport)
-
-        # Add another viewport for UI
-        self.add_viewport(viewport_color=transparent, flags=[VIEWPORT_EQUAL_WINDOW])
+        # Create viewports
+        self.add_viewport(wid, viewport_size, viewport_color, viewport_flags, [0,0])            # Main
+        self.add_viewport(wid = wid, viewport_color=transparent, flags=[VIEWPORT_EQUAL_WINDOW]) # For UI
 
         # Add FPS Display
         if fpsvisible or engine.debug.fps_visible:
@@ -574,7 +575,6 @@ class Display:
             window.set_icon(icon)
         if visible:
             window.set_visible()
-        window.wid = wid
 
         # Return Window ID
         return wid
@@ -584,7 +584,7 @@ class Display:
         wid            : int             = MAIN_WINDOW,
         viewport_size  : list[int] | int = VIEWPORT_EQUAL_WINDOW,
         viewport_color                   = black,
-        flags          : int             = 0,
+        flags          : list            = [],
         pos            : list[int]       = [0,0]
     ):
         """
@@ -687,20 +687,20 @@ class Display:
         """
         self._doomed.append(wid)
     
-    def _close_window(self, wid):
+    def _close_window(self, wid, only_remove=False):
         """
         Close the window `wid` immediately.
 
         Args:
             wid: ID of Window.
+            only_remove: If True, only remove the Window.
         """
         if not (self.windows and self.windows.get(wid, None)):
             return
         
         window_data = self.windows[wid]
-        if window_data["window"]:
+        if window_data["window"] and not only_remove:
             window_data["window"].close()
-        
         if wid == self.main_window_id:
             self.main_window_id = None
         self.windows.pop(wid)
@@ -739,7 +739,13 @@ class Display:
             wid: ID of Window. Defaults to MAIN_WINDOW.
             vid: ID of Viewport. Defaults to MAIN_VIEWPORT.
         """
-        return self.get_window(wid).viewports[vid]
+        if not wid in self.windows:
+            return
+
+        try:
+            return self.get_window(wid).viewports[vid]
+        except:
+            return
 
     def get_batch_from_window(self, wid : int = MAIN_WINDOW, vid: int = MAIN_VIEWPORT, bid : int = MAIN_BATCH) -> pg.graphics.Batch:
         """
@@ -750,7 +756,13 @@ class Display:
             vid: ID of Window's viewport. Defaults to MAIN_VIEWPORT.
             bid: ID of Batch from viewport. Defaults to MAIN_BATCH.
         """
-        return self.get_viewport_from_window(wid, vid).batches[bid]
+        if not wid in self.windows:
+            return
+        
+        try:
+            return self.get_viewport_from_window(wid, vid).batches[bid]
+        except:
+            return
     
     def blit(
         self,

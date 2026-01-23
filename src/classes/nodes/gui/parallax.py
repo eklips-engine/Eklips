@@ -40,8 +40,6 @@ class Parallax(Sprite):
     
     def _draw(self):
         # Draw the Sprite
-        self.sprite.image = self.image
-
         return engine.display.blit(
             transform   = self,
             window_id   = self._drawing_wid,
