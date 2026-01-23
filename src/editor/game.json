@@ -8,7 +8,7 @@
         "size":       [648,   648],
         "color":      [35, 35, 50],
         "minsize":    [648,   648],
-        "maxsize":    null,
+        "maxsize":    [1152,  648],
         "resizable":  true,
         "icon_file":  "res://media/icon.png"
     },

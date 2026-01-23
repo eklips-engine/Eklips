@@ -1,0 +1,240 @@
+{
+    "nodes": {
+        "": {
+            "type":        "Node",
+            "script_path": "res://data/editor.ekl",
+            
+            "children": {
+                "backico": {
+                    "type":       "Sprite",
+                    "image_path": "res://media/icoback.png",
+
+                    "children":  {},
+                    
+                    "transform": {
+                        "position": [10,10],
+                        "tsize":    [1,1],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "playico": {
+                    "type":       "Sprite",
+                    "image_path": "res://media/icoplay.png",
+
+                    "children":  {},
+                    
+                    "transform": {
+                        "position": [10,   20],
+                        "tsize":    [1,     1],
+                        "scale":    [0.7, 0.7],
+                        "scroll":   [0,     0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top right",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "settico": {
+                    "type":       "Sprite",
+                    "image_path": "res://media/icosetting.png",
+
+                    "children":  {},
+                    
+                    "transform": {
+                        "position": [53,   26],
+                        "tsize":    [1,     1],
+                        "scale":    [0.5, 0.5],
+                        "scroll":   [0,     0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top right",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "nlbl": {
+                    "type": "Label",
+                    
+                    "text":      "Dolorem",
+                    "font_size": 23,
+
+                    "children":  {},
+                    
+                    "transform": {
+                        "position": [65,20],
+                        "tsize":    [1,1],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "vlbl": {
+                    "type": "Label",
+                    
+                    "color":     [82,82,114],
+                    "text":      "v1.0",
+                    "font_size": 23,
+
+                    "children":  {},
+                    
+                    "transform": {
+                        "position": [185,20],
+                        "tsize":    [1,1],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+
+                "file_browser_panel": {
+                    "type": "ColorRect",
+
+                    "children": {
+                        "titlebar": {
+                            "type": "ColorRect",
+
+                            "children": {},
+
+                            "color": [45,45,63],
+
+                            "transform": {
+                                "position": [10,  75],
+                                "tsize":    [212, 40],
+                                "scale":    [1,    1],
+                                "scroll":   [0,    0],
+
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "top left",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        }
+                    },
+
+                    "color": [25,25,35],
+
+                    "transform": {
+                        "position": [10,  75],
+                        "tsize":    [212,565],
+                        "scale":    [1,    1],
+                        "scroll":   [0,    0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                
+                "scene_preview_panel": {
+                    "type": "ColorRect",
+
+                    "children": {
+                        "titlebar": {
+                            "type": "ColorRect",
+
+                            "children": {},
+
+                            "color": [45,45,63],
+
+                            "transform": {
+                                "position": [0,   75],
+                                "tsize":    [673, 40],
+                                "scale":    [1,    1],
+                                "scroll":   [0,    0],
+
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "top centerx",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        }
+                    },
+
+                    "color": [25,25,35],
+
+                    "transform": {
+                        "position": [0,    75],
+                        "tsize":    [673, 565],
+                        "scale":    [1,     1],
+                        "scroll":   [0,     0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top centerx",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                
+                "properties_panel": {
+                    "type": "ColorRect",
+
+                    "children": {
+                        "titlebar": {
+                            "type": "ColorRect",
+
+                            "children": {},
+
+                            "color": [45,45,63],
+
+                            "transform": {
+                                "position": [10,  75],
+                                "tsize":    [212, 40],
+                                "scale":    [1,    1],
+                                "scroll":   [0,    0],
+
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "top right",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        }
+                    },
+
+                    "color": [25,25,35],
+
+                    "transform": {
+                        "position": [10,  75],
+                        "tsize":    [212,565],
+                        "scale":    [1,    1],
+                        "scroll":   [0,    0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top right",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                }
+            }
+        }
+    },
+    "properties": {
+        "inherits": null
+    }
+}

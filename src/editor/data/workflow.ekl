@@ -9,8 +9,6 @@ from classes.customprops       import *
 from classes.nodes             import *
 from classes.nodes.packedscene import *
 
-window_created = False
-
 def populate_frame(self : ColorRect):
     # This checks for all projects' game.json file in your savefile,
     # and populates the "Panel" Node with entries of those projects.

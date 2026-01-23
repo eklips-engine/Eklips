@@ -1,0 +1,11 @@
+## Spaghetti code
+import classes.singleton       as engine
+from tkinter                   import ttk
+from tkinter.messagebox        import *
+from tkinter.filedialog        import *
+from classes.customprops       import *
+from classes.nodes             import *
+
+def _process(self : Node, delta : float):
+    window        = engine.display.get_window(MAIN_WINDOW)
+    window.width += round((1152 - window.width) / 10)
