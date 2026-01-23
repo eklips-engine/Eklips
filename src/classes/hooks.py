@@ -61,18 +61,16 @@ class HookFPSDisplay(pg.window.FPSDisplay):
 
         This method is called automatically when the window buffer is flipped.
         """
-        t = self._time()
-        delta = t - self._last_time
-        self._elapsed += delta
-        self._delta_times.append(delta)
-        self._last_time = t
+        self._delta_times.append(engine.delta)
+        self._elapsed += engine.delta
 
         if self._elapsed >= self.update_period:
             self._elapsed = 0
+            engine.fps = round(1 / (sum(self._delta_times)/len(self._delta_times))) if self._delta_times else 0
             if engine.debug.track_visible_sprites:
-                self.label.text = f'{round(1 / self._mean(self._delta_times))} FPS with {engine.spronscr} visible sprites'
+                self.label.text = f'{engine.fps} FPS with {engine.spronscr} visible sprites'
             else:
-                self.label.text = f'{round(1 / self._mean(self._delta_times))} FPS with {engine.uid} objects'
+                self.label.text = f'{engine.fps} FPS with {engine.uid} objects'
     
     def _hook_flip(self) -> None:
         self.update()

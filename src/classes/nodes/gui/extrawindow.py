@@ -24,6 +24,11 @@ class ExtraWindow(CanvasItem, Color):
     This Node will create a new Window with its own viewport. You can
     get this window by using `engine.display.get_window(node.window_id)`
     or by using `node._window`.
+    
+    Definitely wouldn't recommend giving it any CanvasItem-related children
+    if the Window is initialized as invisible, as the engine crashes since
+    the `ExtraWindow` object has its own WindowID but no Window to go along
+    with it to save resources.. and stuff.. 
     """
     _isdisplayobject = True
 
@@ -71,7 +76,6 @@ class ExtraWindow(CanvasItem, Color):
     
     def _make_new_sprite(self):
         if self._window:
-            self._window.set_visible(True)
             return
         
         ## Make Window
@@ -97,6 +101,17 @@ class ExtraWindow(CanvasItem, Color):
 
         ## Get Window
         self._window          = engine.display.get_window(self.window_id)
+        self._window.on_close = self._hookonclose
+    
+    def _hookonclose(self):
+        if self._window.closed:
+            return
+        self._window.closed = True
+        for viewport in self._window.viewports:
+            viewport.close()
+        engine.display._close_window(self.window_id, dont_remove=True)
+        self._window                                     = None
+        engine.display.windows[self.window_id]["window"] = None
     
     def _remove_sprite(self):
         if not self._window:

@@ -687,13 +687,14 @@ class Display:
         """
         self._doomed.append(wid)
     
-    def _close_window(self, wid, only_remove=False):
+    def _close_window(self, wid, only_remove=False, dont_remove=False):
         """
         Close the window `wid` immediately.
 
         Args:
             wid: ID of Window.
             only_remove: If True, only remove the Window.
+            dont_remove: If True, don't remove the Window entry.
         """
         if not (self.windows and self.windows.get(wid, None)):
             return
@@ -703,7 +704,8 @@ class Display:
             window_data["window"].close()
         if wid == self.main_window_id:
             self.main_window_id = None
-        self.windows.pop(wid)
+        if not dont_remove:
+            self.windows.pop(wid)
         gc.collect()
     
     def close_windows(self, forced : bool = False, blacklist : list = []):

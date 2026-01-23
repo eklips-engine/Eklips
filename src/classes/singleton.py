@@ -147,6 +147,7 @@ spronscr  : int                    = 0
 uid       : int                    = 0
 sid       : int                    = 0
 delta     : float                  = 0.0
+fps       : float                  = 0.0
 uptime    : float                  = 0.0
 
 _wincloseblacklist : list = [MAIN_WINDOW]
