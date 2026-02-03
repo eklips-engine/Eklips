@@ -5,7 +5,7 @@
             "children": {
                 "panel_obj": {
                     "type":          "ScrollingViewport",
-                    "left_to_right": true,
+                    "left_to_right": false,
                     "script_path":   "res://data/workflow.ekl",
 
                     "children": {},

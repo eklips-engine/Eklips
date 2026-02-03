@@ -25,26 +25,37 @@ class CollisionManager:
         """Delete shape `sid` from the world."""
         self.shapes.pop(sid)
     
-    def colliderect(self, shape, other):
-        """Check if `shape` is colliding with `other`."""
+    def colliderect(self, shape, other, axis=AXIS_XY) -> bool:
+        """Check if `shape` is colliding with `other` on `axis`."""
         ax1, ay1, ax2, ay2 = shape.aabb()
         bx1, by1, bx2, by2 = other.aabb()
 
-        return not (
-            ax2 < bx1 or
-            ax1 > bx2 or
-            ay2 < by1 or
-            ay1 > by2
-        )
+        if axis == AXIS_XY:
+            return not (
+                ax2 < bx1 or
+                ax1 > bx2 or
+                ay2 < by1 or
+                ay1 > by2
+            )
+        if axis == AXIS_X:
+            return not (
+                ax2 < bx1 or
+                ax1 > bx2
+            )
+        if axis == AXIS_Y:
+            return not (
+                ay2 < by1 or
+                ay1 > by2
+            )
 
-    def get_collisions(self, shape):
-        """Get the shapes that are colliding `shape`."""
+    def get_collisions(self, shape, axis=AXIS_XY) -> list:
+        """Get the shapes that are colliding `shape` on `axis`."""
         hits = []
         for sid in self.shapes:
             other = self.shapes[sid]
             if other is shape:
                 continue
-            if self.colliderect(shape, other):
+            if self.colliderect(shape, other, axis):
                 hits.append(other)
         return hits
 

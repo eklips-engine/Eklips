@@ -75,7 +75,7 @@ class Object(metaclass=_exportmeta):
         self._script : engine.resources.Script = engine.resources.Script()
 
         self._script.file_path   = path
-        self._script.source_code = src.replace("fun ", "def ").replace("fn ", "def ")
+        self._script.source_code = src
         
         exec(self._script.source_code, self._script._namespace, self._script._namespace)
 

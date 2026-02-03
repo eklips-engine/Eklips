@@ -54,17 +54,24 @@ class ScrollingViewport(ExtraViewport):
         self._left_to_right = value
     
     def __init__(self, properties={}, parent=None):
-        self._speed         = 1200.0
+        self._speed         = 700.0
         self._left_to_right = False
+        self._vel           = 0
         super().__init__(properties, parent)
     
     def update(self):
         super().update()
+
+        if engine.mouse.scroll != 0:
+            self._vel = engine.mouse.scroll * (engine.delta * self.speed)
+
         if self._left_to_right:
-            self.cam.x -= engine.mouse.scroll * (engine.delta * self.speed)
+            self.cam.x -= self._vel
             if self.cam.x  < 0:
-                self.cam.x = 0
+                self._vel = -((-self.cam.x) / 10)
         else:
-            self.cam.y += engine.mouse.scroll * (engine.delta * self.speed)
+            self.cam.y += self._vel
             if self.cam.y  > 0:
-                self.cam.y = 0
+                self._vel = (-self.cam.y) / 10
+        
+        self._vel += (-self._vel) / 10

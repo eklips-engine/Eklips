@@ -69,3 +69,7 @@ ITEM_LABEL  = 656
 ITEMKIND : TypeAlias = Literal[657, 656]
 
 EMPTY_SCENE = {"": {"type": "Node", "children": {}}}
+
+AXIS_X  = 128225
+AXIS_XY = 128226
+AXIS_Y  = 128227

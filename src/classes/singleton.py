@@ -148,7 +148,7 @@ uid       : int                    = 0     # amount of Objects
 sid       : int                    = 0     # amount of pygame Channels
 delta     : float                  = 0.0   # deltaTime
 tdelta    : float                  = 0.0   # `engine.delta` but not multiplied by speed
-fps       : float                  = 0.0   # Framerate per window, To get the global FPS, you must do `fps * num_of_windows`
+fps       : float                  = 0.0   # Framerate according to `engine.hooks.HookFPSDisplay`
 uptime    : float                  = 0.0   # This value is how many seconds you have been running the engine.
 speed     : int                    = 1     # This value is the multiplier of `engine.delta`.
 

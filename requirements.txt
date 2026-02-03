@@ -1,6 +1,8 @@
+setuptools
 pyvidplayer2
 pyglet
 numpy
 requests
 anytree
-pygame
+pygame-ce
+typing_extensions
