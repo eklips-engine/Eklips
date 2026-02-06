@@ -1,6 +1,7 @@
-<svg
-	xmlns="http://www.w3.org/2000/svg" width="1247" height="1247">
-	<style>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1247" height="1247"
+     viewBox="45 45 1165 1165">
+<style>
 #Circleelement {
     -webkit-animation-name: rotate; 
     -webkit-animation-duration: 2s; 

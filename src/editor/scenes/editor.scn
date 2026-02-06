@@ -113,7 +113,11 @@
                         "titlebar": {
                             "type": "ColorRect",
 
-                            "children": {},
+                            "children": {
+                                "text": {
+                                    "type": "Label"
+                                }
+                            },
 
                             "color": [45,45,63],
 

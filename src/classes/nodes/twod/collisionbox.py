@@ -6,7 +6,7 @@ from classes import ui
 from classes.nodes.gui.colorrect import *
 
 # Classes
-class CollisionBox(ColorRect):
+class CollisionBox(CanvasItem):
     """
     A rectangle with Collision abilities.
 
@@ -17,15 +17,13 @@ class CollisionBox(ColorRect):
     This Node uses basic AABB collision cause i'm too
     bad at programming to even bother making collision
     for any other shape than rectangles
-    
-    The sole reason it inherits ColorRect is to draw a
-    debug hitbox if `engine.debug.shapes_visible` is on.
     """
 
     def __init__(self, properties={}, parent=None):
         super().__init__(properties, parent)
-        self.world = engine.scene._collisionman
-        self.rid   = self.world.add(self)
+        self.world  = engine.scene._collisionman
+        self.rid    = self.world.add(self)
+        self._shape = pygame.Rect((0,0,0,0))
     
     def _free(self):
         self.world.delete(self.rid)
@@ -35,9 +33,13 @@ class CollisionBox(ColorRect):
         if engine.debug.shapes_visible:
             super().draw(image)
     
-    def aabb(self):
-        return (self.x, self.y, self.x + self.w, self.y + self.h)
-    
+    def colliderect(self, shape):
+        return self._shape
     def _set_pos(self):
-        return
-    
+        self._shape.x = self.x
+        self._shape.y = self.y
+    def _set_size(self, w, h):
+        self._shape.w = w
+        self._shape.h = h
+    def _set_rot(self, deg):
+        print("pygame.Rect does not support rotation")
