@@ -11,6 +11,7 @@ from classes.resources.object  import *
 from classes.resources.scene   import *
 from classes.resources.image   import *
 from classes.resources.tileset import *
+from classes.resources.theme   import *
 
 # Classes
 class Loader:
@@ -35,7 +36,7 @@ class Loader:
         
         if path.startswith("res://"):  return f"{engine.game.project_dir}/{path.removeprefix('res://')}"
         if path.startswith("root://"): return f"{path.removeprefix('root://')}"
-        if path.startswith("user://"): return f"{path.removeprefix('user://')}"
+        if path.startswith("user://"): return f"{engine.game.save_dir}{path.removeprefix('user://')}"
 
         return path
 
@@ -57,9 +58,13 @@ class Loader:
                 return xmltodict.parse(open(actual_path).read())
             if ext in self.extensions["res"]:
                 data     = json.loads(open(actual_path).read())
+                
+                ## Make Resource
                 classobj = globals().get(data["type"])
                 obj      = classobj.__new__(classobj)
                 obj.__init__(data)
+                
+                ## Setup properties
                 obj._setup_properties()
                 return obj
             if ext in self.extensions["vid"]:
@@ -90,7 +95,7 @@ class Loader:
         else:
             obj = self._load(path, ext)
             self.resource_tree[rid] = obj
-
+        
         if return_identifier:
             return obj, rid
         else:

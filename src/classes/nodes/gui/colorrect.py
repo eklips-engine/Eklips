@@ -42,4 +42,4 @@ class ColorRect(CanvasItem, Color):
     
     def update(self):
         super().update()
-        self.draw(self.image)
+        self.draw()

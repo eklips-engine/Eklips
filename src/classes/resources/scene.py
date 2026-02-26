@@ -43,7 +43,8 @@ class SceneLike:
         self._inherited_scn                   = None        # Filepath of the inherited scene
         self._blessed                         = []          # List of nodes that are about to be created
         self._temp_node_list                  = []          # List of nodepaths in the scene tree
-        self._collisionman : CollisionManager = None        # Collision Manager
+        self._stf : CollisionManager = None        # Collision Manager
+        self._widgetman    : WidgetManager    = None        # Widget Manager
 
 class Scene(Resource, SceneLike):
     """
@@ -69,7 +70,8 @@ class Scene(Resource, SceneLike):
     @file_path.setter
     def file_path(self, path : str):
         self.empty()
-        self._collisionman = engine.resources.CollisionManager()
+        self._stf = engine.resources.CollisionManager()
+        self._widgetman    = engine.resources.WidgetManager()
         self._file_path    = path
         _data              = engine.loader.load(path, force_new_resource=True)
         if _data["properties"]["inherits"]:
@@ -82,7 +84,8 @@ class Scene(Resource, SceneLike):
     @nodes.setter
     def nodes(self, nodes : dict):
         self.empty()
-        self._collisionman = engine.resources.CollisionManager()
+        self._stf = engine.resources.CollisionManager()
+        self._widgetman    = engine.resources.WidgetManager()
         self._nodes        = nodes
         nodepaths          = self.get_node_paths("")
 

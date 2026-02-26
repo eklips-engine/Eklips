@@ -19,6 +19,8 @@ import classes.singleton as engine
 ## Pyglet event loop
 print(" ~ Modify pyglet.eventloop._redraw_windows")
 def newrwd(dt: float) -> None:
+    engine.tdelta = dt
+    
     # Redraw all windows
     for wid in engine.display.windows.copy():
         if wid in engine.display.windows:
@@ -75,9 +77,9 @@ class HookFPSDisplay(pg.window.FPSDisplay):
             self._elapsed = 0
             engine.fps = round(1 / (sum(self._delta_times)/len(self._delta_times))) if self._delta_times else 0
             if engine.debug.track_visible_sprites:
-                self.label.text  = f'{engine.fps} FPS with {engine.spronscr} visible sprites'
+                self.label.text  = f"{engine.fps} FPS with {engine.spronscr} visible sprites"
             else:
-                self.label.text  = f'{engine.fps} FPS with {engine.uid} objects'
+                self.label.text  = f"{engine.fps} FPS"
             self.transform.tsize = self.label.content_width, self.label.content_height
     
     def _hook_flip(self) -> None:

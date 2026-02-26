@@ -32,16 +32,6 @@
 
                     "children":   {}
                 },
-                "Shh": {
-                    "type":       "MediaPlayer",
-                    "media":      "root://_assets/shh.mp3",
-                    "auto_start": true,
-                    "loops":      -1,
-
-                    "volume":     0.000000000001,
-
-                    "children":   {}
-                },
                 "Ring": {
                     "type":        "Sprite",
                     "image_path":  "root://_assets/ring.png",

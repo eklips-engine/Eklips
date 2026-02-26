@@ -31,4 +31,4 @@ class Sprite(CanvasItem):
     
     def update(self):
         super().update()
-        self.draw(self.image)
+        self.draw()

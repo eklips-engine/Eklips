@@ -17,7 +17,7 @@ def get_date():
     return time.strftime('%d %m %Y %H %M %S')
 
 def load_engine():
-    global running,game,display,mouse,loader,keyboard,scene,savefile,lang,icon,clock
+    global running,game,display,mouse,loader,keyboard,scene,savefile,lang,icon,clock,theme
 
     # Initialize metadata
     game   = GameData()
@@ -39,6 +39,8 @@ def load_engine():
         resizable      = game.win.resizable,
         minimum_size   = game.win.minsize,
         maximum_size   = game.win.maxsize,
+        
+        vsync          = False,
 
         icon           = icon
     )
@@ -68,6 +70,9 @@ def load_engine():
         name, path = i
         loader.load(path)
         pg.font.load(name)
+    
+    # Load theme
+    theme = resources.Theme.load("root://_assets/theme.rc")
     
     # Load cursors
     for i in CURSORS:
@@ -139,6 +144,7 @@ loader    : resources.Loader       = None
 lang      : Language               = None
 savefile  : saving.Savefile        = None
 mouse     : Mouse                  = None
+theme     : resources.Theme        = None
 icon      : pg.image.AbstractImage = None
 keyboard  : Keyboard               = None
 scene     : resources.Scene        = None

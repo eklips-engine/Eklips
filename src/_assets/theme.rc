@@ -1,0 +1,72 @@
+{
+    "type":       "Theme",
+    "image_path": "root://_assets/theme.png",
+
+    "widgets": {
+        "button": {
+            "corner_size": [8,8],
+            "side_size":   [8,8],
+
+            "pos":  [0,0],
+            "size": [720,40]
+        },
+        "scrollbtn": {
+            "pos":  [0,40],
+            "size": [40,40]
+        },
+        "bar": {
+            "pos":  [44,40],
+            "size": [4,40]
+        },
+        "checkbtn": {
+            "pos":  [52,40],
+            "size": [40,40]
+        },
+        "boxbtn": {
+            "pos":  [0,0],
+            "size": [40,40]
+        },
+        "boxedbtn": {
+            "pos":  [40,0],
+            "size": [40,40]
+        },
+        "knob": {
+            "pos":  [80,0],
+            "size": [40,40]
+        },
+        "bg": {
+            "pos":  [96,52],
+            "size": [4,16]
+        },
+        "scrollbg": {
+            "pos":  [163,51],
+            "size": [40,4]
+        },
+        "error": {
+            "pos":  [72,80],
+            "size": [40,40]
+        },
+        "exclam": {
+            "pos":  [120,80],
+            "size": [16,40]
+        },
+        "questi": {
+            "pos":  [144,80],
+            "size": [32,40]
+        },
+        "allow": {
+            "pos":  [180,80],
+            "size": [36,40]
+        }
+    },
+
+    "meta": {
+        "name":   "Eklips default theme",
+        "date":   "25-02-2026",
+        "author": "ZeeAy",
+
+        "desc": "The default theme on an Eklips 5 project.\n",
+
+        "icon": [120,28, 44,44]
+    }
+}

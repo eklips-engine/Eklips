@@ -24,7 +24,6 @@ class Object(metaclass=_exportmeta):
     """
     _runnable        = True
     _script_path     = None
-    _can_init_script = True
     obj_id           = None
     _function_queue  = []
     _properties      = {}   # NOT actual property values, but instead info of this classes properties

@@ -31,7 +31,7 @@ class ScrollingViewport(ExtraViewport):
     """
     _isdisplayobject = True
 
-    @export(1200.0,"float","slider")
+    @export(700.0,"float","slider")
     def speed(self):
         """How fast the scrolling should be.
 
@@ -44,7 +44,8 @@ class ScrollingViewport(ExtraViewport):
         """
         return self._speed
     @speed.setter
-    def speed(self, value): self._speed = value
+    def speed(self, value):
+        self._speed = value
 
     @export(False, "bool", "bool")
     def left_to_right(self):
@@ -53,25 +54,126 @@ class ScrollingViewport(ExtraViewport):
     def left_to_right(self, value):
         self._left_to_right = value
     
+    @export(False, "int", "slider")
+    def content_width(self):
+        return self._content_width
+    @content_width.setter
+    def content_width(self, value):
+        self._content_width = value
+    
+    @export(False, "int", "slider")
+    def content_height(self):
+        return self._content_height
+    @content_height.setter
+    def content_height(self, value):
+        self._content_height = value
+    
+    def _set_size(self, w, h):
+        self.scrollbar_bg.scale_x = self.scrollbar.width / self.scrollbar_bg.image.width
+        self.scrollbar_bg.scale_y = h                    / self.scrollbar_bg.image.height
+        super()._set_size(w, h)
+    
     def __init__(self, properties={}, parent=None):
-        self._speed         = 700.0
-        self._left_to_right = False
-        self._vel           = 0
+        # Setup vp
         super().__init__(properties, parent)
+        
+        # Alias
+        self.widgetman = engine.scene._widgetman
+        
+        # Set properties
+        self._content_height   = 720
+        self._content_width    = 1280
+        self._speed            = 700.0
+        self._left_to_right    = False
+        self._vel              = 0
+        self.gid               = self.widgetman.add_widget(self)
+        
+        # Make scrollbar
+        self.scrollbar_bg      = pg.sprite.Sprite(
+            img   = engine.theme.get_static_widget("scrollbg"),
+            batch = self.batches[MAIN_BATCH])
+        self.scrollbar         = pg.sprite.Sprite(
+            img   = engine.theme.get_static_widget("scrollbtn"),
+            batch = self.batches[MAIN_BATCH])
+    
+    def _remove_item(self):
+        super()._remove_item()
+        self.scrollbar.delete()
+        self.scrollbar_bg.delete()
+        
+    def _free(self):
+        self.widgetman.widgets.pop(self.gid)
+        super()._free()
+    
+    def get_if_mouse_hovering_knob(self) -> bool:
+        """Returns true if the mouse is hovering over the knob."""
+        if not self.viewport:
+            return
+        mpos   = engine.mouse.pos
+        x,y,z  = self.scrollbar.position
+        vx, vy = self.viewport.into_screen_coords()
+        is_it  = (
+            mpos[0] >= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom)                                                   and
+            mpos[0] <= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom) + (self.scrollbar.width * self.viewport.cam.zoom) and
+            mpos[1] >= ((y + vy - self.viewport.cam.y) * self.viewport.cam.zoom)                                                   and
+            mpos[1] <= ((y + vy - self.viewport.cam.y) * self.viewport.cam.zoom) + (self.scrollbar.height * self.viewport.cam.zoom)
+        )
+            
+        return is_it
     
     def update(self):
         super().update()
 
-        if engine.mouse.scroll != 0:
-            self._vel = engine.mouse.scroll * (engine.delta * self.speed)
-
+        # Handle dragging the scrollbar
+        if engine.mouse.buttons[MOUSE_LEFT]:
+            if self.get_if_mouse_hovering():
+                if self.widgetman.moving_widget  == -1:
+                    self.widgetman.focused_widget = self.gid
+                if engine.mouse.dragging and self.widgetman.focused_widget == self.gid:
+                    self.widgetman.moving_widget  = self.gid
+            if self.widgetman.moving_widget      == self.gid:
+                self._vel = 0
+                if self._left_to_right:
+                    self.cam.x    += engine.mouse.dpos[0]/(self.w-self.scrollbar.width)*self.content_width
+                    if self.cam.x  < 0:
+                        self.cam.x = 0
+                else:
+                    self.cam.y    += engine.mouse.dpos[1]/(self.h-self.scrollbar.height)*self.content_height
+                    if self.cam.y  > 0:
+                        self.cam.y = 0
+        else:
+            if self.get_if_mouse_hovering_knob() or self.widgetman.moving_widget == self.gid:
+                self.widgetman.moving_widget = -1
+        
+        # Handle spinning the mouse wheel
+        if engine.mouse.scroll != 0 and self.get_if_mouse_hovering():
+            self._vel = engine.mouse.scroll * (self.speed * engine.delta)
+        
+        # Camera and scrollbar sprite handling
         if self._left_to_right:
             self.cam.x -= self._vel
-            if self.cam.x  < 0:
+            if self.cam.x < 0:
                 self._vel = -((-self.cam.x) / 10)
+            if self.cam.x > self.content_width:
+                self.cam.x = self.content_width
+            
+            self.scrollbar_bg.y = self.scrollbar.y = 0
+            self.scrollbar.x    = self.cam.x+((self.cam.x/self.content_width) * (self.w-self.scrollbar.width))
         else:
             self.cam.y += self._vel
-            if self.cam.y  > 0:
+            if self.cam.y > 0:
                 self._vel = (-self.cam.y) / 10
+            if self.cam.y < -self.content_height:
+                self.cam.y = -self.content_height
+            
+            self.scrollbar_bg.y = self.cam.y
+            self.scrollbar_bg.x = self.w-self.scrollbar_bg.width
+            self.scrollbar.x    = self.w-self.scrollbar.width
+            y                   = (self.cam.y/self.content_height) * (self.h-self.scrollbar.height)
+            self.scrollbar.y    = self.h-self.scrollbar.height+self.cam.y+y
         
+        # Weeeeeee
         self._vel += (-self._vel) / 10
+        
+        # make this accurate
+        engine.spronscr += 2

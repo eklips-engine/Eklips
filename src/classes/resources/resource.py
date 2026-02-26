@@ -32,8 +32,9 @@ class MyResource(Resource):
         
         Args:
             path: Filepath. (eg: `res://media/load.mp3`, `root://_assets/icon.png`)"""
-        data = json.loads(engine.loader.load(path))
-        return cls(data)
+        obj = cls(engine.loader.load(path, force_type="json"))
+        obj._setup_properties()
+        return obj
 
     @classmethod
     def new(cls) -> Self:

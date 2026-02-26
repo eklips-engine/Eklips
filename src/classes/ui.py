@@ -37,7 +37,7 @@ class EklWindow(pg.window.Window):
         style      : str | None                        = None,
         fullscreen : bool                              = False,
         visible    : bool                              = True,
-        vsync      : bool                              = True,
+        vsync      : bool                              = False,
         file_drops : bool                              = False,
         display    : pg.display.Display         | None = None,
         screen     : pg.display.Screen          | None = None,
@@ -159,6 +159,10 @@ class EklWindow(pg.window.Window):
     def on_mouse_release(self, x, y, button, modifiers):
         engine.mouse.pos             = [x, y]
         engine.mouse.buttons[button] = False
+    def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, buttons: int, modifiers: int):
+        engine.mouse.pos      = [x, y]
+        engine.mouse.dpos     = [dx,dy]
+        engine.mouse.dragging = True
     
     ## Keyboard Events
     def on_key_press(self, symbol, modifiers):
@@ -478,8 +482,7 @@ class Display:
             return
 
         # Fix dimensions
-        transform.w = sprite.image.width
-        transform.h = sprite.image.height
+        transform.tsize = [sprite.image.width, sprite.image.height]
 
         # Get sprite's scaling
         scale_x,scale_y = transform.scale
@@ -614,6 +617,7 @@ class Display:
         resizable      : bool                   = True,
         minimum_size   : None | list[int]       = [640,480],
         maximum_size   : None | list[int]       = None,
+        vsync          : bool                   = False,
         visible        : bool                   = True,
         fpsvisible     : bool                   = False,
         wid            : None | int             = None
@@ -631,6 +635,7 @@ class Display:
             resizable: Allow the window to be resizable if True.
             minimum_size: List of the minimum size the window can be, or None if you dont want a limit.
             maximum_size: List of the maximum size the window can be, or None if you dont want a limit.
+            vsync: If True, turns on V-Sync.
             visible: Make the window visible if True. Defaults to True.
             fpsvisible: Show the FPS if True.
             wid: Create the window in a predetermined window ID if the argument is not None.
@@ -649,22 +654,19 @@ class Display:
             self.main_window_id = wid
         
         # Create Window
-        window        = EklWindow(
-            wid       = wid,
+        window         = EklWindow(
+            wid        = wid,
 
-            width     = size[0],
-            height    = size[1],
-            caption   = name,
-            resizable = resizable
+            width      = size[0],
+            height     = size[1],
+            caption    = name,
+            resizable  = resizable,
+            
+            visible    = False,
+            
+            vsync      = vsync,
+            file_drops = True,
         )
-
-        # Set Window properties
-        if minimum_size:
-            window.set_minimum_size(*minimum_size)
-        if maximum_size:
-            window.set_maximum_size(*maximum_size)
-        if icon:
-            window.set_icon(icon)
         
         # Fill in information for the Window slot
         self.windows[wid] = window
@@ -676,6 +678,15 @@ class Display:
         # Add FPS Display
         if fpsvisible or engine.debug.fps_visible:
             fpsd = engine.hooks.HookFPSDisplay(window, [255,255,255,127])
+        
+        # Finishing up
+        if minimum_size:
+            window.set_minimum_size(*minimum_size)
+        if maximum_size:
+            window.set_maximum_size(*maximum_size)
+        if icon:
+            window.set_icon(icon)
+        window.set_visible(visible)
 
         # Return Window ID
         return wid

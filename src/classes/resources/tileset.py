@@ -10,7 +10,6 @@ class Tileset(Resource):
     
     XXX
     """
-    _can_init_script = False
 
     @property
     def image(self):

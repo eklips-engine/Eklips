@@ -173,7 +173,7 @@ class MediaPlayer(CanvasItem):
         )
     
     def _set_size(self,w,h):
-        size = [round(self._ogsize[0]*self.scale_x),round(self._ogsize[1]*self.scale_x)]
+        size = [round(self._ogsize[0]*self.scale_x),round(self._ogsize[1]*self.scale_y)]
         if self._video:
             self._video.resize(size)
 

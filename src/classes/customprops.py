@@ -1,5 +1,6 @@
 # Import libraries & components
 import json, pyglet    as pg, sys
+import os
 from classes.locals    import *
 from typing_extensions import *
 from typing            import *
@@ -143,6 +144,10 @@ class GameData:
         self.name        = self.project_data["name"]
         self.version     = self.project_data["version"]["app"]
         self.version_ekl = self.project_data["version"]["ekl"]
+        
+        # Make save directory
+        self.save_dir    = f"{os.path.expanduser('~')}/Eklips Engine/{self.name}"
+        os.makedirs(self.save_dir, exist_ok=True)
 
         # Initialize window properties
         self.win              = WindowProperties()
@@ -265,6 +270,7 @@ class Transform:
                 new_value.append(value)
         
         self._anchor = " ".join(new_value).lower()
+        self._set_pos(self._x, self._y)
     
     @scale_x.setter
     def scale_x(self, value):
@@ -319,6 +325,7 @@ class Transform:
         self.y  = value[1]
     @tsize.setter
     def tsize(self, value : list[int,int]):
+        if self.tsize == value: return
         self._w = value[0]
         self.h  = value[1]
 
@@ -389,7 +396,8 @@ class Transform:
     def get_quarter_size(self):
         return [self.w/4,self.h/4]
     
-    def new(pos : position, surface = None, scale = [1,1], opacity = 255, layer = 0, rotation = 0, anchor = "", scroll = [0,0], visible = True, skew = 0):
+    @classmethod
+    def new(cls, pos : position, surface = None, scale = [1,1], opacity = 255, layer = 0, rotation = 0, anchor = "", scroll = [0,0], visible = True, skew = 0):
         transform_obj          = Transform()
         transform_obj.pos      = pos
         if surface:
@@ -406,8 +414,9 @@ class Transform:
         return transform_obj
 
 class Mouse:
-    pos      = [0,0]
-    dpos     = [0,0]
+    pos      = [0,0]       # Mouse position anchored at bottom left
+    dpos     = [0,0]       # Relative pos from last frame
+    dragging = False       # If mouse is dragging
     scroll   = 0           # 1 is up, -1 is down
     buttons  = [0,0,0,0,0] # Index 0 is ignored
     paths    = []          # List of filepaths

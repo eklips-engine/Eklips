@@ -130,12 +130,13 @@ class CanvasItem(Node, Transform):
         self._refresh_item()
 
     ## Drawing related
-    def draw(self, image):
+    def draw(self, image = None):
         """Draw the CanvasItem. If one doesn't exist, a new one will be created. This is usually called automatically."""
         if not self.citem:
             self._make_new_item()
-        if image:
-            self._draw()
+        if image and self.citem.image != image:
+            self.citem.image = image
+        self._draw()
     def _draw(self):
         return engine.display.blit(
             transform   = self,
@@ -185,7 +186,7 @@ class CanvasItem(Node, Transform):
             return
         self.citem.delete()
         self.citem = None
-    def _make_new_item(self):
+    def _make_new_item(self) -> pg.sprite.Sprite | pg.text.Label:
         if self.citem:
             self._remove_item()
         self.batch = engine.display.get_batch_from_window(self.window_id, self.viewport_id, self.batch_id)
@@ -219,9 +220,9 @@ class CanvasItem(Node, Transform):
         """Returns true if the mouse is hovering over self."""
         if not self.viewport:
             return
-        mpos     = engine.mouse.pos
-        x,  y    = self.into_screen_coords(self.viewport.tsize)
-        vx, vy   = self.viewport.into_screen_coords()
+        mpos   = engine.mouse.pos
+        x,  y  = self.into_screen_coords(self.viewport.tsize)
+        vx, vy = self.viewport.into_screen_coords()
         is_it  = (
             mpos[0] >= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom)                                     and
             mpos[0] <= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom) + (self.w * self.viewport.cam.zoom) and

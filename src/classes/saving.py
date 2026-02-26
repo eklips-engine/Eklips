@@ -7,9 +7,9 @@ import classes.singleton as engine
 ## Savefile class
 class Savefile:
     def __init__(self):
-        self.save_dir  = f"{os.path.expanduser('~')}/Eklips Engine/{engine.game.name}" # Save file directory
-        self.savefpath = f"{self.save_dir}/save.json"                                  # Save file path
-        self.base_save = f"{engine.game.project_dir}/base_save.json"                   # Empty save file path
+        self.save_dir  = engine.game.save_dir                        # Save file directory
+        self.savefpath = f"{self.save_dir}/save.json"                # Save file path
+        self.base_save = f"{engine.game.project_dir}/base_save.json" # Empty save file path
         self.savefile  = {}
         self.load_data()
     
@@ -21,7 +21,6 @@ class Savefile:
     
     def save_data(self):
         try:
-            os.makedirs(self.save_dir, exist_ok=True)
             with open(self.savefpath, "w") as f:
                 f.write(json.dumps(self.savefile))
         except:
