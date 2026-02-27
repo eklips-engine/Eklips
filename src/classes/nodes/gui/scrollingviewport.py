@@ -88,13 +88,16 @@ class ScrollingViewport(ExtraViewport):
         self._vel              = 0
         self.gid               = self.widgetman.add_widget(self)
         
+        # Add batch for scrollbar
+        self._scrollbarbatch = self.add_batch()
+        
         # Make scrollbar
-        self.scrollbar_bg      = pg.sprite.Sprite(
+        self.scrollbar_bg = pg.sprite.Sprite(
             img   = engine.theme.get_static_widget("scrollbg"),
-            batch = self.batches[MAIN_BATCH])
-        self.scrollbar         = pg.sprite.Sprite(
+            batch = self.batches[self._scrollbarbatch])
+        self.scrollbar    = pg.sprite.Sprite(
             img   = engine.theme.get_static_widget("scrollbtn"),
-            batch = self.batches[MAIN_BATCH])
+            batch = self.batches[self._scrollbarbatch])
     
     def _remove_item(self):
         super()._remove_item()
@@ -124,15 +127,22 @@ class ScrollingViewport(ExtraViewport):
     def update(self):
         super().update()
 
-        # Handle dragging the scrollbar
+        # Handle the knob
+        if self.get_if_mouse_hovering_knob():
+            self.widgetman.hovering_widget = self.gid
+        else:
+            if self.widgetman.hovering_widget == self.gid:
+                self.widgetman.hovering_widget = -1
+        
         if engine.mouse.buttons[MOUSE_LEFT]:
-            if self.get_if_mouse_hovering():
+            if self.get_if_mouse_hovering_knob():
                 if self.widgetman.moving_widget  == -1:
                     self.widgetman.focused_widget = self.gid
                 if engine.mouse.dragging and self.widgetman.focused_widget == self.gid:
                     self.widgetman.moving_widget  = self.gid
             if self.widgetman.moving_widget      == self.gid:
                 self._vel = 0
+                engine.set_mouse(MOUSE_DRAG)
                 if self._left_to_right:
                     self.cam.x    += engine.mouse.dpos[0]/(self.w-self.scrollbar.width)*self.content_width
                     if self.cam.x  < 0:
@@ -142,7 +152,10 @@ class ScrollingViewport(ExtraViewport):
                     if self.cam.y  > 0:
                         self.cam.y = 0
         else:
+            if self.widgetman.hovering_widget == -1:
+                engine.set_mouse(MOUSE_NORMAL)
             if self.get_if_mouse_hovering_knob() or self.widgetman.moving_widget == self.gid:
+                engine.set_mouse(MOUSE_DRAGGABLE)
                 self.widgetman.moving_widget = -1
         
         # Handle spinning the mouse wheel

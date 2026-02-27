@@ -94,8 +94,9 @@ class Widget(_StaticWidget, _SplicedWidget):
 
 class WidgetManager:
     def __init__(self):
-        self.moving_widget  = -1
-        self.focused_widget = -1
+        self.moving_widget   = -1
+        self.hovering_widget = -1
+        self.focused_widget  = -1
         
         self.widgets  = {}
         self._lastgid = 0

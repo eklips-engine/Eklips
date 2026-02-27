@@ -204,7 +204,10 @@ class CanvasItem(Node, Transform):
     ## Update
     def _update_relativity(self):
         if self.parent and self.parent.get("_iscitem", False):
-            self._offset_x, self._offset_y = self.parent.into_screen_coords(self.viewport.tsize, False)
+            if self.parent.get("_isdisplayobject", False):
+                self._offset_x, self._offset_y = self.parent.into_screen_coords(False)
+            else:
+                self._offset_x, self._offset_y = self.parent.into_screen_coords(self.viewport.tsize, False)
     
     def update(self):
         super().update()

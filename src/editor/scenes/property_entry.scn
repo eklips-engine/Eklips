@@ -1,0 +1,65 @@
+{
+    "nodes": {
+        "": {
+            "type":        "Label",
+            "text":        "NAME",
+            "script_path": "res://data/property_entry.ekl",
+
+            "viewport_id": 5,
+
+            "color":       [255,255,255],
+            "transform":   {
+                "position": [10,10],
+                "tsize":    [1,  1],
+                "scale":    [1,  1],
+                "scroll":   [0,  0],
+
+                "rotation": 0,
+                "alpha":    255,
+                "anchor":   "top left",
+                "visible":  true,
+                "skew":     0
+            },
+
+            "children":    {
+                "htbx": {
+                    "type":  "CanvasItem",
+                    
+                    "transform":   {
+                        "position": [0,    0],
+                        "tsize":    [563, 61],
+                        "scale":    [1,    1],
+                        "scroll":   [0,    0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "value": {
+                    "type":  "Label",
+                    "color": [255,255,255],
+
+                    "transform":   {
+                        "position": [15,30],
+                        "tsize":    [1,  1],
+                        "scale":    [1,  1],
+                        "scroll":   [0,  0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                }
+            }
+        }
+    },
+    "properties": {
+        "inherits": null,
+        "version":  1
+    }
+}

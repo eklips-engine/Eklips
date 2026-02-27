@@ -49,6 +49,7 @@ class EklWindow(pg.window.Window):
         self.closed     = False
         self.viewports  = {}
         self.id         = wid
+        self._lastvid   = MAIN_VIEWPORT
         
         # Init
         ## Code taken from pyglet/window/base/__init__.py line 508-546
@@ -154,11 +155,14 @@ class EklWindow(pg.window.Window):
         engine.mouse.pos    = [x, y]
         engine.mouse.scroll = scroll_y
     def on_mouse_press(self, x, y, button, modifiers):
-        engine.mouse.pos             = [x, y]
-        engine.mouse.buttons[button] = True
+        engine.mouse.pos                  = [x, y]
+        print(button)
+        engine.mouse.buttons[button]      = True
+        engine.mouse.just_clicked[button] = True
     def on_mouse_release(self, x, y, button, modifiers):
-        engine.mouse.pos             = [x, y]
-        engine.mouse.buttons[button] = False
+        engine.mouse.pos                  = [x, y]
+        engine.mouse.buttons[button]      = False
+        engine.mouse.just_clicked[button] = False
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, buttons: int, modifiers: int):
         engine.mouse.pos      = [x, y]
         engine.mouse.dpos     = [dx,dy]
@@ -197,7 +201,8 @@ class EklWindow(pg.window.Window):
             pos: Viewport position.
         """
 
-        vid = len(self.viewports)
+        vid            = self._lastvid
+        self._lastvid += 1
 
         viewport          = Viewport(vid, self, flags)
         viewport.position = pos
@@ -238,6 +243,8 @@ class Viewport(Transform):
         self.window.viewports[vid] = self
 
         self._make_framebuffer()
+        
+        self._lastbid = MAIN_BATCH
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(size={self.w}x{self.h}, id={self.id})"
@@ -245,9 +252,10 @@ class Viewport(Transform):
     ## Add Batch
     def add_batch(self):
         """Add a batch to the Viewport. Returns its ID."""
-        bid      = len(self.batches)
-        batch    = pg.graphics.Batch()
-
+        bid            = self._lastbid
+        batch          = pg.graphics.Batch()
+        self._lastbid += 1
+        
         self.batches.append(batch)
         return bid
 
@@ -413,11 +421,11 @@ class Viewport(Transform):
 
 class Display:
     """A class to manage `EklWindow`'s."""
-    windows        = {}   # Dict of windows
-    _doomed        = []   # List of windows to run through remove_window
-    _merciless     = []   # List of windows to run through window.close
-    main_window_id = None # Name
-    _windid        = 0    # Next ID
+    windows        = {}          # Dict of windows
+    _doomed        = []          # List of windows to run through remove_window
+    _merciless     = []          # List of windows to run through window.close
+    main_window_id = None        # Name
+    _windid        = MAIN_WINDOW # Next ID
 
     ## Update
     def update(self):

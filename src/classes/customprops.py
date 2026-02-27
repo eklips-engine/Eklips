@@ -168,6 +168,9 @@ class GameData:
         self.loading_scene = self.project_data["scenes"]["loading"]
 
 class Transform:
+    def __repr__(self):
+        return f"Transform(x={self.x}, y={self.y}, w={self.w}, h={self.h}, anchor={self.anchor})"
+    
     def __init__(self):
         self._x = 0
         self._y = 0
@@ -414,12 +417,13 @@ class Transform:
         return transform_obj
 
 class Mouse:
-    pos      = [0,0]       # Mouse position anchored at bottom left
-    dpos     = [0,0]       # Relative pos from last frame
-    dragging = False       # If mouse is dragging
-    scroll   = 0           # 1 is up, -1 is down
-    buttons  = [0,0,0,0,0] # Index 0 is ignored
-    paths    = []          # List of filepaths
+    pos          = [0,0]       # Mouse position anchored at bottom left
+    dpos         = [0,0]       # Relative pos from last frame
+    dragging     = False       # If mouse is dragging
+    scroll       = 0           # 1 is up, -1 is down
+    just_clicked = [0,0,0,0,0] # Buttons just now pressed
+    buttons      = [0,0,0,0,0] # Index 0 is ignored
+    paths        = []          # List of filepaths
 
 class Keyboard:
     modifiers = 0

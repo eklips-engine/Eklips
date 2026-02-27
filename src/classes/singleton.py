@@ -27,23 +27,33 @@ def load_engine():
 
     # Initialize display and windows
     icon    = loader.load(game.win.icofile)
-    display = ui.Display()
-    clock   = pg.clock.Clock()
-    display.add_window(
-        name           = game.name,
-        
-        size           = game.win.vsize,
-        viewport_size  = game.win.vsize,
-        viewport_flags = [VIEWPORT_EQUAL_WINDOW],
-        viewport_color = game.win.color,
-        resizable      = game.win.resizable,
-        minimum_size   = game.win.minsize,
-        maximum_size   = game.win.maxsize,
-        
-        vsync          = False,
+    
+    if not running:
+        display = ui.Display()
+        clock   = pg.clock.Clock()
+        display.add_window(
+            name           = game.name,
+            
+            size           = game.win.vsize,
+            viewport_size  = game.win.vsize,
+            viewport_flags = [VIEWPORT_EQUAL_WINDOW],
+            viewport_color = game.win.color,
+            resizable      = game.win.resizable,
+            minimum_size   = game.win.minsize,
+            maximum_size   = game.win.maxsize,
+            
+            vsync          = False,
 
-        icon           = icon
-    )
+            icon           = icon
+        )
+    else:
+        for wid in display.windows:
+            if wid != MAIN_WINDOW:
+                window = display.windows[wid]
+                
+                if window:
+                    window.close()
+                    display.windows.pop(wid)
 
     # Initialize user input sections
     mouse    = Mouse()
@@ -76,10 +86,19 @@ def load_engine():
     
     # Load cursors
     for i in CURSORS:
-        cursors[i] = display.get_window().get_system_mouse_cursor(i)
+        load_cursor(i)
 
     # Set running flag to true
     running = True
+
+def load_cursor(name) -> pg.window.MouseCursor | pg.window.ImageMouseCursor:
+    if os.path.exists(loader._get_true_path(str(name))):
+        cursor = loader.load(name)
+    else:
+        cursor = display.get_window().get_system_mouse_cursor(name)
+    
+    cursors[name] = cursor
+    return cursor
 
 def is_action_pressed(entry) -> bool:
     """Returns true if action `entry` is pressed. Might return False if the entry's settings have `holdable` disabled."""
@@ -130,6 +149,7 @@ def set_mouse(cursor, wid = MAIN_WINDOW):
         wid: The ID of the Window that should have this cursor. Defaults to `MAIN_WINDOW`.
     """
     window = display.get_window(wid)
+    
     window.set_mouse_cursor(cursors[cursor])
 
 def quit():

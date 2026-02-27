@@ -20,6 +20,7 @@ class Loader:
     use_binary    = False
     extensions    = {
         "img": ["png","jpg","jpeg","bmp","gif","dds","tif","tiff"], # Image
+        "cur": ["cur"],                                             # Windows Mouse Cursor
         "sfx": ["mp3","ogg","wav"],                                 # Sound
         "txt": ["py","txt","ekl"],                                  # TXT file
         "jsn": ["json"],                                            # JSON
@@ -56,6 +57,9 @@ class Loader:
                 return json.loads(open(actual_path).read())
             if ext in self.extensions["xml"]:
                 return xmltodict.parse(open(actual_path).read())
+            if ext in self.extensions["cur"]:
+                image = cnveklimg(pg.image.load(actual_path))
+                return pg.window.ImageMouseCursor(image, hot_x=0, hot_y=image.height)
             if ext in self.extensions["res"]:
                 data     = json.loads(open(actual_path).read())
                 

@@ -26,11 +26,10 @@ def on_draw():
     try:
         # Calculate delta
         _current_delta = time.time()
-        #engine.tdelta  = (_current_delta - _old_delta)
         engine.delta   = engine.speed * engine.tdelta
         engine.uptime += engine.tdelta
         _old_delta     = _current_delta
-
+        
         # Update scene
         engine.scene.update()
 
@@ -42,9 +41,10 @@ def on_draw():
 
         # Clear the list of pressed keys
         engine.keyboard.pressed.clear()
-        engine.mouse.scroll   = 0
-        engine.mouse.dragging = False
-        engine.mouse.dpos     = [0,0]
+        engine.mouse.scroll       = 0
+        engine.mouse.dragging     = False
+        engine.mouse.dpos         = [0,0]
+        engine.mouse.just_clicked = [0,0,0,0,0]
     except Exception as error:
         engine.error_handler.show_error(error)
         engine.quit()
