@@ -5,3 +5,5 @@ screenshots
 test*.*
 pb94
 images.png
+build/
+dist/

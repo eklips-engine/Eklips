@@ -59,6 +59,7 @@ class ScrollingViewport(ExtraViewport):
         return self._content_width
     @content_width.setter
     def content_width(self, value):
+        if value < ZDE_FIX: value = ZDE_FIX
         self._content_width = value
     
     @export(False, "int", "slider")
@@ -66,6 +67,7 @@ class ScrollingViewport(ExtraViewport):
         return self._content_height
     @content_height.setter
     def content_height(self, value):
+        if value < ZDE_FIX: value = ZDE_FIX
         self._content_height = value
     
     def _set_size(self, w, h):
@@ -127,6 +129,19 @@ class ScrollingViewport(ExtraViewport):
     def update(self):
         super().update()
 
+        # Check if not wasting time
+        if not self.visible:
+            self.scrollbar.visible    = False
+            self.scrollbar_bg.visible = False
+            return
+        elif self.content_height     == ZDE_FIX or self.content_width == ZDE_FIX:
+            self.scrollbar.visible    = False
+            self.scrollbar_bg.visible = False
+            return
+        else:
+            self.scrollbar.visible    = True
+            self.scrollbar_bg.visible = True
+        
         # Handle the knob
         if self.get_if_mouse_hovering_knob():
             self.widgetman.hovering_widget = self.gid

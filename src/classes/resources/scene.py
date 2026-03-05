@@ -43,7 +43,7 @@ class SceneLike:
         self._inherited_scn                   = None        # Filepath of the inherited scene
         self._blessed                         = []          # List of nodes that are about to be created
         self._temp_node_list                  = []          # List of nodepaths in the scene tree
-        self._stf : CollisionManager = None        # Collision Manager
+        self._stf : CollisionManager          = None        # Collision Manager
         self._widgetman    : WidgetManager    = None        # Widget Manager
 
 class Scene(Resource, SceneLike):
@@ -70,10 +70,10 @@ class Scene(Resource, SceneLike):
     @file_path.setter
     def file_path(self, path : str):
         self.empty()
-        self._stf = engine.resources.CollisionManager()
-        self._widgetman    = engine.resources.WidgetManager()
-        self._file_path    = path
-        _data              = engine.loader.load(path, force_new_resource=True)
+        self._stf       = engine.resources.CollisionManager()
+        self._widgetman = engine.resources.WidgetManager()
+        self._file_path = path
+        _data           = engine.loader.load(path, force_new_resource=True)
         if _data["properties"]["inherits"]:
             self._inherited_scn = _data["properties"]["inherits"]
             self._loadscenefile(_data["properties"]["inherits"])
@@ -84,10 +84,10 @@ class Scene(Resource, SceneLike):
     @nodes.setter
     def nodes(self, nodes : dict):
         self.empty()
-        self._stf = engine.resources.CollisionManager()
-        self._widgetman    = engine.resources.WidgetManager()
-        self._nodes        = nodes
-        nodepaths          = self.get_node_paths("")
+        self._stf       = engine.resources.CollisionManager()
+        self._widgetman = engine.resources.WidgetManager()
+        self._nodes     = nodes
+        nodepaths       = self.get_node_paths("")
 
         for nodepath in nodepaths:
             self._initialize_node_entry(nodepath)
@@ -338,11 +338,15 @@ class Scene(Resource, SceneLike):
         self._temp_node_list = self.get_node_paths("")
     def empty(self):
         """Empty the scene."""
-        root = self.nodes[""].get("obj")
+        start = time.time()
+        
+        root  = self.nodes[""].get("obj")
         if root:
             root._free()
         self._nodes          = EMPTY_SCENE
         self._temp_node_list = []
+        
+        end   = time.time()
     def _free(self):
         self.empty()
         super()._free()

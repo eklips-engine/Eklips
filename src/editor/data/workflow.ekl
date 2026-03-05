@@ -28,28 +28,35 @@ def populate_frame(self : ColorRect):
                 },
                 "name": "Eklips 5.0A"
             }, is_file=False)
-            engine.projects[project] = gamedata
+        except:
+            gamedata = GameData({
+                "project": {
+                    "file": "editor/data/base_project/game.json",
+                    "dir":  "editor/data/base_project"
+                },
+                "name": "Eklips 5.0A"
+            }, is_file=False)
+        engine.projects[project] = gamedata
 
-            btnps : PackedScene = engine.scene._add_node({
-                "type":      "PackedScene",
-                "file_path": "res://scenes/project_entry.scn",
-                "projectid": project,
-                "pid":       pid,
-            }, f"/panel_obj/{gamedata.name}")
-            nlbl : Label      = btnps.get_node_from_path("/nlbl")
-            vlbl : Label      = btnps.get_node_from_path("/vlbl")
-            htbx : CanvasItem = btnps.get_node_from_path("/htbx")
-            rnod : ColorRect  = btnps.get_node_from_path("")
+        btnps : PackedScene = engine.scene._add_node({
+            "type":      "PackedScene",
+            "file_path": "res://scenes/project_entry.scn",
+            "projectid": project,
+            "pid":       pid,
+        }, f"/panel_obj/{pid}")
+        nlbl : Label      = btnps.get_node_from_path("/nlbl")
+        vlbl : Label      = btnps.get_node_from_path("/vlbl")
+        rnod : ColorRect  = btnps.get_node_from_path("")
 
-            nlbl.text = gamedata.name
-            vlbl.text = f"v{gamedata.version}"
-            rnod.y    = y
-            y       += 66
+        nlbl.text = gamedata.name
+        vlbl.text = f"v{gamedata.version}"
+        rnod.y    = y
+        y       += 66
 
-            print(f" |~ {gamedata.name} v{gamedata.version}")
-            pid += 1
-        except Exception as err:
-            engine.error_handler.show_error(err)
+        pid += 1
+    
+    panel = engine.scene.get_node_from_path("/panel_obj")
+    panel.content_height = len(project_list)*66-panel.h
 
 def make_new_project(name, directory):
     # This makes a new project.

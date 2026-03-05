@@ -17,13 +17,15 @@
         "loading": "root://_assets/loading.scn"
     },
     
-    "directory": "dolorem",
+    "directory": "editor/data/base_project",
 
     "behavior": {
         "autoloads":     [],
         "autoload_name": "Autoload!~X",
 
-        "antialiasing":  false
+        "antialiasing": false,
+
+        "fonts": []
     },
     "language": {
         "langs": [],

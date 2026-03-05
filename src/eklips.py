@@ -39,7 +39,7 @@ def on_draw():
         if engine.keyboard.pressed.get(pg.window.key.F12):
             main_window.screenshot()
 
-        # Clear the list of pressed keys
+        # Clear the list of temporary actions
         engine.keyboard.pressed.clear()
         engine.mouse.scroll       = 0
         engine.mouse.dragging     = False
@@ -50,4 +50,4 @@ def on_draw():
         engine.quit()
 
 # Start the engine
-pg.app.run(interval=1/560)
+pg.app.run(interval=0)

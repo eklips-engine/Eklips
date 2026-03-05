@@ -37,34 +37,19 @@ pg.app.event_loop._redraw_windows = newrwd
 
 ## FPS Display
 class HookFPSDisplay(pg.window.FPSDisplay):
-    def __init__(self, window : EklWindow, color = [255,255,255,255], samples = 240):
+    def __init__(self, window : EklWindow, color = [255,255,255,255], samples = MAXFPS):
         super().__init__(window, color, samples)
 
         self.window   : EklWindow = window
         self.viewport : Viewport  = window.viewports[UI_VIEWPORT]
-        self.label                = pg.text.Label(batch = self.viewport.batches[MAIN_BATCH])
-        self.label.color          = color
-
-        self.transform         = engine.Transform()
-        self.transform.x       = 5
-        self.transform.y       = 0
-        self.transform.anchor  = "top"
-        self.transform.visible = True
-        self.transform.scale   = [1,1]
-        self.group             = pg.graphics.Group(order=999)
-    
-    def draw(self):
-        engine.display.blit_label(
-            self.label.text,
-            self.transform,
-            self.label,
-            self.window.id,
-            UI_VIEWPORT,
-            self.group,
-            DEFAULT_FONT_NAME,
-            DEFAULT_FONT_SIZE * 1.25
-        )
-    
+        self.label                = pg.text.Label(
+            text                  = "0 FPS",
+            font_name             = DEFAULT_FONT_NAME,
+            font_size             = DEFAULT_FONT_SIZE * 1.25,
+            batch                 = self.viewport.batches[MAIN_BATCH],
+            color                 = color,
+            group                 = pg.graphics.Group(order=999))
+        
     def update(self) -> None:
         """Records a new data point at the current time.
 
@@ -75,16 +60,13 @@ class HookFPSDisplay(pg.window.FPSDisplay):
 
         if self._elapsed >= self.update_period:
             self._elapsed = 0
-            engine.fps = round(1 / (sum(self._delta_times)/len(self._delta_times))) if self._delta_times else 0
-            if engine.debug.track_visible_sprites:
-                self.label.text  = f"{engine.fps} FPS with {engine.spronscr} visible sprites"
-            else:
-                self.label.text  = f"{engine.fps} FPS"
-            self.transform.tsize = self.label.content_width, self.label.content_height
+            engine.fps = round(
+                1 / (sum(self._delta_times)/len(self._delta_times))
+            ) if self._delta_times else 0
+            self.label.text  = f"{engine.fps} FPS"
     
     def _hook_flip(self) -> None:
         self.update()
-        self.draw()
         self._window_flip()
 
 ## Subprocess
@@ -361,5 +343,5 @@ class HookPopen(ogpopen):
 
             raise
 
-print(f" | ~ Hook function")
+print(f" | ~ Hook Popen")
 subprocess.Popen = HookPopen
