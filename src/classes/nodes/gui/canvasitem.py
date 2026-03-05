@@ -138,12 +138,7 @@ class CanvasItem(Node, Transform):
             self.citem.image = image
         self._draw()
     def _draw(self):
-        return engine.display.blit(
-            transform   = self,
-            window_id   = self.window_id,
-            viewport_id = self.viewport_id,
-            sprite      = self.citem
-        )
+        return self.viewport.blit_sprite(self, self.citem)
 
     ## Transform related
     def _set_pos(self, x, y):

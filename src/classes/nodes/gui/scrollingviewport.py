@@ -179,7 +179,7 @@ class ScrollingViewport(ExtraViewport):
         
         # Camera and scrollbar sprite handling
         if self._left_to_right:
-            self.cam.x -= self._vel
+            self.cam.x   -= self._vel
             if self.cam.x < 0:
                 self._vel = -((-self.cam.x) / 10)
             if self.cam.x > self.content_width:
@@ -188,7 +188,7 @@ class ScrollingViewport(ExtraViewport):
             self.scrollbar_bg.y = self.scrollbar.y = 0
             self.scrollbar.x    = self.cam.x+((self.cam.x/self.content_width) * (self.w-self.scrollbar.width))
         else:
-            self.cam.y += self._vel
+            self.cam.y   += self._vel
             if self.cam.y > 0:
                 self._vel = (-self.cam.y) / 10
             if self.cam.y < -self.content_height:
@@ -202,6 +202,3 @@ class ScrollingViewport(ExtraViewport):
         
         # Weeeeeee
         self._vel += (-self._vel) / 10
-        
-        # make this accurate
-        engine.spronscr += 2

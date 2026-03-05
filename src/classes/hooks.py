@@ -20,7 +20,7 @@ import classes.singleton as engine
 print(" ~ Modify pyglet.eventloop._redraw_windows")
 def newrwd(dt: float) -> None:
     engine.tdelta = dt
-    
+
     # Redraw all windows
     for wid in engine.display.windows.copy():
         if wid in engine.display.windows:
@@ -43,6 +43,8 @@ class HookFPSDisplay(pg.window.FPSDisplay):
         self.window   : EklWindow = window
         self.viewport : Viewport  = window.viewports[UI_VIEWPORT]
         self.label                = pg.text.Label(
+            x                     = 5,
+            y                     = 5,
             text                  = "0 FPS",
             font_name             = DEFAULT_FONT_NAME,
             font_size             = DEFAULT_FONT_SIZE * 1.25,
@@ -60,10 +62,11 @@ class HookFPSDisplay(pg.window.FPSDisplay):
 
         if self._elapsed >= self.update_period:
             self._elapsed = 0
-            engine.fps = round(
-                1 / (sum(self._delta_times)/len(self._delta_times))
-            ) if self._delta_times else 0
-            self.label.text  = f"{engine.fps} FPS"
+            average_delta = sum(self._delta_times)/len(self._delta_times)
+            engine.fps    = round(1 / average_delta)
+
+            self.label.text = f"{engine.fps} FPS"
+            self.label.y    = self.viewport.h-self.label.content_height
     
     def _hook_flip(self) -> None:
         self.update()
@@ -94,39 +97,30 @@ class HookPopen(ogpopen):
         shell = True
         if args[0].startswith("ff"):
             args[0] = args[0].replace("ff", ".\\bin\\ff")
+        
         if not _can_fork_exec:
             raise OSError(
                 errno.ENOTSUP, f"{sys.platform} does not support processes."
             )
         _cleanup()
-        # Held while anything is calling waitpid before returncode has been
-        # updated to prevent clobbering returncode if wait() or poll() are
-        # called from multiple threads at once.  After acquiring the lock,
-        # code must re-check self.returncode to see if another thread just
-        # finished a waitpid() call.
         self._waitpid_lock = threading.Lock()
-
         self._input = None
         self._communication_started = False
         if bufsize is None:
-            bufsize = -1  # Restore default
+            bufsize = -1
         if not isinstance(bufsize, int):
             raise TypeError("bufsize must be an integer")
-
         if stdout is subprocess.STDOUT:
             raise ValueError("STDOUT can only be used for stderr")
-
         if pipesize is None:
-            pipesize = -1  # Restore default
+            pipesize = -1
         if not isinstance(pipesize, int):
             raise TypeError("pipesize must be an integer")
-
         if subprocess._mswindows:
             if preexec_fn is not None:
                 raise ValueError("preexec_fn is not supported on Windows "
                                  "platforms")
         else:
-            # POSIX
             if pass_fds and not close_fds:
                 warnings.warn("pass_fds overriding close_fds.", RuntimeWarning)
                 close_fds = True
@@ -136,7 +130,6 @@ class HookPopen(ogpopen):
             if creationflags != 0:
                 raise ValueError("creationflags is only supported on Windows "
                                  "platforms")
-
         self.args = args
         self.stdin = None
         self.stdout = None
@@ -146,69 +139,50 @@ class HookPopen(ogpopen):
         self.encoding = encoding
         self.errors = errors
         self.pipesize = pipesize
-
-        # Validate the combinations of text and universal_newlines
         if (text is not None and universal_newlines is not None
             and bool(universal_newlines) != bool(text)):
             raise subprocess.SubprocessError('Cannot disambiguate when both text '
                                   'and universal_newlines are supplied but '
                                   'different. Pass one or the other.')
-
         self.text_mode = encoding or errors or text or universal_newlines
         if self.text_mode and encoding is None:
             self.encoding = encoding = subprocess._text_encoding()
-
-        # How long to resume waiting on a child after the first ^C.
-        # There is no right value for this.  The purpose is to be polite
-        # yet remain good for interactive users trying to exit a tool.
-        self._sigint_wait_secs = 0.25  # 1/xkcd221.getRandomNumber()
-
+        self._sigint_wait_secs = 0.25
         self._closed_child_pipe_fds = False
-
         if self.text_mode:
             if bufsize == 1:
                 line_buffering = True
-                # Use the default buffer size for the underlying binary streams
-                # since they don't support line buffering.
                 bufsize = -1
             else:
                 line_buffering = False
-
         if process_group is None:
-            process_group = -1  # The internal APIs are int-only
-
+            process_group = -1
         gid = None
         if group is not None:
             if not hasattr(os, 'setregid'):
                 raise ValueError("The 'group' parameter is not supported on the "
                                  "current platform")
-
             elif isinstance(group, str):
                 try:
                     import grp
                 except ImportError:
                     raise ValueError("The group parameter cannot be a string "
                                      "on systems without the grp module")
-
                 gid = grp.getgrnam(group).gr_gid
             elif isinstance(group, int):
                 gid = group
             else:
                 raise TypeError("Group must be a string or an integer, not {}"
                                 .format(type(group)))
-
             if gid < 0:
                 raise ValueError(f"Group ID cannot be negative, got {gid}")
-
         gids = None
         if extra_groups is not None:
             if not hasattr(os, 'setgroups'):
                 raise ValueError("The 'extra_groups' parameter is not "
                                  "supported on the current platform")
-
             elif isinstance(extra_groups, str):
                 raise ValueError("Groups must be a list, not a string")
-
             gids = []
             for extra_group in extra_groups:
                 if isinstance(extra_group, str):
@@ -218,7 +192,6 @@ class HookPopen(ogpopen):
                         raise ValueError("Items in extra_groups cannot be "
                                          "strings on systems without the "
                                          "grp module")
-
                     gids.append(grp.getgrnam(extra_group).gr_gid)
                 elif isinstance(extra_group, int):
                     gids.append(extra_group)
@@ -226,19 +199,14 @@ class HookPopen(ogpopen):
                     raise TypeError("Items in extra_groups must be a string "
                                     "or integer, not {}"
                                     .format(type(extra_group)))
-
-            # make sure that the gids are all positive here so we can do less
-            # checking in the C code
             for gid_check in gids:
                 if gid_check < 0:
                     raise ValueError(f"Group ID cannot be negative, got {gid_check}")
-
         uid = None
         if user is not None:
             if not hasattr(os, 'setreuid'):
                 raise ValueError("The 'user' parameter is not supported on "
                                  "the current platform")
-
             elif isinstance(user, str):
                 try:
                     import pwd
@@ -253,32 +221,9 @@ class HookPopen(ogpopen):
 
             if uid < 0:
                 raise ValueError(f"User ID cannot be negative, got {uid}")
-
-        # Input and output objects. The general principle is like
-        # this:
-        #
-        # Parent                   Child
-        # ------                   -----
-        # p2cwrite   ---stdin--->  p2cread
-        # c2pread    <--stdout---  c2pwrite
-        # errread    <--stderr---  errwrite
-        #
-        # On POSIX, the child objects are file descriptors.  On
-        # Windows, these are Windows file handles.  The parent objects
-        # are file descriptors on both platforms.  The parent objects
-        # are -1 when not using PIPEs. The child objects are -1
-        # when not redirecting.
-
         (p2cread, p2cwrite,
          c2pread, c2pwrite,
          errread, errwrite) = self._get_handles(stdin, stdout, stderr)
-
-        # From here on, raising exceptions may cause file descriptor leakage
-
-        # We wrap OS handles *before* launching the child, otherwise a
-        # quickly terminating child could make our fds unwrappable
-        # (see #8458).
-
         if subprocess._mswindows:
             if p2cwrite != -1:
                 p2cwrite = subprocess.msvcrt.open_osfhandle(p2cwrite.Detach(), 0)
@@ -286,7 +231,6 @@ class HookPopen(ogpopen):
                 c2pread = subprocess.msvcrt.open_osfhandle(c2pread.Detach(), 0)
             if errread != -1:
                 errread = subprocess.msvcrt.open_osfhandle(errread.Detach(), 0)
-
         try:
             if p2cwrite != -1:
                 self.stdin = io.open(p2cwrite, 'wb', bufsize)
@@ -304,7 +248,6 @@ class HookPopen(ogpopen):
                 if self.text_mode:
                     self.stderr = io.TextIOWrapper(self.stderr,
                             encoding=encoding, errors=errors)
-
             self._execute_child(args, executable, preexec_fn, close_fds,
                                 pass_fds, cwd, env,
                                 startupinfo, creationflags, shell,
@@ -315,13 +258,11 @@ class HookPopen(ogpopen):
                                 gid, gids, uid, umask,
                                 start_new_session, process_group)
         except:
-            # Cleanup if the child failed starting.
             for f in filter(None, (self.stdin, self.stdout, self.stderr)):
                 try:
                     f.close()
                 except OSError:
-                    pass  # Ignore EBADF or other errors.
-
+                    pass
             if not self._closed_child_pipe_fds:
                 to_close = []
                 if stdin == subprocess.PIPE:
@@ -340,7 +281,6 @@ class HookPopen(ogpopen):
                             os.close(fd)
                     except OSError:
                         pass
-
             raise
 
 print(f" | ~ Hook Popen")

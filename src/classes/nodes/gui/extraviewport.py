@@ -81,7 +81,6 @@ class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass no
     def draw(self):
         """Draw the Viewport. This should be called automatically by the `EklWindow`."""
         Viewport.draw(self)
-        engine.spronscr += 1 
     
     def get_if_mouse_hovering(self):
         mpos   = engine.mouse.pos

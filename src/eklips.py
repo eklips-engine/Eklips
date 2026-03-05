@@ -1,5 +1,5 @@
 # Import libraries
-import pygame, pyglet as pg, time
+import pyglet as pg, time
 
 # Import components
 from classes.locals      import *
@@ -50,4 +50,4 @@ def on_draw():
         engine.quit()
 
 # Start the engine
-pg.app.run(interval=0)
+pg.app.run(interval=1/MAXFPS)

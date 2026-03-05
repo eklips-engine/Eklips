@@ -56,7 +56,7 @@ def populate_frame(self : ColorRect):
         pid += 1
     
     panel = engine.scene.get_node_from_path("/panel_obj")
-    panel.content_height = len(project_list)*66-panel.h
+    #panel.content_height = len(project_list)*66-panel.h
 
 def make_new_project(name, directory):
     # This makes a new project.

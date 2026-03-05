@@ -160,22 +160,10 @@ class Slider(CanvasItem):
         else:
             self._ktf.x = x + (self._value/self._maximum)*self.w - self.knob.width/2
         
-        engine.display.blit(
-            transform   = self._stf,
-            window_id   = self.window_id,
-            viewport_id = self.viewport_id,
-            sprite      = self.slider_bg
-        )
-        engine.display.blit(
-            transform   = self._ktf,
-            window_id   = self.window_id,
-            viewport_id = self.viewport_id,
-            sprite      = self.knob
-        )
-        engine.display.blit_label(
+        self.viewport.blit_sprite(self._stf,self.slider_bg)
+        self.viewport.blit_sprite(self._ktf,self.knob)
+        self.viewport.blit_label(
             text        = f"{int(self.value/self.maximum*100)}%" if self.show_percentage else f"{int(self.value)}",
             transform   = self._ltf,
-            window_id   = self.window_id,
-            viewport_id = self.viewport_id,
             label       = self.label
         )

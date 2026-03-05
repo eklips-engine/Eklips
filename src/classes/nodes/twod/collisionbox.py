@@ -29,12 +29,9 @@ class CollisionBox(CanvasItem):
         self.world.delete(self.rid)
         super()._free()
     
-    def draw(self):
-        if engine.debug.shapes_visible:
-            super().draw()
-    
     def colliderect(self, shape):
-        return self._shape
+        return self._shape.colliderect(shape)
+    
     def _set_pos(self):
         self._shape.x = self.x
         self._shape.y = self.y

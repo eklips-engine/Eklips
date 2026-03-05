@@ -4,12 +4,7 @@ from classes.nodes.node import *
 
 # Classes
 class Timer(Node):
-    def __init__(
-            self,
-            properties : dict                   = {}, 
-            parent     : NodeMixin       | None = None,
-            children   : list[NodeMixin] | None = None
-        ):
+    def __init__(self, properties = {}, parent = None):
         super().__init__(properties, parent)
         self._start_time : int   = 0
         self._duration   : float = 0.0

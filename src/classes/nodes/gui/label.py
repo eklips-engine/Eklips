@@ -70,15 +70,7 @@ class Label(CanvasItem, Color):
             return
         self._draw()
     def _draw(self):
-        return engine.display.blit_label(
-            text        = self.text,
-            transform   = self,
-            window_id   = self._drawing_wid,
-            viewport_id = self._drawing_vid,
-            label       = self.citem,
-            font_name   = self.font,
-            font_size   = self.font_size  
-        )
+        return self.viewport.blit_label(self.text, self, self.citem, font_name=self.font, font_size=self.font_size)
 
     ## CItem managing
     def _remove_item(self):

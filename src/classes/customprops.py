@@ -280,13 +280,11 @@ class Transform:
         if self._scale_x == value: return
         self._scale_x = value
         self._set_scale(self.scale_x, self.scale_y)
-        self._set_size(self.w, self.h)
     @scale_y.setter
     def scale_y(self, value):
         if self._scale_y == value: return
         self._scale_y = value
         self._set_scale(self.scale_x, self.scale_y)
-        self._set_size(self.w, self.h)
     @scale.setter
     def scale(self, value):
         self._scale_x = value[0]

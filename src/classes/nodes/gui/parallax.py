@@ -41,15 +41,9 @@ class Parallax(Sprite):
         super().update()
     
     def _draw(self):
-        return engine.display.blit(
-            transform   = self,
-            window_id   = self.window_id,
-            viewport_id = self.viewport_id,
-            sprite      = self.citem,
-            region      = [
-                round(self._imgoffsetx) % self.image.width, # X
-                0,                                          # Y
-                self.image.width,                           # W
-                self.image.height                           # H
-            ]
-        )
+        return self.viewport.blit_sprite(self, self.citem, region=[
+            round(self._imgoffsetx) % self.image.width, # X
+            0,                                          # Y
+            self.image.width,                           # W
+            self.image.height                           # H
+            ])

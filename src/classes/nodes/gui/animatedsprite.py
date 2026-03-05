@@ -55,4 +55,5 @@ class AnimatedSprite(CanvasItem):
     def update(self):
         super().update()
         if self._imagesid in self._images:
-            self.draw(self._images[self._imagesid])
+            self.citem.image = self._images[self._imagesid]
+            self.draw()

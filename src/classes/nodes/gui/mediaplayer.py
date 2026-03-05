@@ -164,13 +164,7 @@ class MediaPlayer(CanvasItem):
             self._draw()
             
     def _draw(self):
-        return engine.display.blit(
-            transform      = self,
-            window_id      = self.window_id,
-            viewport_id    = self.viewport_id,
-            sprite         = self.citem,
-            ignore_scaling = True
-        )
+        return self.viewport.blit_sprite(self, self.citem, ignore_scaling=True)
     
     def _set_size(self,w,h):
         size = [round(self._ogsize[0]*self.scale_x),round(self._ogsize[1]*self.scale_y)]

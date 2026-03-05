@@ -65,22 +65,12 @@ class Checkbox(CanvasItem):
                 engine.set_mouse(MOUSE_POINT)
                 self.widgetman.moving_widget = -1
         
-        ## Draw it
-        self.draw()
-        
-    def _free(self):
-        self.widgetman.widgets.pop(self.gid)
-        super()._free()
-    
-    def draw(self):
+        ## Select the image based on the value
         if self.value:
             self.citem.image = self._checkbox_selected
         else:
             self.citem.image = self._checkbox_image
         
-        engine.display.blit(
-            transform   = self,
-            window_id   = self.window_id,
-            viewport_id = self.viewport_id,
-            sprite      = self.citem
-        )
+    def _free(self):
+        self.widgetman.widgets.pop(self.gid)
+        super()._free()

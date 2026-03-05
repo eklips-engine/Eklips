@@ -169,12 +169,11 @@ icon      : pg.image.AbstractImage = None
 keyboard  : Keyboard               = None
 scene     : resources.Scene        = None
 running   : bool                   = False
-spronscr  : int                    = 0     # amount of CanvasItems on screen
 uid       : int                    = 0     # amount of Objects
 sid       : int                    = 0     # amount of pygame Channels
 delta     : float                  = 0.0   # deltaTime
 tdelta    : float                  = 0.0   # `engine.delta` but not multiplied by speed
-fps       : float                  = 0.0   # Framerate according to `engine.hooks.HookFPSDisplay`
+fps       : float                  = 0.0   # Framerate according to `engine.tdelta`
 uptime    : float                  = 0.0   # This value is how many seconds you have been running the engine.
 speed     : int                    = 1     # This value is the multiplier of `engine.delta`.
 
