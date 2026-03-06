@@ -37,7 +37,7 @@ pg.app.event_loop._redraw_windows = newrwd
 
 ## FPS Display
 class HookFPSDisplay(pg.window.FPSDisplay):
-    def __init__(self, window : EklWindow, color = [255,255,255,255], samples = MAXFPS):
+    def __init__(self, window : EklWindow, color = [255,255,255,255], samples = 70):
         super().__init__(window, color, samples)
 
         self.window   : EklWindow = window
@@ -65,7 +65,7 @@ class HookFPSDisplay(pg.window.FPSDisplay):
             average_delta = sum(self._delta_times)/len(self._delta_times)
             engine.fps    = round(1 / average_delta)
 
-            self.label.text = f"{engine.fps} FPS"
+            self.label.text = f"{engine.fps}/{MAXFPS} FPS"
             self.label.y    = self.viewport.h-self.label.content_height
     
     def _hook_flip(self) -> None:

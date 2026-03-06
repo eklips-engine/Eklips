@@ -17,7 +17,7 @@ viewport_transform = {
 }
 
 # Classes
-class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass node 😭
+class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
     """
     A Viewport Node.
     
@@ -25,6 +25,7 @@ class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass no
     by using `engine.display.get_viewport(node.viewport_id, wid)`
     or by using `node` itself.
     """
+    _supports_tsize  = True
     _isdisplayobject = True
 
     ## CanvasItem stuff
@@ -38,28 +39,12 @@ class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass no
         return self.color_as_tuple()
     @color.setter
     def color(self, rgb : list[int]):
-        self.rgb = rgb
-    
-    ## Transform related
-    def _set_alpha(self, deg):
-        # Viewport objects don't have an alpha property yet
-        return
-    def _set_rot(self, deg):
-        # Viewport objects cannot rotate yet
-        return
-    def _set_scale(self, x, y):
-        # No effect
-        return
-    def _update_color(self, r, g, b, a):
-        self.set_background(r,g,b,a)
+        self.set_background(*rgb)
     
     ## Init
     def __init__(self, properties={}, parent=None):
         ## Setup CanvasItem
         super().__init__(properties, parent)
-
-        ## Setup BG color
-        Color.__init__(self)
 
         ## Setup Viewport
         # Get window and VID
@@ -81,7 +66,6 @@ class ExtraViewport(CanvasItem, Color, Viewport): # Group project looking ass no
     def draw(self):
         """Draw the Viewport. This should be called automatically by the `EklWindow`."""
         Viewport.draw(self)
-    
     def get_if_mouse_hovering(self):
         mpos   = engine.mouse.pos
         x,y    = self.into_screen_coords()

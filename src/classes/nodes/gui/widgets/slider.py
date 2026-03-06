@@ -13,6 +13,7 @@ class Slider(CanvasItem):
     
     XXX
     """
+    _supports_tsize = True
     
     @export(0, "int", "int")
     def value(self):
@@ -100,17 +101,28 @@ class Slider(CanvasItem):
         """Returns true if the mouse is hovering over the knob."""
         if not self.viewport:
             return
+        ## Get things
         mpos   = engine.mouse.pos
         x,  y  = self._ktf.into_screen_coords(self.viewport.tsize)
         vx, vy = self.viewport.into_screen_coords()
-        is_it  = (
-            mpos[0] >= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom)                                          and
-            mpos[0] <= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom) + (self._ktf.w * self.viewport.cam.zoom) and
-            mpos[1] >= ((y + vy - self.viewport.cam.y) * self.viewport.cam.zoom)                                          and
-            mpos[1] <= ((y + vy - self.viewport.cam.y) * self.viewport.cam.zoom) + (self._ktf.h * self.viewport.cam.zoom)
+
+        ## Apply viewport position into x and y
+        x += vx - self.viewport.cam.x
+        y += vy - self.viewport.cam.y
+
+        ## Apply viewport zooming
+        x *= self.viewport.cam.zoom
+        y *= self.viewport.cam.zoom
+        w  = self._ktf.w * self.viewport.cam.zoom
+        h  = self._ktf.h * self.viewport.cam.zoom
+
+        ## Result
+        return (
+            mpos[0] >= x     and
+            mpos[0] <= x + w and
+            mpos[1] >= y     and
+            mpos[1] <= y + h
         )
-            
-        return is_it
     
     def update(self):
         super().update()
@@ -147,23 +159,21 @@ class Slider(CanvasItem):
         super()._free()
     
     def draw(self):
-        x, y = self.into_screen_coords(self.viewport.tsize)
+        # XXX
+        if not (self.visible and self.viewport.is_onscreen(self)):
+            return
         
+        x, y = self.into_screen_coords(self.viewport.tsize)
         self._stf.x = x + 5
         self._stf.y = y + 5
         self._ktf.y = y
         self._ltf.y = y + self.h / 2 - self._ltf.h / 2
         self._ltf.x = x + self.w / 2 - self._ltf.w / 2
-        
         if self._value  == 0:
             self._ktf.x = x - self.knob.width/2
         else:
             self._ktf.x = x + (self._value/self._maximum)*self.w - self.knob.width/2
-        
         self.viewport.blit_sprite(self._stf,self.slider_bg)
         self.viewport.blit_sprite(self._ktf,self.knob)
-        self.viewport.blit_label(
-            text        = f"{int(self.value/self.maximum*100)}%" if self.show_percentage else f"{int(self.value)}",
-            transform   = self._ltf,
-            label       = self.label
-        )
+        self.label.text = f"{int(self.value/self.maximum*100)}%" if self.show_percentage else f"{int(self.value)}",
+        self.viewport.blit_label(self._ltf, self.label)

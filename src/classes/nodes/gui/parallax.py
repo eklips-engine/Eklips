@@ -40,10 +40,12 @@ class Parallax(Sprite):
         self._imgoffsetx = self.speed * engine.delta
         super().update()
     
-    def _draw(self):
-        return self.viewport.blit_sprite(self, self.citem, region=[
-            round(self._imgoffsetx) % self.image.width, # X
-            0,                                          # Y
-            self.image.width,                           # W
-            self.image.height                           # H
-            ])
+    def draw(self):
+        if self.visible and self.viewport.is_onscreen(self):
+            self.citem.image = self.image.get_region([
+                round(self._imgoffsetx) % self.image.width, # X
+                0,                                          # Y
+                self.image.width,                           # W
+                self.image.height                           # H
+                ])
+            return self.viewport.blit_sprite(self, self.citem)

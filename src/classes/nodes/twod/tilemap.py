@@ -30,7 +30,7 @@ class Tilemap(CanvasItem):
         ...
     
     def draw(self):
-        ...
+        ... # draw it
     
     def update(self):
         ... # add collision boxes using engine.scene.CollisionManager

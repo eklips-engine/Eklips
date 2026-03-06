@@ -14,7 +14,7 @@
     },
     "scenes": {
         "master":  "res://scenes/master.scn",
-        "loading": "root://_assets/loading.scn"
+        "loading": null
     },
     
     "directory": "editor",

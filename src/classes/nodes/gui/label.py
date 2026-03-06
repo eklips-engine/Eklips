@@ -13,6 +13,7 @@ class Label(CanvasItem, Color):
     citem  : pg.text.Label = None
     _isblittable           = True
 
+    ## Exported properties
     @export("dolorem ipsum","str","str")
     def text(self) -> str: return self._text
     @text.setter
@@ -29,7 +30,7 @@ class Label(CanvasItem, Color):
         self._fname = value
         if self.citem:
             self.citem.font_name = value
-            self.w, self.h  = self.citem.content_width, self.citem.content_height
+            self.w, self.h       = self.citem.content_width, self.citem.content_height
 
     @export(DEFAULT_FONT_SIZE,"float/int","float/int")
     def font_size(self) -> float | int: return self._fsize
@@ -54,23 +55,21 @@ class Label(CanvasItem, Color):
     
     def __init__(self, properties={}, parent=None):
         Color.__init__(self, 255,255,255)
-        self._text  = "dolorem ipsum"
+        self._text  = "Text"
         self._fsize = DEFAULT_FONT_SIZE
         self._fname = DEFAULT_FONT_NAME
 
         super().__init__(properties, parent)
     
+    ## Drawing and updating
     def update(self):
         super().update()
         self.draw()
     
     def draw(self):
         """Draw the label. This is usually called automatically."""
-        if not len(self.text.split()):
-            return
-        self._draw()
-    def _draw(self):
-        return self.viewport.blit_label(self.text, self, self.citem, font_name=self.font, font_size=self.font_size)
+        if self.visible and self.viewport.is_onscreen(self) and len(self.text.split()):
+            return self.viewport.blit_label(self, self.citem)
 
     ## CItem managing
     def _remove_item(self):
@@ -78,10 +77,10 @@ class Label(CanvasItem, Color):
             return
         self.citem.delete()
         self.citem = None
-    def _make_new_item(self):
+    def _make_new_item(self) -> pg.text.Label:
         if self.citem:
             self._remove_item()
-        self.batch = engine.display.get_batch_from_window(self.window_id, self.viewport_id, self.batch_id)
+        self.batch = self.viewport.batches[self.batch_id]
         self.citem = pg.text.Label(batch=self.batch)
         
         self.citem.color     = self.color
@@ -92,6 +91,5 @@ class Label(CanvasItem, Color):
 
         self.w, self.h       = self.citem.content_width, self.citem.content_height
 
-    def _setup_properties(self, scene=None):
-        super()._setup_properties(scene)
-        self._make_new_item()
+    def _set_rot(self, deg):
+        return

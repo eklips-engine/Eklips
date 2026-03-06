@@ -11,6 +11,7 @@ class Theme(Resource):
     
     XXX
     """
+    print(" ~ Initialize themer")
 
     @property
     def image(self) -> EklImage:

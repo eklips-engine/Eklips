@@ -12,6 +12,7 @@ class Body(CollisionBox):
 
     XXX
     """
+    _supports_tsize = True
 
     @property
     def velocity(self):

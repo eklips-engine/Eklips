@@ -9,6 +9,8 @@ import operator
 from classes.nodes.gui.canvasitem import *
 
 class Treeview(CanvasItem):
+    _supports_tsize = True
+
     ## Init
     def __init__(self, properties={}, parent=None):
         self._items = {}

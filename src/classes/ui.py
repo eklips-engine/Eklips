@@ -211,8 +211,10 @@ class EklWindow(pg.window.Window):
 
         return vid
 
-class Viewport(Transform):
+class Viewport(Transform, Color):
     """A class to manage a portion of a Window."""
+    _supports_tsize = True
+
     def __init__(self, vid : int, window : EklWindow, flags : list = []):
         """Initialize a Viewport.
         
@@ -221,9 +223,9 @@ class Viewport(Transform):
             window: Window that the Viewport is attached to.
             flags: List of Viewport flags. Ex (`NO_CLEAR, NO_CLEAR_BACKGROUND`..)"""
         super().__init__()
+        Color.__init__(self)
         
-        self.cam         = CameraTransform()
-        self._background = [0,0,0,1]
+        self.cam = CameraTransform()
 
         self.flags = flags
 
@@ -231,6 +233,7 @@ class Viewport(Transform):
         self.framebuffer  = None
         self.color_buffer = None
         self.depth_buffer = None
+        self._sprite      = None
 
         self._closing = False
 
@@ -287,6 +290,7 @@ class Viewport(Transform):
             internalformat=GL_RGBA
         )
         self.framebuffer.attach_texture(self.color_buffer, attachment=GL_COLOR_ATTACHMENT0)
+        self._sprite = pg.sprite.Sprite(self.color_buffer, z=self.id)
     def _resize_framebuffer(self):
         if self.window:
             self.window.switch_to()
@@ -299,6 +303,7 @@ class Viewport(Transform):
             internalformat=GL_RGBA8
         )
         self.framebuffer.attach_texture(self.color_buffer, attachment=GL_COLOR_ATTACHMENT0)
+        self._sprite.image = self.color_buffer
     def _delete_buffer(self):
         if not self.framebuffer:
             return
@@ -306,10 +311,18 @@ class Viewport(Transform):
             self.window.switch_to()
         self.framebuffer.delete()
         self.color_buffer.delete()
+        self._sprite.delete()
 
     ## Transform related
     def into_screen_coords(self, do_flip : bool = True):
         return super().into_screen_coords(self.window.size, do_flip)
+    def _set_alpha(self, deg):
+        self._sprite.opacity = deg
+    def _set_rot(self, deg):
+        self._sprite.rotation = deg
+    def _set_scale(self, x, y):
+        self._sprite.scale_x = x
+        self._sprite.scale_y = y
     def _set_size(self, w, h):
         self._resize_framebuffer()
 
@@ -317,139 +330,37 @@ class Viewport(Transform):
     def blit_sprite(
         self,
         transform      : Transform,
-        sprite         : pg.sprite.Sprite,
-        group          : pg.graphics.Group = None,
-        region         : list | None       = None,
-        ignore_scaling : bool              = False,
+        sprite         : pg.sprite.Sprite
     ) -> None:
         """
-        Draw a Sprite.
-        
-        The batch must be manually set, you can get this batch by running `get_batch_from_window()` and setting that as your sprites batch.
-        You must also pass a Transform object, you can get this by either manually creating one yourself or running `Transform.new(...)`.
-
-        Args:
-            transform:
-                `Transform` object to tell where the image is drawn.
-            sprite:
-                Sprite with the Batch set properly and `EklImage` for the image.
-            group:
-                Pyglet `Group`. Defaults to `None`.
-            region:
-                The piece of the image to use.
-            ignore_scaling:
-                Read, silly.
+        Less dependent version
         """
-        if not transform.visible:
-            return
-        if not (transform.scale_x or transform.scale_y):
-            return
-        if not sprite:
-            return
-
-        # Fix dimensions
-        transform.tsize = [sprite.image.width, sprite.image.height]
-
-        # Get sprite's scaling
-        scale_x,scale_y = transform.scale
-        if ignore_scaling:
-            scale_x,scale_y=1,1
-
         # Get XY position
+        transform.tsize = [sprite.image.width, sprite.image.height]
         x, y = transform.into_screen_coords(self.tsize)
-
-        # Set image's flip values properly
-        if transform.flip_w or transform.flip_h:
-            sprite.image = sprite.image.flip(transform.flip_w, transform.flip_h)
-        
-        # Set image's region (if it isn't None)
-        if region != None:
-            sprite.image = sprite.image.get_region(*region)
         
         # Set sprite's properites
-        if transform.rotation:
-            sprite.image.anchor_x = sprite.image.width  // 2
-            sprite.image.anchor_y = sprite.image.height // 2
-            x += (sprite.image.anchor_x) * scale_x
-            y += (sprite.image.anchor_y) * scale_y
-        else:
-            sprite.image.anchor_x = 0
-            sprite.image.anchor_y = 0
-        
-        if sprite.rotation != transform.rotation:
-            sprite.rotation = transform.rotation
         if sprite.x != x:
             sprite.x = x
         if sprite.y != y:
             sprite.y = y
-        if sprite.group != group:
-            sprite.group = group
-        if sprite.scale_x != scale_x:
-            sprite.scale_x = scale_x
-        if sprite.scale_y != scale_y:
-            sprite.scale_y = scale_y
-        if sprite.opacity != transform.alpha:
-            sprite.opacity = transform.alpha
-        sprite.visible = self.is_onscreen(transform)
     def blit_label(
         self,
-        text           : str,
-        transform      : Transform,
-        label          : pg.text.Label,
-        group          : pg.graphics.Group = None,
-        font_name      : str               = DEFAULT_FONT_NAME,
-        font_size      : int               = DEFAULT_FONT_SIZE
+        transform : Transform,
+        label     : pg.text.Label
     ) -> list[int,int]:
         """
-        Draw a Label.
-        
-        The batch must be manually set, you can get this batch by running `get_batch_from_window()` and setting that as your labels batch.
-        
-        You must also pass a Transform object, you can get this by either manually creating one yourself or running `Transform.new(...)`.
-
-        Args:
-            text: Read the property silly
-            transform: Transform object to tell where the image is drawn.
-            label: Pyglet Label with the Batch set properly.
-            group: Pyglet Group. Defaults to None.
-            font_name: Read the property silly. Defaults to DEFAULT_FONT_NAME ("Arial")
-            font_size: Read the property silly. Defaults to DEFAULT_FONT_SIZE (12.5)
+        Less dependent version
         """
-        if not text:
-            return
-        if not transform.visible:
-            return
-        if not (transform.scale_x or transform.scale_y):
-            return
-        if not label:
-            return
-        
-        # Set properties for label
-        if label.text != text:
-            label.text = text
-        if label.font_name != font_name:
-            label.font_name = font_name
-        if label.font_size != font_size:
-            label.font_size = font_size
-        
-        # | Adjustments
-        w,h = transform.w, transform.h
-        
         # | Get XY position
+        transform.tsize = [label.content_width, label.content_height]
         x,y = transform.into_screen_coords(self.tsize)
 
         # | Set the others
-        if label.rotation != transform.rotation:
-            label.rotation = transform.rotation
         if label.x != x:
             label.x = x
         if label.y != y:
             label.y = y
-        if label.group != group:
-            label.group = group
-        if label.opacity != transform.alpha:
-            label.opacity = transform.alpha
-        label.visible = self.is_onscreen(transform)
     
     def set_background(self, r=0,g=0,b=0,a=255):
         """
@@ -461,7 +372,7 @@ class Viewport(Transform):
             b: Blue value of the background color (0-255).
             a: Alpha of the background color (0-255).
         """
-        self._background = [
+        self.rgb = [
             r / 255,
             g / 255,
             b / 255,
@@ -485,7 +396,7 @@ class Viewport(Transform):
         glDisable(GL_BLEND)
         self.framebuffer.bind()
         if not NO_CLEAR_BACKGROUND in self.flags:
-            glClearColor(*self._background)
+            glClearColor(*self.rgb)
         if not NO_CLEAR in self.flags:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
@@ -506,7 +417,10 @@ class Viewport(Transform):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         x, y = self.into_screen_coords()
-        self.color_buffer.blit(x, y, self.id)
+        if self._sprite.position[:2] != [x, y]:
+            self._sprite.x = x
+            self._sprite.y = y
+        self._sprite.draw()
 
     ## Camera functions    
     def _reset_camera(self):
@@ -517,11 +431,19 @@ class Viewport(Transform):
                 1
             )
         )
+        view_matrix = view_matrix.rotate(
+            -self.cam.rotation * (math.pi/180),
+            (
+                0,
+                0,
+                1
+            )
+        )
         view_matrix = view_matrix.translate(
             (
                 self.cam.x * self.cam.zoom,
                 self.cam.y * self.cam.zoom,
-                0
+                self.cam.z * self.cam.zoom
             )
         )
         self.window.view = view_matrix
@@ -530,7 +452,15 @@ class Viewport(Transform):
             (
                 -self.cam.x * self.cam.zoom,
                 -self.cam.y * self.cam.zoom,
-                0
+                -self.cam.z * self.cam.zoom
+            )
+        )
+        view_matrix = view_matrix.rotate(
+            self.cam.rotation * (math.pi/180),
+            (
+                0,
+                0,
+                1
             )
         )
         view_matrix = view_matrix.scale(
@@ -558,7 +488,8 @@ class Display:
     _merciless     = []          # List of windows to run through window.close
     main_window_id = None        # Name
     _windid        = MAIN_WINDOW # Next ID
-
+    print(" ~ Initialize Display")
+    
     ## Update
     def update(self):
         for doomedid in self._doomed.copy():

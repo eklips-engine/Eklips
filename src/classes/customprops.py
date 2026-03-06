@@ -168,8 +168,10 @@ class GameData:
         self.loading_scene = self.project_data["scenes"]["loading"]
 
 class Transform:
+    _supports_tsize = True
+    
     def __repr__(self):
-        return f"Transform(x={self.x}, y={self.y}, w={self.w}, h={self.h}, anchor={self.anchor})"
+        return f"{self.__class__.__name__}(position={self.position}, tsize={self.tsize})"
     
     def __init__(self):
         self._x = 0
@@ -206,6 +208,8 @@ class Transform:
     def x(self): return self._x + self._offset_x
     @property
     def y(self): return self._y + self._offset_y
+    @property
+    def z(self): return self._z
 
     @property
     def scale_x(self): return self._scale_x
@@ -259,6 +263,10 @@ class Transform:
     @y.setter
     def y(self, value):
         self._y = value + self._offset_y
+        self._set_pos(self._x,self._y)
+    @z.setter
+    def z(self, value):
+        self._z = value
         self._set_pos(self._x,self._y)
 
     @anchor.setter
@@ -337,7 +345,7 @@ class Transform:
     
     ## Functions
     def _turn_object_into_transform_property(self):
-        transprop = {
+        return {
             "position": self.position,
             "scale":    self.scale,
             "alpha":    self.alpha,
@@ -348,18 +356,17 @@ class Transform:
             "visible":  self.visible,
             "tsize":    self.tsize
         }
-        return transprop
     
     def _convert_transform_property_into_object(self, value):
-        self.position = value["position"]
-        self.scale    = value["scale"]
-        self.alpha    = value["alpha"]
-        self.skew     = value["skew"]
-        self.rotation = value["rotation"]
-        self.anchor   = value["anchor"]
-        self.scroll   = value["scroll"]
-        self.visible  = value["visible"]
-        self.tsize    = value["tsize"]
+        self.tsize     = value["tsize"]
+        self.position  = value["position"]
+        self.scale     = value["scale"]
+        self.alpha     = value["alpha"]
+        self.skew      = value["skew"]
+        self.rotation  = value["rotation"]
+        self.anchor    = value["anchor"]
+        self.scroll    = value["scroll"]
+        self.visible   = value["visible"]
     
     def into_screen_coords(self, window_size : list[int,int] = [480,480], do_flip : bool = True):
         anchor = self.anchor
@@ -511,7 +518,7 @@ class Color:
         return self.color_as_list()
     @rgb.setter
     def rgb(self, rgbv):
-        self._r, self._g, self._b = rgbv
+        self._r, self._g, self._b = rgbv[:3]
         if len(rgbv) > 3:
             self._a = rgbv[3]
         self._update_color(*self.color_as_list())

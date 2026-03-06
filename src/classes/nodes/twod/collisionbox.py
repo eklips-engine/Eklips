@@ -18,6 +18,7 @@ class CollisionBox(CanvasItem):
     bad at programming to even bother making collision
     for any other shape than rectangles
     """
+    _supports_tsize = True
 
     def __init__(self, properties={}, parent=None):
         super().__init__(properties, parent)

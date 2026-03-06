@@ -7,4 +7,4 @@ from classes import ui
 from classes.nodes.gui.canvasitem import *
 
 class Progressbar(CanvasItem):
-    pass
+    _supports_tsize = True

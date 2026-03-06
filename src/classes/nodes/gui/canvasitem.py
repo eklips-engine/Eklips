@@ -47,7 +47,9 @@ class CanvasItem(Node, Transform):
     ## Properties
     @property
     def viewport(self):
-        return self._get_viewport()
+        if not hasattr(self, "_cached_viewport"):
+            self._cached_viewport = engine.display.get_viewport_from_window(self.window_id, self.viewport_id)
+        return self._cached_viewport
     @property
     def image(self):
         return self._image
@@ -84,78 +86,67 @@ class CanvasItem(Node, Transform):
     @flip.setter
     def flip(self, value : list):
         self.flip_w, self.flip_h = value
+        if self.citem:
+            self.citem.image = self.image.flip(*self.flip)
     @export(base_transform, "dict", "transform")
     def transform(self):
         return self._turn_object_into_transform_property()
     @transform.setter
     def transform(self, value):
-        self._convert_transform_property_into_object(value)
         if self._isblittable:
             self._make_new_item()
-    @export(MAIN_WINDOW,   "int", "windowid")
-    def window_id(self):
-        """ID of the Window `window_id` to draw to."""
-        return self._drawing_wid
+        self._convert_transform_property_into_object(value)
+    
+    def _update_drawing_ids(self, attr, value):
+        if self._isdisplayobject:
+            return
+        if self.citem:
+            self._remove_item()
+        setattr(self, attr, value)
+        self._refresh_item()
+    @export(MAIN_WINDOW, "int", "windowid")
+    def window_id(self): return self._drawing_wid
     @window_id.setter
-    def window_id(self, value):
-        if self._isdisplayobject:
-            return
-        if self.citem:
-            self._remove_item()
-        self._drawing_wid = value
-        self._refresh_item()
+    def window_id(self, value): self._update_drawing_ids("_drawing_wid", value)
     @export(MAIN_VIEWPORT, "int", "viewportid")
-    def viewport_id(self):
-        """ID of the viewport in Window `window_id` to draw to."""
-        return self._drawing_vid
+    def viewport_id(self): return self._drawing_vid
     @viewport_id.setter
-    def viewport_id(self, value):
-        if self._isdisplayobject:
-            return
-        if self.citem:
-            self._remove_item()
-        self._drawing_vid = value
-        self._refresh_item()
-    @export(MAIN_BATCH,    "int", "batchid")
-    def batch_id(self):
-        """ID of the batch in Viewport `viewport_id` to use."""
-        return self._drawing_bid
+    def viewport_id(self, value): self._update_drawing_ids("_drawing_vid", value)
+    @export(MAIN_BATCH, "int", "batchid")
+    def batch_id(self): return self._drawing_bid
     @batch_id.setter
-    def batch_id(self, value):
-        if self._isdisplayobject:
-            return
-        if self.citem:
-            self._remove_item()
-        self._drawing_bid = value
-        self._refresh_item()
+    def batch_id(self, value): self._update_drawing_ids("_drawing_bid", value)
 
     ## Drawing related
-    def draw(self, image = None):
-        """Draw the CanvasItem. If one doesn't exist, a new one will be created. This is usually called automatically."""
-        if not self.citem:
-            self._make_new_item()
-        if image and self.citem.image != image:
-            self.citem.image = image
-        self._draw()
-    def _draw(self):
-        return self.viewport.blit_sprite(self, self.citem)
+    def draw(self):
+        """Draw the CanvasItem. This is usually called automatically."""
+        if self.visible and self.viewport.is_onscreen(self):
+            return self.viewport.blit_sprite(self, self.citem)
 
     ## Transform related
     def _set_pos(self, x, y):
         if not self.citem:
             return
-        
         self.citem.x = x
         self.citem.y = y
     def _set_scale(self, x, y):
         if not self.citem:
             return
         self.citem.scale_x = x
-        self.citem.scale_y = y  
+        self.citem.scale_y = y
     def _set_rot(self, deg):
         if not self.citem:
             return
+        if deg:
+            self.citem.image.anchor_x = self.w // 2
+            self.citem.image.anchor_y = self.h // 2
+        else:
+            self.citem.image.anchor_x = self.citem.image.anchor_y = 0
         self.citem.rotation = deg
+    def _set_visible(self, val):
+        if not self.citem:
+            return
+        self.citem.visible = val
     def _set_alpha(self, deg):
         if not self.citem:
             return
@@ -184,9 +175,8 @@ class CanvasItem(Node, Transform):
     def _make_new_item(self) -> pg.sprite.Sprite | pg.text.Label:
         if self.citem:
             self._remove_item()
-        self.batch = engine.display.get_batch_from_window(self.window_id, self.viewport_id, self.batch_id)
-        self.citem = pg.sprite.Sprite(img=self.image, batch=self.batch)
-
+        self.batch         = self.viewport.batches[self.batch_id]
+        self.citem         = pg.sprite.Sprite(img=self.image, batch=self.batch)
         self.citem.visible = False
     def _refresh_item(self):
         if self.citem:
@@ -220,14 +210,25 @@ class CanvasItem(Node, Transform):
         """Returns true if the mouse is hovering over self."""
         if not self.viewport:
             return
+        ## Get things
         mpos   = engine.mouse.pos
         x,  y  = self.into_screen_coords(self.viewport.tsize)
         vx, vy = self.viewport.into_screen_coords()
-        is_it  = (
-            mpos[0] >= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom)                                     and
-            mpos[0] <= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom) + (self.w * self.viewport.cam.zoom) and
-            mpos[1] >= ((y + vy - self.viewport.cam.y) * self.viewport.cam.zoom)                                     and
-            mpos[1] <= ((y + vy - self.viewport.cam.y) * self.viewport.cam.zoom) + (self.h * self.viewport.cam.zoom)
+
+        ## Apply viewport position into x and y
+        x += vx - self.viewport.cam.x
+        y += vy - self.viewport.cam.y
+
+        ## Apply viewport zooming
+        x *= self.viewport.cam.zoom
+        y *= self.viewport.cam.zoom
+        w  = self.w * self.viewport.cam.zoom
+        h  = self.h * self.viewport.cam.zoom
+
+        ## Result
+        return (
+            mpos[0] >= x     and
+            mpos[0] <= x + w and
+            mpos[1] >= y     and
+            mpos[1] <= y + h
         )
-            
-        return is_it

@@ -29,6 +29,7 @@ class ScrollingViewport(ExtraViewport):
     contents (or rather Camera, but that doesn't sound so magical
     now, does it?), or use the (non-existent?) scrollbar instead.
     """
+    _supports_tsize  = True
     _isdisplayobject = True
 
     @export(700.0,"float","slider")
@@ -114,17 +115,28 @@ class ScrollingViewport(ExtraViewport):
         """Returns true if the mouse is hovering over the knob."""
         if not self.viewport:
             return
+        ## Get things
         mpos   = engine.mouse.pos
         x,y,z  = self.scrollbar.position
-        vx, vy = self.viewport.into_screen_coords()
-        is_it  = (
-            mpos[0] >= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom)                                                   and
-            mpos[0] <= ((x + vx - self.viewport.cam.x) * self.viewport.cam.zoom) + (self.scrollbar.width * self.viewport.cam.zoom) and
-            mpos[1] >= ((y + vy - self.viewport.cam.y) * self.viewport.cam.zoom)                                                   and
-            mpos[1] <= ((y + vy - self.viewport.cam.y) * self.viewport.cam.zoom) + (self.scrollbar.height * self.viewport.cam.zoom)
+        vx, vy = self.into_screen_coords()
+
+        ## Apply viewport position into x and y
+        x += vx - self.viewport.cam.x
+        y += vy - self.viewport.cam.y
+
+        ## Apply viewport zooming
+        x *= self.viewport.cam.zoom
+        y *= self.viewport.cam.zoom
+        w  = self.scrollbar.width  * self.viewport.cam.zoom
+        h  = self.scrollbar.height * self.viewport.cam.zoom
+
+        ## Result
+        return (
+            mpos[0] >= x     and
+            mpos[0] <= x + w and
+            mpos[1] >= y     and
+            mpos[1] <= y + h
         )
-            
-        return is_it
     
     def update(self):
         super().update()

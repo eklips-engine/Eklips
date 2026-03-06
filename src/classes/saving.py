@@ -6,6 +6,8 @@ import classes.singleton as engine
 
 ## Savefile class
 class Savefile:
+    print(" ~ Initialize Savefile")
+    
     def __init__(self):
         self.save_dir  = engine.game.save_dir                        # Save file directory
         self.savefpath = f"{self.save_dir}/save.json"                # Save file path

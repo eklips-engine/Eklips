@@ -13,6 +13,7 @@ class Button(CanvasItem):
     
     XXX
     """
+    _supports_tsize = True
     
     def __init__(self, properties={}, parent=None):
         self._tiles = {}

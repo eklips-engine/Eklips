@@ -13,6 +13,7 @@ class ColorRect(CanvasItem, Color):
     XXX
     """
     _can_check_layer = True
+    _supports_tsize  = True
     _isblittable     = True
 
     def __init__(self, properties={}, parent=None):

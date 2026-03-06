@@ -31,6 +31,7 @@ class ExtraWindow(CanvasItem, Color):
     with it to save resources.. and stuff.. 
     """
     _isdisplayobject = True
+    _supports_tsize  = True
     _isblittable     = True
 
     def __init__(self, properties={}, parent=None):

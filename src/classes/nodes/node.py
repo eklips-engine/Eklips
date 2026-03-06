@@ -21,6 +21,7 @@ class Node(Object, NodeMixin):
 
     There is nothing to do with this Node. The only useful thing to do with it is run a script with it, and no more.
     """
+    
     ## Init
     def __init__(
             self,
