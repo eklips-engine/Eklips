@@ -36,22 +36,17 @@ def populate_frame(self : ColorRect):
                 "name": "Eklips 5.0A"
             }, is_file=False)
         engine.projects[project] = gamedata
+        print(f" \\~ {gamedata.name} v{gamedata.version} (for Eklips {gamedata.version_ekl})")
 
-        btnps : PackedScene = engine.scene._add_node({
+        btnps : PackedScene = engine.scene.add_node({
             "type":      "PackedScene",
             "file_path": "res://scenes/project_entry.scn",
             "projectid": project,
             "pid":       pid,
+            "target_y":  y
         }, f"/panel_obj/{pid}")
-        nlbl : Label      = btnps.get_node_from_path("/nlbl")
-        vlbl : Label      = btnps.get_node_from_path("/vlbl")
-        rnod : ColorRect  = btnps.get_node_from_path("")
 
-        nlbl.text = gamedata.name
-        vlbl.text = f"v{gamedata.version}"
-        rnod.y    = y
-        y       += 66
-
+        y   += 66
         pid += 1
 
 def make_new_project(name, directory):

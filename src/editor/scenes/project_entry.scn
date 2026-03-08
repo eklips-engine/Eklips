@@ -21,6 +21,24 @@
             },
 
             "children":    {
+                "htbx": {
+                    "type":  "ColorRect",
+
+                    "color": [0,0,0],
+                    
+                    "transform":   {
+                        "position": [0,    0],
+                        "tsize":    [563, 61],
+                        "scale":    [1,    1],
+                        "scroll":   [0,    0],
+
+                        "rotation": 0,
+                        "alpha":    127,
+                        "anchor":   "top left",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
                 "nlbl": {
                     "type":  "Label",
                     "color": [255,255,255],
@@ -32,22 +50,6 @@
                         "tsize":    [1,  1],
                         "scale":    [1,  1],
                         "scroll":   [0,  0],
-
-                        "rotation": 0,
-                        "alpha":    255,
-                        "anchor":   "top left",
-                        "visible":  true,
-                        "skew":     0
-                    }
-                },
-                "htbx": {
-                    "type":  "ColorRect",
-                    
-                    "transform":   {
-                        "position": [0,    0],
-                        "tsize":    [563, 61],
-                        "scale":    [1,    1],
-                        "scroll":   [0,    0],
 
                         "rotation": 0,
                         "alpha":    255,

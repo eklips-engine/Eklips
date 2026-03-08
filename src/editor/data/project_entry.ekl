@@ -11,29 +11,39 @@ gjsp : str      = ""
 lid  : str      = ""
 gid  : int      = 0
 gmdt : GameData = None
+target_y : int  = 0
 
 ready : bool = False
 
-nlbl : Label      = None
-vlbl : Label      = None
-htbx : CanvasItem = None
+nlbl = None
+vlbl = None
+htbx = None
+rnod = None
 
 def scnready(self : ColorRect):
-    global gjsp, gid, gmdt, htbx, vlbl, nlbl, ready, lid
+    global gjsp, gid, gmdt, htbx, vlbl, nlbl, ready, lid, target_y, rnod
     gjsp = self.scene.projectid
     gid  = self.scene.pid
     gmdt = engine.projects[gjsp]
 
-    nlbl : Label     = self.scene.get_node_from_path("/nlbl")
-    vlbl : Label     = self.scene.get_node_from_path("/vlbl")
-    htbx : ColorRect = self.scene.get_node_from_path("/htbx")
+    nlbl = self.scene.get_node_from_path("/nlbl")
+    vlbl = self.scene.get_node_from_path("/vlbl")
+    htbx = self.scene.get_node_from_path("/htbx")
+    rnod = self.scene.get_node_from_path("")
+
+    nlbl.text = gmdt.name
+    vlbl.text = f"v{gmdt.version}"
+
+    target_y = self.scene.target_y
+    rnod.y   = target_y
 
     ready  = True
 
 def _process(self : ColorRect, delta : float):
-    global gjsp, gid, gmdt, htbx, vlbl, nlbl, ready, lid
+    global gjsp, gid, gmdt, htbx, vlbl, nlbl, ready, lid, target_y, rnod
     if not ready:
         scnready(self)
+
     if htbx.get_if_mouse_hovering():
         htbx.color = [45,45,63]
         if engine.mouse.just_clicked[MOUSE_LEFT]:

@@ -17,6 +17,18 @@ def load():
     playbtn = engine.scene.get_node_from_path("/playico")
     settbtn = engine.scene.get_node_from_path("/settico")
 
+    fb_title = engine.scene.get_node_from_path("/file_browser_panel/titlebar/text")
+    st_title = engine.scene.get_node_from_path("/scene_tree_panel/titlebar/text")
+    sp_title = engine.scene.get_node_from_path("/scene_preview_panel/titlebar/text")
+    pr_title = engine.scene.get_node_from_path("/properties_panel/titlebar/text")
+    sg_title = engine.scene.get_node_from_path("/signals_panel/titlebar/text")
+
+    fb_title.text = engine.lang.get(fb_title.text)
+    st_title.text = engine.lang.get(st_title.text)
+    sp_title.text = engine.lang.get(sp_title.text)
+    pr_title.text = engine.lang.get(pr_title.text)
+    sg_title.text = engine.lang.get(sg_title.text)
+
 def _process(self : Node, delta : float):
     global backbtn, settbtn, playbtn
 
