@@ -48,6 +48,7 @@ class ExtraWindow(CanvasItem, Color):
         self._drawing_wid        = engine.display._add_window_entry()
         self._window : EklWindow = None
     
+    ## Exported properties
     @export([255,255,255],"list","color")
     def color(self) -> tuple[int, int, int]:
         """RGBA Color value of the Window's main viewport. Modifying a single item will do nothing."""
@@ -89,6 +90,11 @@ class ExtraWindow(CanvasItem, Color):
     def transform(self, val):
         self._convert_transform_property_into_object(val)
     
+    ## Transform related
+    def _set_size(self, w, h):
+        if not self._window:
+            return
+        self._window.size = [w,h]
     def _set_alpha(self, deg):
         # Any desktop environment does not have support for opacity, unless i manage the window frame and shit
         # myself. Which i am NOT doing.
@@ -105,6 +111,7 @@ class ExtraWindow(CanvasItem, Color):
             return
         self._window.viewports[MAIN_VIEWPORT].set_background(r,g,b,a)
     
+    ## Window management
     def _make_new_item(self):
         if self._window:
             return

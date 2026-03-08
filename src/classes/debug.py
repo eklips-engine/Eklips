@@ -23,21 +23,28 @@ sprite_always_visible = False and enabled
 avoid_error_mercy     = True  and enabled
 skip_load             = True  and enabled
 freeze_load           = False and enabled
-show_graph            = True  and enabled
+show_graph            = False and enabled
 
 ## Profiling
+_timers   = {}
+_initprf  = False
+_pglspr   = None
+_pygafont = pygame.font.Font(None, 25)
 def _init_graph():
-    global _pglspr, _timers, _peak, _oldpeak, graphsurf, _pygafont, ovrlysurf, _peaktxt, _0pktxt
+    global _pglspr, _initprf, _timers, _peak, _oldpeak, graphsurf, _pygafont, ovrlysurf, _peaktxt, _0pktxt
     graphsurf = pygame.Surface((350, 200))
     graphsurf.fill("white")
     ovrlysurf = pygame.Surface(graphsurf.get_size(), pygame.SRCALPHA)
     _timers   = {}
-    _peak     = ZDE_FIX
-    _oldpeak  = ZDE_FIX
+    _peak     = 1
+    _oldpeak  = _peak
     _pygafont = pygame.font.Font(None, 25)
-    _peaktxt  = _pygafont.render(str(_peak), True, "black")
-    _0pktxt   = _pygafont.render("0", True, "black")
+    _peaktxt  = _pygafont.render("1 s", True, "black")
+    _0pktxt   = _pygafont.render("0 s", True, "black")
+    if _pglspr:
+        _pglspr.delete()
     _pglspr   = pg.sprite.Sprite(engine.resources.cnvsrfekl(graphsurf))
+    _initprf  = True
 
 def start_timer(name):
     global _timers
@@ -82,7 +89,7 @@ def draw_debug_graph():
     start_timer("DebugGraphDraw")
 
     # Dimensions
-    w  = 3
+    w  = 1
     gw = graphsurf.get_width()
     gh = graphsurf.get_height()
 
@@ -90,7 +97,7 @@ def draw_debug_graph():
     ovrlysurf.fill([0,0,0,0])
 
     # Scroll graph left
-    graphsurf.blit(graphsurf, (-w, 0))
+    graphsurf.blit(graphsurf, [-w,0])
     pygame.draw.rect(graphsurf, "white", (gw-w, 0, w, gh))
 
     _oldpeak = _peak
@@ -107,7 +114,7 @@ def draw_debug_graph():
         
         if elapsed > _peak:
             _peak = elapsed
-            _peaktxt  = _pygafont.render(str(_peak), True, "black")
+            _peaktxt  = _pygafont.render(f"{_peak} s", True, "black")
             if _peak <= 0:
                 _peak = ZDE_FIX
         

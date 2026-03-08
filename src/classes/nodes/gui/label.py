@@ -53,6 +53,9 @@ class Label(CanvasItem, Color):
             return
         self.citem.color = (r,g,b,a)
     
+    def _set_size(self, w, h):
+        self._w, self._h = self.citem.content_width, self.citem.content_height
+    
     def __init__(self, properties={}, parent=None):
         Color.__init__(self, 255,255,255)
         self._text  = "Text"
@@ -69,7 +72,9 @@ class Label(CanvasItem, Color):
     def draw(self):
         """Draw the label. This is usually called automatically."""
         if self.visible and self.viewport.is_onscreen(self) and len(self.text.split()) and self.citem:
-            return self.viewport.blit_label(self, self.citem)
+            x,y          = self.into_screen_coords(self.viewport.tsize)
+            self.citem.x = x
+            self.citem.y = y
 
     ## CItem managing
     def _remove_item(self):
@@ -89,7 +94,7 @@ class Label(CanvasItem, Color):
         self.citem.font_size = self.font_size
         self.citem.visible   = False
 
-        self.w, self.h       = self.citem.content_width, self.citem.content_height
+        self._w, self._h     = self.citem.content_width, self.citem.content_height
 
     def _set_rot(self, deg):
         return

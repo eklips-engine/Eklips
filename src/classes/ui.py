@@ -317,6 +317,9 @@ class Viewport(Transform, Color):
         self._sprite.delete()
 
     ## Transform related
+    def _set_anchors(self):
+        self._sprite.image.anchor_x = self._sprite.image.width  // self.scale_x
+        self._sprite.image.anchor_y = self._sprite.image.height // self.scale_y
     def into_screen_coords(self, do_flip : bool = True):
         return super().into_screen_coords(self.window.size, do_flip)
     def _set_alpha(self, deg):
@@ -326,45 +329,15 @@ class Viewport(Transform, Color):
     def _set_scale(self, x, y):
         self._sprite.scale_x = x
         self._sprite.scale_y = y
+        self._set_anchors()
     def _set_size(self, w, h):
         self._resize_framebuffer()
+    def _set_visible(self, val):
+        if not self._sprite:
+            return
+        self._sprite.visible = val
 
     ## Drawing related
-    def blit_sprite(
-        self,
-        transform      : Transform,
-        sprite         : pg.sprite.Sprite
-    ) -> None:
-        """
-        Less dependent version
-        """
-        # Get XY position
-        transform.tsize = [sprite.image.width, sprite.image.height]
-        x, y = transform.into_screen_coords(self.tsize)
-        
-        # Set sprite's properites
-        if sprite.x != x:
-            sprite.x = x
-        if sprite.y != y:
-            sprite.y = y
-    def blit_label(
-        self,
-        transform : Transform,
-        label     : pg.text.Label
-    ) -> list[int,int]:
-        """
-        Less dependent version
-        """
-        # | Get XY position
-        transform.tsize = [label.content_width, label.content_height]
-        x,y = transform.into_screen_coords(self.tsize)
-
-        # | Set the others
-        if label.x != x:
-            label.x = x
-        if label.y != y:
-            label.y = y
-    
     def set_background(self, r=0,g=0,b=0,a=255):
         """
         Set the background color of the Viewport.

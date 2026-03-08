@@ -104,6 +104,7 @@ class MediaPlayer(CanvasItem):
             self._video.play()
             if not self.citem:
                 self._make_new_item()
+            self.citem.visible = self.visible
         
     def restart(self):
         """Restart the attached Media file."""
@@ -145,7 +146,8 @@ class MediaPlayer(CanvasItem):
     
     def update(self):
         super().update()
-        ## Video
+        
+        ## Handle playback
         if self.busy:
             if self._video:
                 self._video._update()
@@ -160,13 +162,16 @@ class MediaPlayer(CanvasItem):
     def draw(self):
         if self._video.frame_surf:
             self.citem.image = self._video.frame_surf
-            if self.visible and self.viewport.is_onscreen(self) and self.citem:
-                return self.viewport.blit_sprite(self, self.citem)
+            self._set_anchors()
+            if self.visible and self.viewport.is_onscreen(self):
+                x,y          = self.into_screen_coords(self.viewport.tsize)
+                self.citem.x = x
+                self.citem.y = y
     
     def _set_size(self,w,h):
-        size = [round(self._ogsize[0]*self.scale_x),round(self._ogsize[1]*self.scale_y)]
         if self._video:
-            self._video.resize(size)
+            self._w, self._h = self._ogsize
+            self._video.resize(self.tsize)
 
     @export(1.0, "float", "float")
     def volume(self) -> int:

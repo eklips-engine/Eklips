@@ -31,17 +31,17 @@ class CanvasItem(Node, Transform):
     (NOTE: The reason why `tsize` is called that because
     anytree's NodeMixin uses a size property..)
     """
-    _iscitem                                    = True
-    _can_check_layer                            = True
+    _iscitem                                    = True 
+    _can_check_layer                            = True 
     _isdisplayobject                            = False
-    _isblittable                                = False   # If class is meant to blit CItem
-    _drawing_bid : int                          = 0
-    _drawing_vid : int                          = 0
-    _drawing_wid : int                          = 0
-    citem        : pg.sprite.Sprite             = None
-    _imagesid    : int                          = 0
-    _images      : dict[pg.image.AbstractImage] = {}
-    _image       : pg.image.AbstractImage       = None
+    _isblittable                                = False # If class is meant to blit CItem
+    _drawing_bid : int                          = 0    
+    _drawing_vid : int                          = 0    
+    _drawing_wid : int                          = 0    
+    citem        : pg.sprite.Sprite             = None 
+    _imagesid    : int                          = 0    
+    _images      : dict[pg.image.AbstractImage] = {}   
+    _image       : pg.image.AbstractImage       = None 
     _ignore_size_if_drawing                     = False
 
     ## Properties
@@ -59,13 +59,14 @@ class CanvasItem(Node, Transform):
         self.w, self.h = value.width, value.height
         if self.citem:
             self.citem.image = value
+            self._set_anchors()
 
     ## Init
     def __init__(self, properties={}, parent = None):
         engine.Transform.__init__(self)
         super().__init__(properties, parent)
 
-        self._image   = engine.loader.load("root://_assets/error.png")
+        self._image = None
 
         if self.parent:
             self._drawing_wid = self.parent.get("_drawing_wid", MAIN_WINDOW)
@@ -121,27 +122,35 @@ class CanvasItem(Node, Transform):
     def draw(self):
         """Draw the CanvasItem. This is usually called automatically."""
         if self.visible and self.viewport.is_onscreen(self) and self.citem:
-            return self.viewport.blit_sprite(self, self.citem)
+            x,y = self.into_screen_coords(self.viewport.tsize)
+            x  += self.image.width
+            y  += self.image.height
+            
+            self.citem.x = x
+            self.citem.y = y
 
     ## Transform related
+    def _set_anchors(self):
+        self.citem.image.anchor_x = self.citem.image.width  // self.scale_x
+        self.citem.image.anchor_y = self.citem.image.height // self.scale_y
     def _set_pos(self, x, y):
         if not self.citem:
             return
+        x,y = self.into_screen_coords(self.viewport.tsize)
         self.citem.x = x
         self.citem.y = y
+    def _set_size(self, w, h):
+        if self.image:
+            self._w, self._h = self.image.width, self.image.height
     def _set_scale(self, x, y):
         if not self.citem:
             return
         self.citem.scale_x = x
         self.citem.scale_y = y
+        self._set_anchors()
     def _set_rot(self, deg):
         if not self.citem:
             return
-        if deg:
-            self.citem.image.anchor_x = self.w // 2
-            self.citem.image.anchor_y = self.h // 2
-        else:
-            self.citem.image.anchor_x = self.citem.image.anchor_y = 0
         self.citem.rotation = deg
     def _set_visible(self, val):
         if not self.citem:
@@ -176,7 +185,10 @@ class CanvasItem(Node, Transform):
         if self.citem:
             self._remove_item()
         self.batch         = self.viewport.batches[self.batch_id]
+        if not self.image:
+            self._image    = engine.loader.load("root://_assets/error.png")
         self.citem         = pg.sprite.Sprite(img=self.image, batch=self.batch)
+        self._set_anchors()
         self.citem.visible = False
     def _refresh_item(self):
         if self.citem:

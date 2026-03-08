@@ -58,6 +58,18 @@ class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
         self.add_batch()
         window.viewports[self.viewport_id] = self
     
+    ## Transform related
+    def _set_size(self, w, h):
+        Viewport._set_size(self, w,h)
+    def _set_scale(self, x, y):
+        Viewport._set_scale(self, x, y)
+    def _set_rot(self, deg):
+        Viewport._set_rot(self, deg)
+    def _set_visible(self, val):
+        Viewport._set_visible(self, val)
+    def _set_alpha(self, deg):
+        Viewport._set_alpha(self, deg)
+    
     ## Rewrites
     def _update_relativity(self):
         if self.parent and self.parent.get("_iscitem", False):

@@ -171,11 +171,11 @@ class ScrollingViewport(ExtraViewport):
                 self._vel = 0
                 engine.set_mouse(MOUSE_DRAG)
                 if self._left_to_right:
-                    self.cam.x    += engine.mouse.dpos[0]/(self.w-self.scrollbar.width)*self.content_width
+                    self.cam.x    += engine.mouse.dpos[0] / (self._w-self.scrollbar.width) * self.content_width
                     if self.cam.x  < 0:
                         self.cam.x = 0
                 else:
-                    self.cam.y    += engine.mouse.dpos[1]/(self.h-self.scrollbar.height)*self.content_height
+                    self.cam.y    += engine.mouse.dpos[1] / (self._h-self.scrollbar.height) * self.content_height
                     if self.cam.y  > 0:
                         self.cam.y = 0
         else:
@@ -193,16 +193,17 @@ class ScrollingViewport(ExtraViewport):
         if self._left_to_right:
             self.cam.x   -= self._vel
             if self.cam.x < 0:
-                self._vel = -((-self.cam.x) / 10)
+                self._vel = -((-self.cam.x) / (engine.fps * 0.25))
             if self.cam.x > self.content_width:
                 self.cam.x = self.content_width
             
             self.scrollbar_bg.y = self.scrollbar.y = 0
+            # XXX make bg horizontal
             self.scrollbar.x    = self.cam.x+((self.cam.x/self.content_width) * (self.w-self.scrollbar.width))
         else:
             self.cam.y   += self._vel
             if self.cam.y > 0:
-                self._vel = (-self.cam.y) / 10
+                self._vel = (-self.cam.y) / (engine.fps * 0.25)
             if self.cam.y < -self.content_height:
                 self.cam.y = -self.content_height
             
@@ -213,4 +214,4 @@ class ScrollingViewport(ExtraViewport):
             self.scrollbar.y    = self.h-self.scrollbar.height+self.cam.y+y
         
         # Weeeeeee
-        self._vel += (-self._vel) / 10
+        self._vel += (-self._vel) / (engine.fps * 0.25)

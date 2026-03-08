@@ -48,4 +48,4 @@ class Parallax(Sprite):
                 self.image.width, # W
                 self.image.height # H
             )
-            self.viewport.blit_sprite(self, self.citem)
+            super().draw()

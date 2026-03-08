@@ -219,9 +219,9 @@ class Transform:
     def scale(self):   return [self.scale_x, self.scale_y]
     
     @property
-    def w(self): return self._w * self._scale_x
+    def w(self): return round(self._w * self._scale_x)
     @property
-    def h(self): return self._h * self._scale_y
+    def h(self): return round(self._h * self._scale_y)
     
     @property
     def rect(self): return [self.x,self.y,self.w,self.h]
