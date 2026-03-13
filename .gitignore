@@ -12,3 +12,5 @@ images.png
 ## Pyinstaller things
 build/
 dist/
+
+docs/

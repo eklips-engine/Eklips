@@ -6,8 +6,9 @@ from classes.locals      import *
 from classes.customprops import *
 import classes.singleton as engine
 
-# Variables
-main_window    = engine.display.get_window()
+# Load the engine components
+engine.load_engine()
+main_window = engine.display.get_window()
 
 # Create event loop
 @main_window.event

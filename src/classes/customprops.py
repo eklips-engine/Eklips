@@ -88,6 +88,7 @@ class _exportmeta(type):
         return cls
 
 class WindowProperties:
+    """Properties for the main Window."""
     maxsize      : list = [0,0]
     minsize      : list = [0,0]
     color        : list = BLACK
@@ -97,6 +98,7 @@ class WindowProperties:
     icofile      : str  = ""
 
 class DebugConfig:
+    """Debugging configuration."""
     _skipload  = False
     _freezload = False
     _enabled   = True
@@ -106,47 +108,90 @@ class DebugConfig:
     _alwaysvis = False
 
     @export(False,"bool")
-    def sprite_always_visible(self):     return self._alwaysvis    and self._enabled
+    def sprite_always_visible(self):
+        """True if sprites are always visible. Read-write."""
+        return self._alwaysvis and self._enabled
     @sprite_always_visible.setter
     def sprite_always_visible(self,val): self._alwaysvis = val
 
     @export(False,"bool")
-    def skip_load(self):     return self._skipload                 and self._enabled
+    def skip_load(self):
+        """True if the loading animation can be skipped. Read-write."""
+        return self._skipload and self._enabled
     @skip_load.setter
     def skip_load(self,val): self._skipload = val
 
     @export(False,"bool")
-    def freeze_load(self):     return self._freezload              and self._enabled
+    def freeze_load(self):
+        """True if the loading animation can be frozen. Read-write."""
+        return self._freezload and self._enabled
     @freeze_load.setter
     def freeze_load(self,val): self._freezload = val
 
     @export(True,"bool")
-    def show_fps(self):       return self._showfps                 and self._enabled
+    def show_fps(self):
+        """True if the engine can show the FPS. Read-write."""
+        return self._showfps and self._enabled
     @show_fps.setter
-    def show_graph(self,val): self._showfps = val
+    def show_fps(self,val): self._showfps = val
 
     @export(False,"bool")
-    def avoid_error_mercy(self):     return self._nomercy          and self._enabled
+    def avoid_error_mercy(self):
+        """True if the engine can be more error-prone. Read-write."""
+        return self._nomercy and self._enabled
     @avoid_error_mercy.setter
     def avoid_error_mercy(self,val): self._nomercy = val
     
     @export(False,"bool")
-    def show_graph(self): return self._showgraph                   and self._enabled
+    def show_graph(self):
+        """True if the engine can show a profiling graph. Read-write."""
+        return self._showgraph and self._enabled
     @show_graph.setter
     def show_graph(self,val):
         self._showgraph = val
 
     @export(False,"bool")
-    def show_fps(self):     return self._showfps                   and self._enabled
-    @show_fps.setter
-    def show_fps(self,val): self._showfps = val
-
-    @export(False,"bool")
-    def enabled(self):     return self._enabled
+    def enabled(self):
+        """True if debugging is enabled. Read-write."""
+        return self._enabled
     @enabled.setter
     def enabled(self,val): self._enabled = val
     
 class GameData:
+    """Data about the running project."""
+    
+    #: The location of the game.json file being used.
+    project_file = None
+    #: The directory of the project that is running.
+    project_dir  = None
+
+    #: The project's version.
+    version     = None
+    #: The project's Eklips version.
+    version_ekl = None
+    
+    #: The save folder.
+    save_dir = None
+
+    #: Main Window properties
+    win = None
+
+    #: List of fonts
+    fonts = None
+
+    #: The directory of all of the language files.
+    langdir = None
+    #: List of languages.
+    langs   = None
+
+    #: Dictionary of actions.
+    actions = None
+
+    #: The main scene.
+    master_scene  = None
+    #: The scene loaded at the start of the runtime. Can be used for a loading animation, etc..
+    loading_scene = None
+
     def __init__(self, settings="settings.json", is_file = True):
         #### Settings file related
         ### Load settings
@@ -218,6 +263,8 @@ class GameData:
         self.loading_scene = self.project_data["scenes"]["loading"]
 
 class Transform:
+    """A transformation object with width, height, x, y, z, scale, flip, etc..."""
+
     def __repr__(self):
         return f"{self.__class__.__name__}(position={self.position}, tsize={self.tsize})"
     
@@ -250,51 +297,89 @@ class Transform:
     
     # Getters
     @property
-    def visible(self): return self._visible
+    def visible(self):
+        """If the Transform is visible. Read-write"""
+        return self._visible
     @property
-    def anchor(self): return self._anchor
+    def anchor(self):
+        """The Transform's anchor (top, left, right, bottom). You can put multiple, too. Read-write"""
+        return self._anchor
 
     @property
-    def x(self): return self._x + self._offset_x
+    def x(self):
+        """The Transform's X. Read-write"""
+        return self._x + self._offset_x
     @property
-    def y(self): return self._y + self._offset_y
+    def y(self):
+        """The Transform's Y. Read-write"""
+        return self._y + self._offset_y
     @property
-    def z(self): return self._z
+    def z(self):
+        """The Transform's Z. Read-write"""
+        return self._z
 
     @property
-    def layer(self): return self._layer
+    def layer(self):
+        """The Transform's layer. Read-write"""
+        return self._layer
 
     @property
-    def scale_x(self): return self._scale_x
+    def scale_x(self):
+        """The Transform's X scale. Read-write"""
+        return self._scale_x
     @property
-    def scale_y(self): return self._scale_y
+    def scale_y(self):
+        """The Transform's Y scale. Read-write"""
+        return self._scale_y
     @property
-    def scale(self):   return [self.scale_x, self.scale_y]
+    def scale(self):
+        """The Transform's scaling. Read-write"""
+        return [self.scale_x, self.scale_y]
     
     @property
-    def w(self): return round(self._w * self._scale_x)
+    def w(self):
+        """The Transform's width. Read-write"""
+        return round(self._w * self._scale_x)
     @property
-    def h(self): return round(self._h * self._scale_y)
+    def h(self):
+        """The Transform's height. Read-write"""
+        return round(self._h * self._scale_y)
     
     @property
-    def rect(self): return [self.x,self.y,self.w,self.h]
+    def rect(self):
+        """The Transform's Rect (XYWH). Read-write"""
+        return [self.x,self.y,self.w,self.h]
     @property
-    def position(self):  return [self.x,self.y]
+    def position(self):
+        """The Transform's position. Read-write"""
+        return [self.x,self.y]
     @property
-    def tsize(self):  return [self.w,self.h]
+    def tsize(self):
+        """The Transform's size. Read-write"""
+        return [self.w,self.h]
 
     @property
-    def rotation(self): return self._rotation
+    def rotation(self):
+        """The Transform's rotation. Read-write"""
+        return self._rotation
     
     @property
-    def alpha(self): return round(self._alpha)
+    def alpha(self):
+        """The Transform's opacity. Read-write"""
+        return round(self._alpha)
 
     @property
-    def flip_w(self): return self._flip_w
+    def flip_w(self):
+        """If the Transform's flipped horizontaly. Read-write"""
+        return self._flip_w
     @property
-    def flip_h(self): return self._flip_h
+    def flip_h(self):
+        """If the Transform's flipped vertically. Read-write"""
+        return self._flip_h
     @property
-    def flip(self): return [self.flip_w,self.flip_h]
+    def flip(self):
+        """The Transform's flip. Read-write"""
+        return [self.flip_w,self.flip_h]
 
     # Setters
     @layer.setter
@@ -416,6 +501,7 @@ class Transform:
     
     ## Functions
     def _turn_object_into_transform_property(self):
+        """Returns a dictionary of the Transform object's properties."""
         return {
             "position": self.position,
             "scale":    self.scale,
@@ -430,6 +516,7 @@ class Transform:
         }
     
     def _convert_transform_property_into_object(self, value):
+        """Sets the Transform object's properties from a dictionary."""
         self.tsize     = value.get("tsize",    self.tsize)
         self.position  = value.get("position", self.position)
         self.scale     = value.get("scale",    self.scale)
@@ -472,13 +559,8 @@ class Transform:
         _screenc_cache[cid] = [x,y]
         return [x,y]
     
-    def get_half_size(self):
-        return [self.w/2,self.h/2]
-    def get_quarter_size(self):
-        return [self.w/4,self.h/4]
-    
     @classmethod
-    def new(cls, pos : position, surface = None, scale = [1,1], opacity = 255, layer = 0, rotation = 0, anchor = "", scroll = [0,0], visible = True, skew = 0):
+    def new(cls, pos : list, surface = None, scale = [1,1], opacity = 255, layer = 0, rotation = 0, anchor = "", scroll = [0,0], visible = True, skew = 0):
         transform_obj          = Transform()
         transform_obj.pos      = pos
         if surface:
@@ -495,17 +577,27 @@ class Transform:
         return transform_obj
 
 class Mouse:
-    pos          = [0,0]       # Mouse position anchored at bottom left
-    dpos         = [0,0]       # Relative pos from last frame
-    dragging     = False       # If mouse is dragging
-    scroll       = 0           # 1 is up, -1 is down
-    just_clicked = [0,0,0,0,0] # Buttons just now pressed
-    buttons      = [0,0,0,0,0] # Index 0 is ignored
-    paths        = []          # List of filepaths
+    #: Mouse position anchored at bottom left
+    pos          = [0,0]
+    #: Relative pos from last frame
+    dpos         = [0,0]
+    #: If mouse is dragging
+    dragging     = False
+    #: 1 is up, -1 is down
+    scroll       = 0
+    #: Buttons just now pressed. Use `engine.is_action_pressed` instead.
+    just_clicked = [0,0,0,0,0]
+    #: Index 0 is ignored. Use `engine.is_action_pressed` instead.
+    buttons      = [0,0,0,0,0]
+    #: List of filepaths
+    paths        = []
 
 class Keyboard:
+    #: Keyboard modifiers.
     modifiers = 0
+    #: Dictionary of keys pressed. Use `engine.is_action_pressed` instead.
     pressed   = {}
+    #: Dictionary of keys held down. Use `engine.is_action_pressed` instead.
     held      = {}
 
 class Language:
@@ -541,27 +633,42 @@ class CameraTransform(Transform):
         self._zoom = 1
     
     @property
-    def zoom(self):      return self._zoom
+    def zoom(self):
+        """The camera's zoom. Read-write"""
+        return self._zoom
     @zoom.setter
     def zoom(self, val): self._zoom = val
 
 class Color:
+    """A color container."""
     def __init__(self, r=0,g=0,b=0,a=255):
         self._r = r
         self._g = g
         self._b = b
         self._a = a
-    def color_as_tuple(self): return (self.r, self.g, self.b, self.a)
-    def color_as_list(self):  return [self.r, self.g, self.b, self.a]
+    def color_as_tuple(self):
+        """Return the color as a tuple."""
+        return (self.r, self.g, self.b, self.a)
+    def color_as_list(self):
+        """Return the color as a list."""
+        return [self.r, self.g, self.b, self.a]
 
     @property
-    def r(self): return self._r
+    def r(self):
+        """Red."""
+        return self._r
     @property
-    def g(self): return self._g
+    def g(self):
+        """Green."""
+        return self._g
     @property
-    def b(self): return self._b
+    def b(self):
+        """Blue."""
+        return self._b
     @property
-    def a(self): return self._a
+    def a(self):
+        """Alpha."""
+        return self._a
 
     @r.setter
     def r(self, value):

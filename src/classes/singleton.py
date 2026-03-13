@@ -14,13 +14,16 @@ pygame.mixer.init(channels=2)
 
 # Functions
 def rgbtohex(rgb: list) -> str:
+    """Turn a hex color into an RGB color."""
     r,g,b = rgb
     return "#{:02x}{:02x}{:02x}".format(round(r),round(g),round(b))
 def invertrgb(rgb: list) -> list:
+    """Invert an RGB color."""
     r,g,b = rgb
     return [255-r,255-g,255-b]
 
 def get_date():
+    """Returns the date and time."""
     return time.strftime('%d %m %Y %H %M %S')
 
 def load_engine():
@@ -102,6 +105,12 @@ def load_engine():
     running = True
 
 def load_cursor(name) -> pg.window.MouseCursor | pg.window.ImageMouseCursor:
+    """
+    Load a mouse cursor from its name.
+
+    Args:
+        name: The mouse cursor to load. Can either be a path or constant (e.g. `MOUSE_NORMAL`..)
+    """
     if os.path.exists(loader._get_true_path(str(name))):
         cursor = loader.load(name)
     else:
@@ -190,6 +199,3 @@ speed     : int                    = 1     # This value is the multiplier of `en
 
 _wincloseblacklist : list = [MAIN_WINDOW]
 _screenc_cache     : dict = {}
-
-# Load the engine components
-load_engine()
