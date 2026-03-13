@@ -5,11 +5,11 @@ USE_GAME_PARENT = "UseFileParent"
 USE_GAME_CV_DIR = "UseFileCVar"
 
 NAME         = "Eklips Engine"
-BDATE        = [6, 8, 2026]  # DMY
-MAJOR        = "5"           # Major [5].0 A 
-MINOR        = "0"           # Minor  5.[0]A 
-HOTFIX       = "A"           # Hotfix 5. 0[A]
-BUILD        = 27            # Increment every time a major feature has been added/completely overhauled
+BDATE        = [13, 3, 2026]  # DMY
+MAJOR        = "5"            # Major [5].0 A 
+MINOR        = "0"            # Minor  5.[0]A 
+HOTFIX       = "A"            # Hotfix 5. 0[A]
+BUILD        = 27             # Increment every time a major feature has been added/completely overhauled
 VERSION      = f"{MAJOR}.{MINOR}{HOTFIX}"
 VERSION_FULL = f"v{VERSION} ({BDATE[0]}/{BDATE[1]}/{BDATE[2]})"
 print(f"{NAME} {VERSION_FULL}")
@@ -68,7 +68,7 @@ AXIS_X  = 128225
 AXIS_XY = 128226
 AXIS_Y  = 128227
 
-MAXFPS   = 60
+MAXFPS = 120
 
 NEIGHBOUR_TOPLEFT  = 83850
 NEIGHBOUR_TOPRIGHT = 83854
@@ -78,3 +78,10 @@ NEIGHBOUR_BOTRIGHT = 83864
 NEIGHBOUR_BOTMID   = 83868
 NEIGHBOUR_LEFT     = 83800
 NEIGHBOUR_RIGHT    = 83844
+
+RED         = [255, 0,   0,   255]
+GREEN       = [0,   255, 0,   255]
+BLUE        = [0,   0,   255, 255]
+BLACK       = [0,   0,   0,   255]
+WHITE       = [255, 255, 255, 255]
+TRANSPARENT = [0,   0,   0,     1]

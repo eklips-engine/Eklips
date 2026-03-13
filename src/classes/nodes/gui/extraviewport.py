@@ -25,7 +25,6 @@ class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
     by using `engine.display.get_viewport(node.viewport_id, wid)`
     or by using `node` itself.
     """
-    _supports_tsize  = True
     _isdisplayobject = True
 
     ## CanvasItem stuff
@@ -33,7 +32,7 @@ class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
         return self
     
     ## Exports
-    @export([255,255,255],"list","color")
+    @export(WHITE,"list","color")
     def color(self) -> tuple[int, int, int]:
         """RGBA Color value of the Viewport. Modifying a single item will do nothing."""
         return self.color_as_tuple()

@@ -1,8 +1,5 @@
 # Import libraries
-import pyglet as pg
 from pygame import mixer
-
-# Import inherited
 from classes.nodes.gui.canvasitem import *
 
 # Classes

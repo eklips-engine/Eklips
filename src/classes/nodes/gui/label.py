@@ -9,7 +9,6 @@ class Label(CanvasItem, Color):
     
     XXX
     """
-    _can_check_layer       = True
     citem  : pg.text.Label = None
     _isblittable           = True
 
@@ -41,7 +40,7 @@ class Label(CanvasItem, Color):
             self.citem.font_size = value
             self.w, self.h       = self.citem.content_width, self.citem.content_height
 
-    @export([255,255,255],"list","color")
+    @export(WHITE,"list","color")
     def color(self) -> tuple[int, int, int]:
         """RGBA Color value of the Label. Modifying a single item will do nothing."""
         return self.color_as_tuple()
@@ -56,7 +55,7 @@ class Label(CanvasItem, Color):
         self._w, self._h = self.citem.content_width, self.citem.content_height
     
     def __init__(self, properties={}, parent=None):
-        Color.__init__(self, 255,255,255)
+        Color.__init__(self, *WHITE)
         self._text  = "Text"
         self._fsize = DEFAULT_FONT_SIZE
         self._fname = DEFAULT_FONT_NAME

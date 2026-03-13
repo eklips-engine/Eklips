@@ -31,7 +31,6 @@ class ExtraWindow(CanvasItem, Color):
     with it to save resources.. and stuff.. 
     """
     _isdisplayobject = True
-    _supports_tsize  = True
     _isblittable     = True
 
     def __init__(self, properties={}, parent=None):
@@ -42,14 +41,14 @@ class ExtraWindow(CanvasItem, Color):
         super().__init__(properties, parent)
 
         ## Setup BG color
-        Color.__init__(self)
+        Color.__init__(self, *WHITE)
 
         ## Claim an empty slot for use
         self._drawing_wid        = engine.display._add_window_entry()
         self._window : EklWindow = None
     
     ## Exported properties
-    @export([255,255,255],"list","color")
+    @export(WHITE,"list","color")
     def color(self) -> tuple[int, int, int]:
         """RGBA Color value of the Window's main viewport. Modifying a single item will do nothing."""
         return self.color_as_tuple()

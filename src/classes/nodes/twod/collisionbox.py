@@ -1,8 +1,5 @@
 # Import libraries
-import pygame, pyglet as pg, json, gc
-from classes import ui
-
-# Import inherited
+import pygame
 from classes.nodes.gui.colorrect import *
 
 # Classes
@@ -18,7 +15,6 @@ class CollisionBox(CanvasItem):
     bad at programming to even bother making collision
     for any other shape than rectangles
     """
-    _supports_tsize = True
 
     def __init__(self, properties={}, parent=None):
         super().__init__(properties, parent)

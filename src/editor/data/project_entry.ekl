@@ -15,10 +15,10 @@ target_y : int  = 0
 
 ready : bool = False
 
-nlbl = None
-vlbl = None
-htbx = None
-rnod = None
+nlbl : Label     = None
+vlbl : Label     = None
+htbx : ColorRect = None
+rnod : ColorRect = None
 
 def scnready(self : ColorRect):
     global gjsp, gid, gmdt, htbx, vlbl, nlbl, ready, lid, target_y, rnod
@@ -34,8 +34,7 @@ def scnready(self : ColorRect):
     nlbl.text = gmdt.name
     vlbl.text = f"v{gmdt.version}"
 
-    target_y = self.scene.target_y
-    rnod.y   = target_y
+    rnod.y   = self.scene.target_y
 
     ready  = True
 
@@ -45,11 +44,11 @@ def _process(self : ColorRect, delta : float):
         scnready(self)
 
     if htbx.get_if_mouse_hovering():
-        htbx.color = [45,45,63]
+        htbx.visible = True
         if engine.mouse.just_clicked[MOUSE_LEFT]:
             engine.selected_project = gjsp
             window                  = engine.display.get_window(MAIN_WINDOW)
             window.set_caption(engine.lang.get("pe_titleeditor").replace("%", gmdt.name))
             engine.scene.load("res://scenes/editor.scn")
     else:
-        htbx.color = [35,35,45]
+        htbx.visible = False

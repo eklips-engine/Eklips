@@ -1,15 +1,10 @@
-# XXX
 # Import libraries
-import pyglet as pg
-from classes import ui
-
-# Import inherited
 from classes.nodes.gui.canvasitem import *
 
 # Classes
 class Checkbox(CanvasItem):
     """
-    A slider element.
+    A Checkbox element that has two states; on or off.
     
     XXX
     """

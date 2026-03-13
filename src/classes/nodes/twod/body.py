@@ -1,8 +1,4 @@
 # Import libraries
-import pygame, pyglet as pg, json, gc
-from classes import ui
-
-# Import inherited
 from classes.nodes.twod.collisionbox import *
 
 # Classes
@@ -12,7 +8,6 @@ class Body(CollisionBox):
 
     XXX
     """
-    _supports_tsize = True
 
     @property
     def velocity(self):

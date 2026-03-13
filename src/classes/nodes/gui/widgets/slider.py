@@ -1,9 +1,5 @@
-# XXX
 # Import libraries
 import pyglet as pg
-from classes import ui
-
-# Import inherited
 from classes.nodes.gui.canvasitem import *
 
 # Classes
@@ -13,7 +9,6 @@ class Slider(CanvasItem):
     
     XXX
     """
-    _supports_tsize = True
     
     @export(0, "int", "int")
     def value(self):

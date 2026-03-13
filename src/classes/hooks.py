@@ -19,8 +19,6 @@ import classes.singleton as engine
 ## Pyglet event loop
 print(" ~ Modify pyglet.app.eventloop._redraw_windows")
 def newrwd(dt: float) -> None:
-    engine.tdelta = dt
-
     # Redraw all windows
     for wid in engine.display.windows.copy():
         if wid in engine.display.windows:

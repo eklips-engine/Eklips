@@ -10,12 +10,14 @@ class EklImage(ImageData):
     
     def get_texture(self, rectangle = False):
         texture               = super().get_texture()
+        if not "00" in self._flipimgcache:
+            self._flipimgcache["00"] = texture
         texture._flipimgcache = self._flipimgcache
         texture.flip          = self.flip
         return texture
 
     def flip(self, flip_w, flip_h, no_cache=False) -> Texture:
-        fid = f"{flip_w}{flip_h}"
+        fid = f"{int(flip_w)}{int(flip_h)}"
         if not fid in self._flipimgcache or no_cache:
             texture = super().get_texture()
             result  = texture.get_transform(flip_w, flip_h, 0)

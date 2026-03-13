@@ -287,11 +287,11 @@ class Scene(Resource, SceneLike):
 
             # Now we can delete the Node and remove it eternally
             if engine.debug.enabled:
-                engine.debug.start_timer(timer_name)
+                engine.profiling.start_timer(timer_name)
             if node:
                 node._free()
             if engine.debug.enabled:
-                engine.debug.end_timer(timer_name)
+                engine.profiling.end_timer(timer_name)
                 #engine.debug.remove_timer(timer_name)
             current["children"].pop(parts[-1])
         except Exception as error:
@@ -306,14 +306,14 @@ class Scene(Resource, SceneLike):
         """Empty the scene."""
         timer_name = f"Clear'{self.file_path}'"
         if engine.debug.enabled:
-            engine.debug.start_timer(timer_name)
+            engine.profiling.start_timer(timer_name)
         root = self.nodes[""].get("obj")
         if root: root._free()
         self._nodes          = EMPTY_SCENE
         self._temp_node_list = []
         if engine.debug.enabled:
-            engine.debug.end_timer(timer_name)
-            engine.debug.remove_timer(timer_name)
+            engine.profiling.end_timer(timer_name)
+            engine.profiling.remove_timer(timer_name)
     def _free(self):
         self.empty()
         super()._free()

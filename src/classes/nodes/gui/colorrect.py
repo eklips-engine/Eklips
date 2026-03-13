@@ -1,8 +1,5 @@
 # Import libraries
-import pygame, pyglet as pg, json, gc
-from classes import ui
-
-# Import inherited
+import pyglet as pg
 from classes.nodes.gui.canvasitem import *
 
 # Classes
@@ -12,15 +9,14 @@ class ColorRect(CanvasItem, Color):
     
     XXX
     """
-    _can_check_layer = True
-    _supports_tsize  = True
-    _isblittable     = True
+    _isblittable                = True
+    citem : pg.shapes.Rectangle = None
 
     def __init__(self, properties={}, parent=None):
-        Color.__init__(self, 255,255,255)
+        Color.__init__(self, *WHITE)
         super().__init__(properties, parent)
     
-    @export([255,255,255],"list","color")
+    @export(WHITE,"list","color")
     def color(self) -> tuple[int, int, int]:
         """RGBA Color value of the ColorRect. Modifying a single item will do nothing."""
         return self.color_as_tuple()
@@ -29,20 +25,44 @@ class ColorRect(CanvasItem, Color):
         if rgb == self.rgb:
             return
         self.rgb = rgb
-    def _update_color(self, r, g, b, a):
-        self._refresh_image()
     
-    def _refresh_image(self):
-        self._set_size(self.w,self.h)
-    def _set_size(self,w,h):
-        # Make the size be valid
-        rw, rh         = round(w),round(h)
-        if rw == 0: rw = 1
-        if rh == 0: rh = 1
-
-        # Make the image
-        self.image = engine.resources.EklImage(rw,rh,'RGB',bytes(self.rgb[:3]*rw*rh))
-    
+    ## Drawing related
     def update(self):
         super().update()
         self.draw()
+    
+    def draw(self):
+        """Draw the ColorRect. This is usually called automatically."""
+        if self.visible and self.viewport.is_onscreen(self) and self.citem:
+            x, y         = self.into_screen_coords(self.viewport.tsize)
+            self.citem.x = x + (self.citem.anchor_x * self.scale_x)
+            self.citem.y = y + (self.citem.anchor_y * self.scale_y)
+            
+            self.citem.visible = self.visible
+        else:
+            self.citem.visible = False
+    
+    ## Transform related
+    def _update_color(self, r, g, b, a):
+        if self.citem:
+            self.citem.color = [r, g, b, a]
+    def _set_size(self, w, h):
+        if self.citem:
+            self.citem.width  = self._w
+            self.citem.height = self._h
+    def _set_flip(self, w, h):
+        return
+    def _set_anchors(self):
+        self.citem.anchor_x = self._w  // 2
+        self.citem.anchor_y = self._h // 2
+        self.citem._update_translation()
+    
+    def _make_new_item(self):
+        if self.citem:
+            self._remove_item()
+        self.batch         = self.viewport.batches[self.batch_id]
+        if not self.image:
+            self._image    = engine.loader.load("root://_assets/error.png")
+        self.citem         = pg.shapes.Rectangle(0,0,self._w,self._h, color=self.color, batch=self.batch)
+        self._set_anchors()
+        self.citem.visible = False

@@ -12,6 +12,7 @@
                 "tsize":    [5, 61],
                 "scale":    [1,  1],
                 "scroll":   [0,  0],
+                "layer":    2,
 
                 "rotation": 0,
                 "alpha":    255,
@@ -24,18 +25,19 @@
                 "htbx": {
                     "type":  "ColorRect",
 
-                    "color": [0,0,0],
+                    "color": [35,35,45],
                     
                     "transform":   {
-                        "position": [0,    0],
-                        "tsize":    [563, 61],
+                        "position": [12,   2],
+                        "tsize":    [549, 57],
                         "scale":    [1,    1],
                         "scroll":   [0,    0],
-
+                        "layer":    1,
+                        
                         "rotation": 0,
-                        "alpha":    127,
+                        "alpha":    255,
                         "anchor":   "top left",
-                        "visible":  true,
+                        "visible":  false,
                         "skew":     0
                     }
                 },
@@ -50,6 +52,7 @@
                         "tsize":    [1,  1],
                         "scale":    [1,  1],
                         "scroll":   [0,  0],
+                        "layer":    2,
 
                         "rotation": 0,
                         "alpha":    255,
@@ -67,6 +70,7 @@
                         "tsize":    [1,  1],
                         "scale":    [1,  1],
                         "scroll":   [0,  0],
+                        "layer":    2,
 
                         "rotation": 0,
                         "alpha":    255,

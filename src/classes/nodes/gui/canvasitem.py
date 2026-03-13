@@ -1,5 +1,5 @@
 # Import libraries
-import pygame, pyglet as pg, json, gc
+import pyglet as pg
 from classes import ui
 
 # Import inherited
@@ -33,7 +33,6 @@ class CanvasItem(Node, Transform):
     """
     _relativity_pos                             = True
     _iscitem                                    = True 
-    _can_check_layer                            = True 
     _isdisplayobject                            = False
     _isblittable                                = False # If class is meant to blit CItem
     _drawing_bid : int                          = 0    
@@ -134,19 +133,15 @@ class CanvasItem(Node, Transform):
     ## Transform related
     def _set_layer(self, val):
         if self.citem:
-            self.citem.group = pg.graphics.Group(order=val)
+            self.citem.group = engine.ui.request_group(val)
+    
     def _set_flip(self, w, h):
         if self.citem:
             self.citem.image = self.image.flip(w,h)
     def _set_anchors(self):
-        self.citem.image.anchor_x = self.citem.image.width  // 2
-        self.citem.image.anchor_y = self.citem.image.height // 2
+        self.citem.image.anchor_x = self._w // 2
+        self.citem.image.anchor_y = self._h // 2
         self.citem._update_position()
-    def _set_pos(self, x, y):
-        if self.citem:
-            x,y = self.into_screen_coords(self.viewport.tsize)
-            self.citem.x = x
-            self.citem.y = y
     def _set_size(self, w, h):
         if self.image:
             self._w, self._h = self.image.width, self.image.height
@@ -184,7 +179,7 @@ class CanvasItem(Node, Transform):
         if self.citem:
             self.citem.delete()
             self.citem = None
-    def _make_new_item(self) -> pg.sprite.Sprite | pg.text.Label:
+    def _make_new_item(self):
         if self.citem:
             self._remove_item()
         self.batch         = self.viewport.batches[self.batch_id]
@@ -226,8 +221,6 @@ class CanvasItem(Node, Transform):
     def get_if_mouse_hovering(self) -> bool:
         """Returns true if the mouse is hovering over self."""
         if not self.viewport:
-            return
-        if not self.visible:
             return
         if not self.viewport.is_onscreen(self):
             return

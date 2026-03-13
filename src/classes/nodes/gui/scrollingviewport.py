@@ -29,7 +29,6 @@ class ScrollingViewport(ExtraViewport):
     contents (or rather Camera, but that doesn't sound so magical
     now, does it?), or use the (non-existent?) scrollbar instead.
     """
-    _supports_tsize  = True
     _isdisplayobject = True
 
     @export(700.0,"float","slider")

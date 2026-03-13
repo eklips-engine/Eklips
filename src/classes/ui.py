@@ -7,23 +7,23 @@ from classes.locals          import *
 from classes.customprops     import *
 from pyglet.gl               import *
 
-# Functions
-def set_anti_aliasing(yn : bool):
-    if yn: value = GL_LINEAR
-    else:  value = GL_NEAREST
-    pg.image.Texture.default_mag_filter = pg.image.Texture.default_min_filter = value
-
 # Cast some fucking OpenGL spells i don't know
 glEnable(GL_BLEND)
 glEnable(GL_CULL_FACE)
 
-# Colors
-red         = [255, 0,   0,   255]
-green       = [255, 0,   0,   255]
-blue        = [0,   0,   255, 255]
-black       = [0,   0,   0,   255]
-white       = [255, 255, 255, 255]
-transparent = [0,   0,   0,     1]
+# Variables
+groups = {}
+
+# Functions
+def request_group(order  : int):
+    if not order in groups:
+        groups[order] = pg.graphics.Group(order)
+    return groups[order]
+
+def set_anti_aliasing(yn : bool):
+    if yn: value = GL_LINEAR
+    else:  value = GL_NEAREST
+    pg.image.Texture.default_mag_filter = pg.image.Texture.default_min_filter = value
 
 # Classes
 class EklWindow(pg.window.Window):
@@ -143,7 +143,7 @@ class EklWindow(pg.window.Window):
             viewport.draw()
         
         if engine.debug.show_graph:
-            engine.debug.draw_debug_graph()
+            engine.profiling.draw_debug_graph()
         super().flip()
     
     ## Mouse Events
@@ -186,7 +186,7 @@ class EklWindow(pg.window.Window):
     def add_viewport(
         self,
         size  : list[int] = [640,480],
-        color : list[int] = black,
+        color : list[int] = BLACK,
         flags : list[int] = [VIEWPORT_EQUAL_WINDOW],
         pos   : list[int] = [0,0]
     ):
@@ -215,7 +215,6 @@ class EklWindow(pg.window.Window):
 
 class Viewport(Transform, Color):
     """A class to manage a portion of a Window."""
-    _supports_tsize = True
 
     def __init__(self, vid : int, window : EklWindow, flags : list = []):
         """Initialize a Viewport.
@@ -320,9 +319,8 @@ class Viewport(Transform, Color):
 
     ## Transform related
     def _set_anchors(self):
-        # For some reason when rotating the anchors dont anchor anchoringly and rotate around the bottom left of the image (????)
-        self.citem.image.anchor_x = self.citem.image.width  // 2
-        self.citem.image.anchor_y = self.citem.image.height // 2
+        self.citem.image.anchor_x = self._w // 2
+        self.citem.image.anchor_y = self._h // 2
         self.citem._update_position()
     def into_screen_coords(self, do_flip : bool = True):
         return super().into_screen_coords(self.window.size, do_flip)
@@ -489,7 +487,7 @@ class Display:
         size           : list[int]              = [640,480],
         viewport_flags : list                   = [],
         viewport_size  : list[int] | int        = [640,480],
-        viewport_color                          = black,
+        viewport_color                          = BLACK,
         icon           : pg.image.AbstractImage = None,
         resizable      : bool                   = True,
         minimum_size   : None | list[int]       = [640,480],
@@ -550,10 +548,10 @@ class Display:
 
         # Create viewports
         window.add_viewport(color=viewport_color, flags=viewport_flags, size=viewport_size) # MAIN_VIEWPORT
-        window.add_viewport(color=transparent,    flags=[VIEWPORT_EQUAL_WINDOW])            # UI_VIEWPORT
+        window.add_viewport(color=TRANSPARENT,    flags=[VIEWPORT_EQUAL_WINDOW])            # UI_VIEWPORT
 
         # Add FPS Display
-        if fpsvisible or engine.debug.fps_visible:
+        if fpsvisible or engine.debug.show_fps:
             fpsd = engine.hooks.HookFPSDisplay(window, [255,255,255,255])
         
         # Finishing up

@@ -1,31 +1,17 @@
 """
-Module for debug settings and also profiling.
+Module for profiling.
 
 To make a profile, use `make_timer`, to mark a profile as finished for this frame, use `end_timer`.
 To remove a profile, use `remove_timer`.
 
-"But ZeeAy, why is the profile rendering in pygame?" Uhhh i dont feel like drawing graphs using pyglet
-so yeah deal with it plus it doesn't hurt FPS that much
+"But ZeeAy, why is the profile rendering in pygame?" la a3lam
 """
 
 ## Imports
 import time, pygame, random, pyglet as pg
-import classes.singleton as engine
 from classes.locals import *
+import classes.singleton as engine
 
-## Values
-enabled               = True
-
-shapes_visible        = True  and enabled
-fps_visible           = True  and enabled
-path_visible          = True  and enabled
-sprite_always_visible = False and enabled
-avoid_error_mercy     = True  and enabled
-skip_load             = True  and enabled
-freeze_load           = False and enabled
-show_graph            = False and enabled
-
-## Profiling
 _timers   = {}
 _initprf  = False
 _pglspr   = None
@@ -45,7 +31,6 @@ def _init_graph():
         _pglspr.delete()
     _pglspr   = pg.sprite.Sprite(engine.resources.cnvsrfekl(graphsurf))
     _initprf  = True
-
 def start_timer(name):
     global _timers
 
@@ -63,16 +48,13 @@ def start_timer(name):
         _pygafont.render(name, True, color),
         0
     ]
-
 def end_timer(name):
     if not name in _timers: return
     _timers[name][1] = time.time()
     _timers[name][2] = True
-
 def remove_timer(name):
     if not name in _timers: return
     _timers.pop(name)
-
 def _draw():
     global graphsurf, ovrlysurf, _pglspr
     fullsrf = pygame.Surface(graphsurf.get_size())
@@ -81,7 +63,6 @@ def _draw():
 
     _pglspr.image = engine.resources.cnvsrfekl(fullsrf)
     _pglspr.image.blit(0,0)
-
 def draw_debug_graph():
     global graphsurf, _timers, _peak, _oldpeak, _pglspr, ovrlysurf, _peaktxt, _0pktxt
 

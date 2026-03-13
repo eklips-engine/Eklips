@@ -1,12 +1,12 @@
 # Import libraries
-import pygame, pyglet as pg, json, gc
-import pyvidplayer2   as pvd, time
+import pyglet       as pg, pygame
+import pyvidplayer2 as pvd, time
 
 # Import components
-from classes             import hooks, resources, nodes, ui
-from classes             import crash_screen as error_handler, debug
-from classes             import saving, networking
 from classes.customprops import *
+from classes             import hooks, profiling, resources, nodes, ui
+from classes             import crash_screen as error_handler
+from classes             import saving, networking
 from classes.locals      import *
 
 # Init mixer
@@ -24,7 +24,10 @@ def get_date():
     return time.strftime('%d %m %Y %H %M %S')
 
 def load_engine():
-    global running,game,display,mouse,loader,keyboard,scene,savefile,lang,icon,clock,theme
+    global running,game,display,debug,mouse,loader,keyboard,scene,savefile,lang,icon,clock,theme
+
+    # Make debug config
+    debug = DebugConfig()
 
     # Initialize metadata
     game   = GameData()
@@ -61,10 +64,6 @@ def load_engine():
                 if window:
                     window.close()
                     display.windows.pop(wid)
-
-    # Init debug graph
-    if debug.show_graph:
-        debug._init_graph()
     
     # Initialize user input sections
     mouse    = Mouse()
@@ -173,6 +172,7 @@ display   : ui.Display             = None
 game      : GameData               = None
 loader    : resources.Loader       = None
 lang      : Language               = None
+debug     : DebugConfig            = None
 savefile  : saving.Savefile        = None
 mouse     : Mouse                  = None
 theme     : resources.Theme        = None

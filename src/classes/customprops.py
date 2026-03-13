@@ -1,5 +1,5 @@
 # Import libraries & components
-import json, pyglet    as pg, sys
+import json, pyglet      as pg, sys
 import os
 from classes.locals    import *
 from typing_extensions import *
@@ -40,7 +40,6 @@ class _export:
     def setter(self, fset):
         self.fset = fset
         return self
-
 def export(default=None, type_=None, hint=None):
     """
     Use this class to expose a value as a property in the editor.
@@ -64,7 +63,6 @@ def export(default=None, type_=None, hint=None):
             hint    = hint,
         )
     return wrapper
-
 class _exportmeta(type):
     def __new__(mcs, name, bases, namespace):
         cls = super().__new__(mcs, name, bases, namespace)
@@ -92,12 +90,62 @@ class _exportmeta(type):
 class WindowProperties:
     maxsize      : list = [0,0]
     minsize      : list = [0,0]
-    color        : list = [0,0,0]
+    color        : list = BLACK
     resizable    : bool = False
     antialiasing : bool = False
     vsize        : list = [0,0]
     icofile      : str  = ""
 
+class DebugConfig:
+    _skipload  = False
+    _freezload = False
+    _enabled   = True
+    _showfps   = True
+    _nomercy   = False
+    _showgraph = False
+    _alwaysvis = False
+
+    @export(False,"bool")
+    def sprite_always_visible(self):     return self._alwaysvis    and self._enabled
+    @sprite_always_visible.setter
+    def sprite_always_visible(self,val): self._alwaysvis = val
+
+    @export(False,"bool")
+    def skip_load(self):     return self._skipload                 and self._enabled
+    @skip_load.setter
+    def skip_load(self,val): self._skipload = val
+
+    @export(False,"bool")
+    def freeze_load(self):     return self._freezload              and self._enabled
+    @freeze_load.setter
+    def freeze_load(self,val): self._freezload = val
+
+    @export(True,"bool")
+    def show_fps(self):       return self._showfps                 and self._enabled
+    @show_fps.setter
+    def show_graph(self,val): self._showfps = val
+
+    @export(False,"bool")
+    def avoid_error_mercy(self):     return self._nomercy          and self._enabled
+    @avoid_error_mercy.setter
+    def avoid_error_mercy(self,val): self._nomercy = val
+    
+    @export(False,"bool")
+    def show_graph(self): return self._showgraph                   and self._enabled
+    @show_graph.setter
+    def show_graph(self,val):
+        self._showgraph = val
+
+    @export(False,"bool")
+    def show_fps(self):     return self._showfps                   and self._enabled
+    @show_fps.setter
+    def show_fps(self,val): self._showfps = val
+
+    @export(False,"bool")
+    def enabled(self):     return self._enabled
+    @enabled.setter
+    def enabled(self,val): self._enabled = val
+    
 class GameData:
     def __init__(self, settings="settings.json", is_file = True):
         #### Settings file related
@@ -132,7 +180,7 @@ class GameData:
                     self.project_dir  = after.replace("\\", "/")
                 elif current == "-file":
                     self.project_file = after.replace("\\", "/")
-            
+                
             wrid += 1
 
         if self.project_dir == USE_GAME_PARENT:
@@ -170,8 +218,6 @@ class GameData:
         self.loading_scene = self.project_data["scenes"]["loading"]
 
 class Transform:
-    _supports_tsize = True
-    
     def __repr__(self):
         return f"{self.__class__.__name__}(position={self.position}, tsize={self.tsize})"
     

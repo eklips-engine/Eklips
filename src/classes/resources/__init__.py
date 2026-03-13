@@ -1,5 +1,5 @@
 # Import libraries
-import pygame, pyglet as pg, json, gc, xmltodict
+import pygame, pyglet as pg, json, xmltodict
 
 # Import components
 from classes.locals      import *

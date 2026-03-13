@@ -1,9 +1,5 @@
 ## XXX
 # Import libraries
-import pygame, pyglet as pg, json, gc
-from classes import ui
-
-# Import inherited
 from classes.nodes.gui.canvasitem import *
 
 # Classes
@@ -13,7 +9,6 @@ class Button(CanvasItem):
     
     XXX
     """
-    _supports_tsize = True
     
     def __init__(self, properties={}, parent=None):
         self._tiles = {}

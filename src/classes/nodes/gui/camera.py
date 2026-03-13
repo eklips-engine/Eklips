@@ -1,8 +1,4 @@
-# Import libraries
-import pyglet as pg
-from classes import ui
-
-# Import inherited
+# Import libraries=
 from classes.nodes.gui.canvasitem import *
 
 # Classes
@@ -12,8 +8,7 @@ class Camera(CanvasItem):
     
     XXX
     """
-    _can_check_layer = True
-
+    
     ## Init
     def __init__(self, properties={}, parent=None):
         super().__init__(properties, parent)
