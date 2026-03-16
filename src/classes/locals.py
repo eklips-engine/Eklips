@@ -1,5 +1,6 @@
 import pyglet as pg, socket as sock, math, sys
-from typing import *
+from typing        import *
+from pyglet.window import key
 
 USE_GAME_PARENT = "UseFileParent" #: Use the game.json file's parent as the project dir
 USE_GAME_CV_DIR = "UseFileCVar"   #: Use the specified project dir in the game.json file
@@ -9,7 +10,7 @@ BDATE        = [13, 3, 2026]  #:  Uses DD/MM/YYYY format
 MAJOR        = "5"            #: Major; [5].0 A 
 MINOR        = "0"            #: Minor;  5.[0]A 
 HOTFIX       = "A"            #: Hotfix; 5. 0[A]
-BUILD        = 28             #: Increment every time a major feature has been added/completely overhauled
+BUILD        = 30             #: Increment every time a major feature has been added/completely overhauled
 VERSION      = f"{MAJOR}.{MINOR}{HOTFIX}"
 VERSION_FULL = f"v{VERSION}.build{BUILD}"
 print(f"{NAME} {VERSION_FULL}")
@@ -45,11 +46,14 @@ MOUSE_HELP      = pg.window.Window.CURSOR_HELP #: "?" mouse cursor
 MOUSE_CROSS     = pg.window.Window.CURSOR_CROSSHAIR #: Crosshair mouse cursor
 MOUSE_NO        = pg.window.Window.CURSOR_NO #: Forbidden mouse cursor
 MOUSE_WAIT      = pg.window.Window.CURSOR_WAIT #: Waiting mouse cursor
+MOUSE_IBEAM     = pg.window.Window.CURSOR_TEXT #: I-beam mouse cursor
 MOUSE_DRAGGABLE = "root://_assets/grab.cur" #: Grabbing mouse cursor
 MOUSE_DRAG      = "root://_assets/grabbing.cur" #: Grabbing mouse cursor
 MOUSE_NORMAL    = pg.window.Window.CURSOR_DEFAULT #: Default mouse cursor
 #: List of cursors
-CURSORS         = [MOUSE_POINT, MOUSE_HELP, MOUSE_CROSS, MOUSE_NO, MOUSE_WAIT, MOUSE_NORMAL, MOUSE_DRAG, MOUSE_DRAGGABLE]
+CURSORS         = [MOUSE_IBEAM, MOUSE_POINT, MOUSE_HELP, MOUSE_CROSS, MOUSE_NO, MOUSE_WAIT, MOUSE_NORMAL, MOUSE_DRAG, MOUSE_DRAGGABLE]
+
+MOUSE_DEFAULT_STATE = {MOUSE_LEFT: 0, MOUSE_RIGHT: 0, MOUSE_MIDDLE: 0}
 
 INTERNET_ABORTED   = 253132 #: Internet connection was aborted.
 INTERNET_CONNECTED = 253133 #: Client connected successfully.

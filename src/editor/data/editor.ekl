@@ -1,23 +1,66 @@
 ## Spaghetti code
-import classes.singleton as engine
-import tkinter           as tk
-from tkinter             import ttk
-from tkinter.messagebox  import *
-from tkinter.filedialog  import *
-from classes.customprops import *
-from classes.nodes       import *
-from tkinter             import colorchooser
+import classes.singleton       as engine
+import tkinter                 as tk
+from tkinter                   import ttk
+from tkinter.messagebox        import *
+from tkinter.filedialog        import *
+from classes.customprops       import *
+from classes.nodes             import *
+from classes.nodes.packedscene import *
+from tkinter                   import colorchooser
 
 backbtn : Sprite = None
 settbtn : Sprite = None
 playbtn : Sprite = None
 
+scenepreview : PackedScene   = None
+sp_vp        : ExtraViewport = None
+
+old_gmdt_dir = engine.game.project_dir
+
+gjsp : str      = None
+gmdt : GameData = None
+gjs  : dict     = None
+
+current_scene = None
+
+def change_scn(scn):
+    global gmdt, gjs, current_scene, scenepreview, sp_vp, old_gmdt_dir
+    scenepreview.resume()
+    engine.game.project_dir = gmdt.project_dir
+
+    current_scene = scn
+    true_scn      = scn.replace("res://", f"{gmdt.project_dir}/")
+    window        = engine.display.get_window(MAIN_WINDOW)
+    window.set_caption(engine.lang.get("pe_titleeditor").replace("%", gmdt.name).replace("@", scn))
+    
+    _data                     = engine.loader.load(true_scn)["nodes"]
+    _data[""]["_drawing_vid"] = sp_vp.viewport_id
+
+    scenepreview.nodes = _data
+
+    scenepreview.pause()
+
 def load():
-    global backbtn, settbtn, playbtn
+    global backbtn, settbtn, playbtn, gjsp, gmdt, gjs, current_scene, scenepreview, sp_vp
     
     backbtn = engine.scene.get_node_from_path("/backico")
     playbtn = engine.scene.get_node_from_path("/playico")
     settbtn = engine.scene.get_node_from_path("/settico")
+
+    gjsp = engine.selected_project
+    gmdt = engine.projects[engine.selected_project]
+    gjs  = engine.loader.load(gjsp)
+
+    window = engine.display.get_window(MAIN_WINDOW)
+    window.set_caption(engine.lang.get("pe_titleeditor").replace("%", gmdt.name).replace("@", "?"))
+
+    scenepreview = engine.scene.get_node_from_path("/scene_preview_panel/viewport/scene")
+    sp_vp        = scenepreview.parent
+    sp_vp.color  = gmdt.win.color
+    
+    engine.ineditor = True
+    #change_scn(gmdt.master_scene)
 
     fb_title = engine.scene.get_node_from_path("/file_browser_panel/titlebar/text")
     st_title = engine.scene.get_node_from_path("/scene_tree_panel/titlebar/text")
@@ -32,9 +75,7 @@ def load():
     sg_title.text = engine.lang.get(sg_title.text)
 
 def _settings_dialog():
-    gjsp : str      = engine.selected_project
-    gmdt : GameData = engine.projects[engine.selected_project]
-    gjs  : dict     = engine.loader.load(gjsp)
+    global gjsp, gmdt, gjs
 
     window   = engine.display.windows[MAIN_WINDOW]
     window.switch_to()
@@ -123,7 +164,8 @@ def _process(self : Node, delta : float):
         load()
     
     if backbtn.get_if_mouse_hovering() and engine.mouse.buttons[MOUSE_LEFT]:
-        if True or askyesno(engine.lang.get("ee_title"), engine.lang.get("pe_warnleaveprj")):
+        if askyesno(engine.lang.get("ee_title"), engine.lang.get("pe_warnleaveprj")):
+            engine.ineditor = False
             engine.scene.load("res://scenes/master.scn")
     if playbtn.get_if_mouse_hovering() and engine.mouse.buttons[MOUSE_LEFT]:
         os.system(f"eklips.py -file {gmdt.project_file} -dir {gmdt.project_dir} -editordebug")

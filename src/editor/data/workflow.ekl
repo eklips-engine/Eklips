@@ -14,18 +14,19 @@ def populate_frame(self : ColorRect):
     # and populates the "Panel" Node with entries of those projects.
     #
     # The "project_list" list is formatted like this:
-    # project_list: ['editor/game.json', ...]
-    project_list = engine.savefile.get("projects", [])
+    # project_list: {'editor/game.json': {'favorited':False,'tags':[]}, ...]
+    project_list = engine.savefile.get("projects", {})
     pid = 0
     y   = 10
     for project in project_list:
+        gjsp = project.replace('$','/').replace(';',':')
         try:
             gamedata = GameData({
                 "project": {
-                    "file": project,
+                    "file": gjsp,
                     "dir":  "UseFileParent"
                 },
-                "name": "Eklips 5.0A"
+                "name": "Editor-Runtime"
             }, is_file=False)
         except:
             gamedata = GameData({
@@ -33,25 +34,20 @@ def populate_frame(self : ColorRect):
                     "file": "editor/data/base_project/game.json",
                     "dir":  "editor/data/base_project"
                 },
-                "name": "Eklips 5.0A"
+                "name": "Editor-Runtime"
             }, is_file=False)
-        engine.projects[project] = gamedata
-        print(f" \\~ {gamedata.name} v{gamedata.version} (for Eklips {gamedata.version_ekl})")
+        engine.projects[gjsp] = gamedata
 
         btnps : PackedScene = engine.scene.add_node({
             "type":      "PackedScene",
             "file_path": "res://scenes/project_entry.scn",
-            "projectid": project,
+            "projectid": gjsp,
             "pid":       pid,
             "target_y":  y
         }, f"/panel_obj/{pid}")
 
         y   += 66
         pid += 1
-
-def make_new_project(name, directory):
-    # This makes a new project.
-    shutil.copytree("editor/data/base_project", directory, ignore=True)
 
 def select_project_file(self): return askopenfilename(
         filetypes = [

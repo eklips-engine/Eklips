@@ -137,15 +137,24 @@ def is_action_pressed(entry) -> bool:
                    ):
                     if keyboard.held[action]: return True
             else:
-                if mouse.buttons[action]: return True
+                if (
+                    (action in mouse.buttons      and action_data["holdable"])
+                    or
+                    (action in mouse.just_clicked and not action_data["holdable"])
+                   ):
+                    if mouse.buttons[action]: return True
     return False
 
 def is_anything_pressed() -> bool:
-    """Returns true if any key is pressed or held down."""
+    """Returns true if any key or button is pressed or held down."""
     for i in keyboard.pressed:
         if keyboard.pressed[i]: return True
     for i in keyboard.held:
         if keyboard.held[i]: return True
+    for i in mouse.just_clicked:
+        if mouse.just_clicked[i]: return True
+    for i in mouse.buttons:
+        if mouse.buttons[i]: return True
     return False
 
 def handle_closing():
@@ -169,14 +178,17 @@ def set_mouse(cursor, wid = MAIN_WINDOW):
     """
     window = display.get_window(wid)
     
-    window.set_mouse_cursor(cursors[cursor])
+    if not window.is_basewindow:
+        window.set_mouse_cursor(cursors[cursor])
 
 def quit():
     display.get_window().on_close()
     
 # Variables
-_inpyinstaller : bool                   = getattr(sys, "frozen", False)  and hasattr(sys, "_MEIPASS")
-_pyinstallpath : str                    = getattr(sys, "_MEIPASS", None)
+_inpyinstaller : bool = getattr(sys, "frozen", False)  and hasattr(sys, "_MEIPASS") #: is in Pyinstaller?
+_pyinstallpath : str  = getattr(sys, "_MEIPASS", None)                              #: Pyinstaller _internal dir
+
+ineditor       : bool                   = False #: If you are in the Eklips Editor project.
 cursors        : int                    = {}    #: Dict of cursor images
 clock          : pg.clock.Clock         = None  #: Pyglet clock
 display        : ui.Display             = None  #: Display object. See `classes.ui.Display`

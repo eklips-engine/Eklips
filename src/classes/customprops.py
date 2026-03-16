@@ -204,7 +204,7 @@ class GameData:
         self.metadata     = self.file_data["project"]
 
         ## Get project itself
-        self.project_file = self.metadata["file"].replace("\\", "/")
+        self.project_file = str(self.metadata["file"]).replace("\\", "/")
         self.project_dir  = self.metadata["dir"].replace("\\", "/")
         
         # Check if arguments decide otherwise ("-file ...", "-dir ...")
@@ -230,7 +230,12 @@ class GameData:
 
         if self.project_dir == USE_GAME_PARENT:
             self.project_dir = "/".join(self.project_file.split("/")[:-1])
-        self.project_data = json.loads(open(self.project_file).read())
+        
+        if os.path.isfile(self.project_file):
+            self.project_data = json.loads(open(self.project_file).read())
+        else:
+            self.project_data = json.loads(open("_assets/no_game/game.json").read())
+            self.project_dir  = "_assets/no_game"
 
         #### Project file related
         # Get basic metadata
@@ -529,34 +534,58 @@ class Transform:
         self.layer     = value.get("layer",    self.layer)
         self.visible   = value.get("visible",  self.visible)
     
-    def into_screen_coords(self, window_size : list[int,int] = [480,480], do_flip : bool = True):
-        anchor = self.anchor
-        cid    = f"{self.position}{window_size}{self.tsize}{anchor}{do_flip}"
+    def into_screen_coords(self,
+            viewport_size : list[int]        = [480,480],
+            do_flip       : bool             = True,
+            drawing       : bool             = False,
+            parent_rect   : Self             = None):
+        """Get the position of the Transform object in the Viewport.
+        
+        Args:
+            viewport_size: The size of the Viewport.
+            do_flip:       If True, make the `top` anchor be the top.
+            drawing:       If True, account for the image's anchor being on the center.
+            parent_rect:   If specified, will account the parent Transform for anchoring."""
+        ## Caching stuff
+        anchor          = self.anchor
+        if parent_rect == None:
+            parent_rect = [0,0,
+                           *viewport_size]
+        cid             = f"{self.rect}{viewport_size}{parent_rect}{anchor}{do_flip}{drawing}"
         if cid in _screenc_cache:
             return _screenc_cache[cid]
-        x = 0
-        y = 0
+        
+        ## Calculate pos
+        x = parent_rect[0]
+        y = parent_rect[1]
 
-        if "right"   in anchor:
-            x = window_size[0] - self.w - self.x
+        if "right" in anchor:
+            x += parent_rect[2] - self.w - self.x
+        elif "centerx" in anchor:
+            x += (parent_rect[2]/2) - (self.w/2) + self.x
         else:
-            x = self.x
+            x += self.x
 
         if do_flip:
             if "top" in anchor:
-                y = window_size[1] - self.h - self.y
+                y += parent_rect[3] - self.h - self.y
             else:
-                y = self.y
+                y += self.y
         else:
             if "top" in anchor:
-                y = self.y
+                y += self.y
             else:
-                y = window_size[1] - self.h - self.y
+                y += parent_rect[3] - self.h - self.y
 
-        if "centerx" in anchor:
-            x = (window_size[0]/2) - (self.w/2) + self.x
         if "centery" in anchor:
-            y = (window_size[1]/2) - (self.h/2) + self.y
+            y += (parent_rect[3]/2) - (self.h/2) + self.y
+        
+        ## Draw check
+        if drawing:
+            x += (self._w // 2) * self.scale_x
+            y += (self._h // 2) * self.scale_y
+        
+        ## More caching stuff
         _screenc_cache[cid] = [x,y]
         return [x,y]
     
@@ -587,9 +616,9 @@ class Mouse:
     #: 1 is up, -1 is down
     scroll       = 0
     #: Buttons just now pressed. Use `engine.is_action_pressed` instead.
-    just_clicked = [0,0,0,0,0]
-    #: Index 0 is ignored. Use `engine.is_action_pressed` instead.
-    buttons      = [0,0,0,0,0]
+    just_clicked = MOUSE_DEFAULT_STATE
+    #: Use `engine.is_action_pressed` instead.
+    buttons      = MOUSE_DEFAULT_STATE
     #: List of filepaths
     paths        = []
 
@@ -600,6 +629,8 @@ class Keyboard:
     pressed   = {}
     #: Dictionary of keys held down. Use `engine.is_action_pressed` instead.
     held      = {}
+    #: Text from Window.on_text.
+    text      = ""
 
 class Language:
     def __init__(self, file="res://data/foobar.json"):

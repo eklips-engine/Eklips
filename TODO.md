@@ -13,20 +13,20 @@ The rating system is used to see how important an entry is, here's the list of w
 |  10/10  | Needed                  |
 
 # List
-The list of stuff TODO are here: (4/12)
+The list of stuff TODO are here:
 
 | Item                                   |Rating| Done? | Why the rating?                          |
 |----------------------------------------|------|-------|------------------------------------------|
-| Add Scrolling Viewport Node            | 8/10 |  Yes  | Editor, also UI reasons                  |
-| Add Viewport Node                      | 9/10 |  Yes  | Needed for multi-viewport system         |
-| Add Window Node                        | 9/10 |  Yes  | Editor                                   |
-| Fix Window bugs                        | 9/10 |  Yes  | Editor + severe bugs                     | 
+| Add Scrolling Viewport Node            | 8/10 |  Yes  |                                          |
+| Add Viewport Node                      | 9/10 |  Yes  |                                          |
+| Add Window Node                        | 9/10 |  Yes  |                                          |
+| Fix Window bugs                        | 9/10 |  Yes  |                                          | 
 | Add Tilemap, and tileset               | 9/10 |  No   | What's a 2d game engine without it lul   |
 | Add Networking                         | 3/10 |  No   | Idk how yet and don't need it rn         |
 | Add UI elements                        | 4/10 |  2/5  | Not really needed right now              |
 | Fix Docs                               | 1/10 |  No   | Not all features are done yet            |
 | Make a readthedocs site                | 1/10 |  No   | Not all features are done yet            |
 | Finish editor                          | 3/10 |  No   | After the other features are done        |
-| Add relativity to CanvasItems          | 9/10 |  Yes  | Stuff doesn't make much sense without it |
-| Add Animation resource                 | 3/10 |  No   | AnimatedSprite exists                    |
-| Add spritesheet resource               | 3/10 |  No   | AnimatedSprite exists                    |
+| Add relativity to CanvasItems          | 9/10 |  Yes  |                                          |
+| Add Animation resource                 | 3/10 |  No   | Use AnimatedSprite untill i make this    |
+| Add spritesheet resource               | 3/10 |  No   | ^^^                                      |

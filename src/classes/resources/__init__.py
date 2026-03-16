@@ -90,7 +90,7 @@ class Loader:
         
         return None
     
-    def load(self, path, force_type = None, return_identifier = False, force_new_resource = False):
+    def load(self, path, force_type = None, return_identifier = False, force_new_resource = False) -> Any | (tuple[Any | str]):
         """Load a resource from a file.
         
         Args:

@@ -16,6 +16,7 @@ from classes.nodes.gui.animatedsprite    import *
 from classes.nodes.gui.parallax          import *
 from classes.nodes.gui.mediaplayer       import *
 
+from classes.nodes.gui.widgets.inputbox    import *
 from classes.nodes.gui.widgets.button      import *
 from classes.nodes.gui.widgets.progressbar import *
 from classes.nodes.gui.widgets.treeview    import *

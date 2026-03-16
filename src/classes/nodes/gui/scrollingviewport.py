@@ -168,7 +168,7 @@ class ScrollingViewport(ExtraViewport):
                     self.widgetman.moving_widget  = self.gid
             if self.widgetman.moving_widget      == self.gid:
                 self._vel = 0
-                engine.set_mouse(MOUSE_DRAG)
+                engine.set_mouse(MOUSE_DRAG, self.window_id)
                 if self._left_to_right:
                     self.cam.x    += engine.mouse.dpos[0] / (self._w-self.scrollbar.width) * self.content_width
                     if self.cam.x  < 0:
@@ -179,9 +179,9 @@ class ScrollingViewport(ExtraViewport):
                         self.cam.y = 0
         else:
             if self.widgetman.hovering_widget == -1:
-                engine.set_mouse(MOUSE_NORMAL)
+                engine.set_mouse(MOUSE_NORMAL, self.window_id)
             if self.get_if_mouse_hovering_knob() or self.widgetman.moving_widget == self.gid:
-                engine.set_mouse(MOUSE_DRAGGABLE)
+                engine.set_mouse(MOUSE_DRAGGABLE, self.window_id)
                 self.widgetman.moving_widget = -1
         
         # Handle spinning the mouse wheel

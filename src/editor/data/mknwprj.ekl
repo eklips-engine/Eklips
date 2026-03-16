@@ -1,3 +1,4 @@
+import shutil
 from classes.ui          import *
 from classes.customprops import *
 from classes.nodes       import *
@@ -11,8 +12,13 @@ nametxt : Label = None
 vertxt  : Label = None
 pathtxt : Label = None
 
+name : Inputbox = None
+path : Inputbox = None
+ver  : Inputbox = None
+auth : Inputbox = None
+
 def scnready(self : ColorRect):
-    global cancelbtn, makebtn, ready, nametxt, vertxt, pathtxt
+    global cancelbtn, makebtn, ready, nametxt, vertxt, pathtxt, name, ver, path, auth
 
     makebtn   = self.scene.get_node_from_path("/make_new_project_window/mnp_okbtn")
     cancelbtn = self.scene.get_node_from_path("/make_new_project_window/mnp_nobtn")
@@ -27,6 +33,11 @@ def scnready(self : ColorRect):
     pathtxt.text = engine.lang.get("es_projpath")
     authtxt.text = engine.lang.get("es_auth")
 
+    name = self.scene.get_node_from_path("/make_new_project_window/name_entry")
+    ver  = self.scene.get_node_from_path("/make_new_project_window/ver_entry")
+    path = self.scene.get_node_from_path("/make_new_project_window/path_entry")
+    auth = self.scene.get_node_from_path("/make_new_project_window/auth_entry")
+
     ready  = True
 
 def _process(self : ExtraWindow, delta : float):
@@ -36,6 +47,42 @@ def _process(self : ExtraWindow, delta : float):
 
     if engine.mouse.just_clicked[MOUSE_LEFT]:
         if makebtn.get_if_mouse_hovering():
+            # Set variables
+            directory = path.value
+            gjsp      = f"{directory}/game.json"
+
+            # Make the project.
+            shutil.copytree("editor/data/base_project", directory, dirs_exist_ok=True)
+
+            ## Modify game.json to function properly
+            gjs                   = json.loads(open(gjsp).read())
+            gjs["name"]           = name.value
+            gjs["version"]["app"] = ver.value
+            gjs["version"]["ekl"] = VERSION
+            gjs["directory"]      = directory
+
+            with open(gjsp, "w") as f:
+                f.write(json.dumps(gjs, indent=4))
+
+            # Add to savefile
+            engine.savefile.set(f"projects/{gjsp.replace('/','$').replace(':',';')}", {
+                "favorited": False,
+                "tags":      []
+            })
+
+            # Recognize in editor
+            gmdt = GameData({
+                "project": {
+                    "file": gjsp,
+                    "dir":  "UseFileParent"
+                },
+                "name": "Editor-Runtime"
+            }, is_file=False)
+            engine.selected_project = gjsp
+            engine.projects[gjsp]   = gmdt
+
+            # Send to editor
+            self.visible = False
             engine.scene.load("res://scenes/editor.scn")
         if cancelbtn.get_if_mouse_hovering():
             self.visible = False

@@ -100,7 +100,7 @@ class Scene(Resource, SceneLike):
             self._initialize_node_entry(nodepath)
     def _loadscenefile(self, path):
         _data       = engine.loader.load(path, force_new_resource=True)
-        self._nodes = _data["nodes"]
+        self._nodes = _data["nodes"] # XXX Cleanup this mess
         nodepaths   = self.get_node_paths("")
 
         for nodepath in nodepaths:

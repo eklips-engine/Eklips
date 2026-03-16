@@ -1,12 +1,12 @@
 {
-    "name":    "base_project",
+    "name":    "Eklips Engine",
     "version": {
-        "app": "...",
+        "app": "5.0A",
         "ekl": "5.0A"
     },
     "viewport": {
         "size": [
-            1152,
+            648,
             648
         ],
         "color": [
@@ -14,16 +14,16 @@
             0,
             0
         ],
-        "minsize": null,
-        "maxsize": null,
+        "minsize": [648,648],
+        "maxsize": [648,648],
         "resizable": false,
-        "icon_file": "res://media/icon.png"
+        "icon_file": "root://_assets/icon.png"
     },
     "scenes": {
         "master": "res://scenes/master.scn",
-        "loading": "root://_assets/loading.scn"
+        "loading": null
     },
-    "directory": "editor/data/base_project",
+    "directory": "_assets/no_game",
     "actions": {},
     "behavior": {
         "autoloads": [],

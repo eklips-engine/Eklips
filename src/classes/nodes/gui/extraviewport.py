@@ -72,10 +72,6 @@ class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
         Viewport._set_alpha(self, deg)
     
     ## Rewrites
-    def _update_relativity(self):
-        if self.parent and self.parent.get("_iscitem", False):
-            self._offset_x, self._offset_y = self.parent.into_screen_coords(self.window.size, False)
-    
     def _make_new_item(self):
         self._make_framebuffer()
     def draw(self):

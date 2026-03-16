@@ -59,3 +59,32 @@ class Savefile:
             d[keys[-1]] = value
         except:
             pass
+    
+    def pop(self, key):
+        """Pop a key (e.g. `useless/thng`) from the savefile.
+
+        Args:
+            key: The key to remove."""
+        try:
+            keys = key.split('/')
+            d = self.savefile
+            for k in keys[:-1]:
+                d = d.setdefault(k, {})
+            d.pop(keys[-1])
+        except:
+            pass
+    
+    def append(self, key, entry):
+        """Append an entry to a key (e.g. `player/item_list`) from the savefile.
+
+        Args:
+            key: The key to modify. (assumed as a list)
+            entry: The entry to append to said key."""
+        try:
+            keys = key.split('/')
+            d = self.savefile
+            for k in keys[:-1]:
+                d = d.setdefault(k, {})
+            d[keys[-1]].append(entry)
+        except:
+            pass

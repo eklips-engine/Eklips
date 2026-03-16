@@ -33,6 +33,7 @@ class CanvasItem(Node, Transform):
     _relativity_pos                             = True
     _iscitem                                    = True 
     _isdisplayobject                            = False
+    _parentrect                                 = None
     _isblittable                                = False # If class is meant to blit CItem
     _drawing_bid : int                          = 0    
     _drawing_vid : int                          = 0    
@@ -71,7 +72,8 @@ class CanvasItem(Node, Transform):
         engine.Transform.__init__(self)
         super().__init__(properties, parent)
 
-        self._image = None
+        self._parentrect = None
+        self._image      = None
 
         if self.parent:
             self._drawing_wid = self.parent.get("_drawing_wid", MAIN_WINDOW)
@@ -121,18 +123,6 @@ class CanvasItem(Node, Transform):
     @batch_id.setter
     def batch_id(self, value): self._update_drawing_ids("_drawing_bid", value)
 
-    ## Drawing related
-    def draw(self):
-        """Draw the CanvasItem. This is usually called automatically."""
-        if self.visible and self.viewport.is_onscreen(self) and self.citem:
-            x, y         = self.into_screen_coords(self.viewport.tsize)
-            self.citem.x = x + (self.citem.image.anchor_x * self.scale_x)
-            self.citem.y = y + (self.citem.image.anchor_y * self.scale_y)
-            
-            self.citem.visible = self.visible
-        else:
-            self.citem.visible = False
-
     ## Transform related
     def _set_layer(self, val):
         if self.citem:
@@ -163,7 +153,20 @@ class CanvasItem(Node, Transform):
     def _set_alpha(self, deg):
         if self.citem:
             self.citem.opacity = round(deg)
+    def into_screen_coords(self, viewport_size = None, do_flip = True, drawing = False):
+        """Get the position of the CanvasItem in the Viewport.
+        
+        Args:
+            viewport_size: If not specified, will use CanvasItem.viewport.tsize."""
+        if not viewport_size:
+            viewport_size = self.viewport.tsize
+        if self.parent and self.parent.get("_iscitem", False) and self._relativity_pos:
+            return super().into_screen_coords(viewport_size, do_flip, drawing, 
+                [*self.parent.into_screen_coords(),
+                 *self.parent.tsize])
+        return super().into_screen_coords(viewport_size, do_flip, drawing)
 
+    ## Display object getters
     def _get_viewport(self) -> ui.Viewport:
         """Get the Viewport that the CanvasItem will be drawn to."""
         viewport : ui.Viewport = engine.display.get_viewport_from_window(
@@ -183,6 +186,11 @@ class CanvasItem(Node, Transform):
         if self.citem:
             self.citem.delete()
             self.citem = None
+    def _fix_broken_item(self):
+        self._remove_item()
+        del self._cached_batch
+        self._make_new_item()
+        self._convert_transform_property_into_object(self.transform)
     def _make_new_item(self):
         if self.citem:
             self._remove_item()
@@ -199,27 +207,12 @@ class CanvasItem(Node, Transform):
         super()._free()
     
     ## Update
-    def _update_relativity(self):
-        if self.parent and self.parent.get("_iscitem", False) and self._relativity_pos:
-            if self.parent.get("_isdisplayobject", False):
-                self._offset_x, self._offset_y = self.parent.into_screen_coords(False)
-            else:
-                self._offset_x, self._offset_y = self.parent.into_screen_coords(self.viewport.tsize, False)
-        else:
-            self._offset_x = self._offset_y = 0
-    
     def update(self):
         super().update()
-
-        ## Update relativity
-        self._update_relativity()
         
         ## Reset CITEM if it's fucked.
         if getattr(self.batch, "invalid", False) and self.citem and not self.viewport._refreshing:
-            self._remove_item()
-            del self._cached_batch
-            self._make_new_item()
-            self._convert_transform_property_into_object(self.transform)
+            self._fix_broken_item()
         
         ## Check for hovering
         if self.get_if_mouse_hovering():
@@ -228,6 +221,17 @@ class CanvasItem(Node, Transform):
                 self.call_signal("_held")
             if engine.mouse.just_clicked[engine.MOUSE_LEFT]:
                 self.call_signal("_clicked")
+    
+    def draw(self):
+        """Draw the CanvasItem. This is usually called automatically."""
+        if self.visible and self.viewport.is_onscreen(self) and self.citem:
+            x, y         = self.into_screen_coords(drawing=True)
+            self.citem.x = x
+            self.citem.y = y
+            
+            self.citem.visible = self.visible
+        else:
+            self.citem.visible = False
     
     ## Convenience functions for user
     def get_if_mouse_hovering(self) -> bool:
@@ -239,7 +243,7 @@ class CanvasItem(Node, Transform):
         
         ## Get things
         mpos   = engine.mouse.pos
-        x,  y  = self.into_screen_coords(self.viewport.tsize)
+        x,  y  = self.into_screen_coords()
         vx, vy = self.viewport.into_screen_coords()
 
         ## Apply viewport position into x and y

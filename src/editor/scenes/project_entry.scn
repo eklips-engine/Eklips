@@ -26,6 +26,96 @@
                     "type":  "ColorRect",
 
                     "color": [35,35,45],
+
+                    "children": {
+                        "icon": {
+                            "type": "Sprite",
+
+                            "transform":   {
+                                "position": [4,  0],
+                                "tsize":    [5, 61],
+                                "scale":    [1,  1],
+                                "scroll":   [0,  0],
+                                "layer":    2,
+
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "top left",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        },
+                        "nlbl": {
+                            "type":  "Label",
+                            "color": [255,255,255],
+                            
+                            "font_size": 19,
+
+                            "transform":   {
+                                "position": [68, 0],
+                                "tsize":    [1,  1],
+                                "scale":    [1,  1],
+                                "scroll":   [0,  0],
+                                "layer":    2,
+
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "top left",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        },
+                        "vlbl": {
+                            "type":  "Label",
+                            "color": [255,255,255],
+
+                            "transform":   {
+                                "position": [70,30],
+                                "tsize":    [1,  1],
+                                "scale":    [1,  1],
+                                "scroll":   [0,  0],
+                                "layer":    2,
+
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "top left",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        },
+                        "trash": {
+                            "type":       "Sprite",
+                            "image_path": "res://media/icotrash.png",
+
+                            "transform": {
+                                "position": [0,    0],
+                                "scale":    [0.5,0.5],
+                                "layer":    3,
+                                
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "top right",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        },
+                        "star": {
+                            "type":       "Sprite",
+                            "image_path": "res://media/icostar.png",
+
+                            "transform": {
+                                "position": [0,    0],
+                                "scale":    [0.5,0.5],
+                                "layer":    3,
+                                
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "right",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        }
+                    },
                     
                     "transform":   {
                         "position": [12,   2],
@@ -38,44 +128,6 @@
                         "alpha":    255,
                         "anchor":   "top left",
                         "visible":  false,
-                        "skew":     0
-                    }
-                },
-                "nlbl": {
-                    "type":  "Label",
-                    "color": [255,255,255],
-                    
-                    "font_size": 19,
-
-                    "transform":   {
-                        "position": [15, 0],
-                        "tsize":    [1,  1],
-                        "scale":    [1,  1],
-                        "scroll":   [0,  0],
-                        "layer":    2,
-
-                        "rotation": 0,
-                        "alpha":    255,
-                        "anchor":   "top left",
-                        "visible":  true,
-                        "skew":     0
-                    }
-                },
-                "vlbl": {
-                    "type":  "Label",
-                    "color": [255,255,255],
-
-                    "transform":   {
-                        "position": [15,30],
-                        "tsize":    [1,  1],
-                        "scale":    [1,  1],
-                        "scroll":   [0,  0],
-                        "layer":    2,
-
-                        "rotation": 0,
-                        "alpha":    255,
-                        "anchor":   "top left",
-                        "visible":  true,
                         "skew":     0
                     }
                 }

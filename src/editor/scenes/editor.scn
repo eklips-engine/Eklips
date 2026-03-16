@@ -62,6 +62,30 @@
                         "skew":     0
                     }
                 },
+                
+                "new_node_window": {
+                    "type":  "ExtraWindow",
+                    "title": "new_node_window",
+                    
+                    "script_path": "res://data/mknwprj.ekl",
+                    
+                    "color": [35, 35, 50],
+                    
+                    "transform": {
+                        "position": [0,0],
+                        "tsize":    [540,540],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
+                        
+                        "color": [35, 35, 50],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "",
+                        "visible":  false,
+                        "skew":     0
+                    }
+                },
 
                 "file_browser_panel": {
                     "type": "CanvasItem",
@@ -97,15 +121,7 @@
 
                             "transform": {
                                 "position": [0,    0],
-                                "tsize":    [212, 40],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [212, 40]
                             }
                         },
                         "viewport": {
@@ -115,15 +131,7 @@
 
                             "transform": {
                                 "position": [0,   40],
-                                "tsize":    [212,232],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [212,232]
                             }
                         }
                     },
@@ -175,15 +183,7 @@
 
                             "transform": {
                                 "position": [0,    0],
-                                "tsize":    [212, 40],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [212, 40]
                             }
                         },
                         "viewport": {
@@ -193,15 +193,7 @@
 
                             "transform": {
                                 "position": [0,   40],
-                                "tsize":    [212,232],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [212,232]
                             }
                         }
                     },
@@ -253,40 +245,24 @@
 
                             "transform": {
                                 "position": [0,    0],
-                                "tsize":    [673, 40],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [673, 40]
                             }
                         },
                         "viewport": {
                             "type":  "ExtraViewport",
-                            "color": [25,25,35],
+                            "color": [0,0,0],
 
                             "children": {
                                 "scene": {
                                     "type":      "PackedScene",
                                     "paused":    true,
-                                    "file_path": "res://scenes/master.scn"
+                                    "file_path": "res://scenes/base_scene.scn"
                                 }
                             },
 
                             "transform": {
                                 "position": [0,   40],
-                                "tsize":    [673,525],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [673,525]
                             }
                         }
                     },
@@ -338,15 +314,7 @@
 
                             "transform": {
                                 "position": [0,    0],
-                                "tsize":    [212, 40],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [212, 40]
                             }
                         },
                         "viewport": {
@@ -356,15 +324,7 @@
 
                             "transform": {
                                 "position": [0,   40],
-                                "tsize":    [212,232],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [212,232]
                             }
                         }
                     },
@@ -416,15 +376,7 @@
 
                             "transform": {
                                 "position": [0,    0],
-                                "tsize":    [212, 40],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [212, 40]
                             }
                         },
                         "viewport": {
@@ -434,15 +386,7 @@
 
                             "transform": {
                                 "position": [0,   40],
-                                "tsize":    [212,232],
-                                "scale":    [1,    1],
-                                "scroll":   [0,    0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
+                                "tsize":    [212,232]
                             }
                         }
                     },

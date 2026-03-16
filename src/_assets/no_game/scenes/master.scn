@@ -1,0 +1,91 @@
+{
+    "nodes":      {
+        "": {
+            "type": "Node",
+
+            "children": {
+                "Eklips": {
+                    "type":       "Sprite",
+                    "image_path": "root://_assets/eklips_beta.png",
+
+                    "children":   {},
+
+                    "transform": {
+                        "position": [0,    0],
+                        "tsize":    [1,    1],
+                        "scale":    [1.9,1.9],
+                        "scroll":   [0,    0],
+
+                        "rotation": 0,
+                        "alpha":    127,
+                        "anchor":   "center",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                },
+                "Ring": {
+                    "type":        "Sprite",
+                    "image_path":  "root://_assets/ring.png",
+                    "script_path": "root://_assets/spin.ekl",
+
+                    "transform": {
+                        "position": [0,0],
+                        "tsize":    [2,2],
+                        "scale":    [2,2],
+                        "scroll":   [0,0],
+
+                        "rotation": 0,
+                        "alpha":    127,
+                        "anchor":   "center",
+                        "visible":  true,
+                        "skew":     0
+                    },
+                    
+                    "children":   {}
+                },
+                "text": {
+                    "_relativity_pos": false,
+
+                    "type": "Label",
+                    "text": "There was either no project specified or the project specified is borked.",
+                    
+                    "children": {
+                        "text2": {
+                            "type": "Label",
+                            "text": "     ~ Fix it and restart the engine.",
+                            
+                            "transform": {
+                                "position": [0,20],
+                                "tsize":    [2,2],
+                                "scale":    [1,1],
+                                "scroll":   [0,0],
+
+                                "rotation": 0,
+                                "alpha":    255,
+                                "anchor":   "top left",
+                                "visible":  true,
+                                "skew":     0
+                            }
+                        }
+                    },
+                    "transform": {
+                        "position": [0,20],
+                        "tsize":    [2,2],
+                        "scale":    [1,1],
+                        "scroll":   [0,0],
+
+                        "rotation": 0,
+                        "alpha":    255,
+                        "anchor":   "center",
+                        "visible":  true,
+                        "skew":     0
+                    }
+                }
+            }
+        }
+    },
+    "properties": {
+        "inherits": null,
+        "version":  1
+    }
+}

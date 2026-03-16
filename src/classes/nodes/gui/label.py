@@ -70,7 +70,7 @@ class Label(CanvasItem, Color):
     def draw(self):
         """Draw the label. This is usually called automatically."""
         if self.visible and self.viewport.is_onscreen(self) and len(self.text.split()) and self.citem:
-            x,y          = self.into_screen_coords(self.viewport.tsize)
+            x,y          = self.into_screen_coords()
             self.citem.x = x
             self.citem.y = y
 

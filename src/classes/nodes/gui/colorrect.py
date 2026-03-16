@@ -31,17 +31,6 @@ class ColorRect(CanvasItem, Color):
         super().update()
         self.draw()
     
-    def draw(self):
-        """Draw the ColorRect. This is usually called automatically."""
-        if self.visible and self.viewport.is_onscreen(self) and self.citem:
-            x, y         = self.into_screen_coords(self.viewport.tsize)
-            self.citem.x = x + (self.citem.anchor_x * self.scale_x)
-            self.citem.y = y + (self.citem.anchor_y * self.scale_y)
-            
-            self.citem.visible = self.visible
-        else:
-            self.citem.visible = False
-    
     ## Transform related
     def _update_color(self, r, g, b, a):
         if self.citem:
@@ -50,11 +39,14 @@ class ColorRect(CanvasItem, Color):
         if self.citem:
             self.citem.width  = self._w
             self.citem.height = self._h
+            self._set_anchors()
     def _set_flip(self, w, h):
-        return
+        if self.citem:
+            self.citem.scale_x = self.scale_x
+            self.citem.scale_y = self.scale_y
     def _set_anchors(self):
-        self.citem.anchor_x = self._w  // 2
-        self.citem.anchor_y = self._h // 2
+        self.citem.anchor_x = self.citem.width  // 2
+        self.citem.anchor_y = self.citem.height // 2
         self.citem._update_translation()
     
     def _make_new_item(self):

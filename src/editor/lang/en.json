@@ -10,7 +10,7 @@
         "pe_titlesetting": "Eklips Editor - Settings",
         "pe_titlenewprj": "Eklips Editor - New Project",
         "pe_titleselprj": "Eklips Editor - Select Project File",
-        "pe_titleeditor": "Eklips Editor - %",
+        "pe_titleeditor": "Eklips Editor - % [@]",
         "yes": "Yes",
         "no": "No",
         "can": "Cancel",
@@ -73,8 +73,9 @@
         "ee_title": "Eklips Editor",
         "op_font":  "Open font",
         "notfont":  "Either not a font file or something broke.",
-        "pe_warnleaveprj": "Are you sure you want to leave? Your progress will be saved. Totally.",
-        
+        "pe_warnleaveprj": "Are you sure you want to leave?",
+        "pe_remove":       "Are you sure you want to remove this project? The files will remain, though.",
+
         "es_mleft": "Left Click",
         "es_mmdl":  "Middle Click",
         "es_mrght": "Right Click",

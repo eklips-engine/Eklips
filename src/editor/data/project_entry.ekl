@@ -15,26 +15,49 @@ target_y : int  = 0
 
 ready : bool = False
 
+icon : Sprite    = None
+trsh : Sprite    = None
+star : Sprite    = None
 nlbl : Label     = None
 vlbl : Label     = None
 htbx : ColorRect = None
 rnod : ColorRect = None
 
+save_entry = {}
+
+def _refresh_save():
+    global save_entry, star
+    save_entry = engine.savefile.get(f"projects/{gjsp.replace('/','$').replace(':',';')}")
+
+    if save_entry["favorited"]:
+        star.image_path = "res://media/icostarred.png"
+    else:
+        star.image_path = "res://media/icostar.png"
+    
 def scnready(self : ColorRect):
-    global gjsp, gid, gmdt, htbx, vlbl, nlbl, ready, lid, target_y, rnod
+    global gjsp, gid, gmdt, htbx, vlbl, nlbl, ready, lid, target_y, rnod, icon, trsh, star, save_entry
     gjsp = self.scene.projectid
     gid  = self.scene.pid
     gmdt = engine.projects[gjsp]
 
-    nlbl = self.scene.get_node_from_path("/nlbl")
-    vlbl = self.scene.get_node_from_path("/vlbl")
+    nlbl = self.scene.get_node_from_path("/htbx/nlbl")
+    vlbl = self.scene.get_node_from_path("/htbx/vlbl")
+    icon = self.scene.get_node_from_path("/htbx/icon")
+    trsh = self.scene.get_node_from_path("/htbx/trash")
+    star = self.scene.get_node_from_path("/htbx/star")
     htbx = self.scene.get_node_from_path("/htbx")
     rnod = self.scene.get_node_from_path("")
 
     nlbl.text = gmdt.name
     vlbl.text = f"v{gmdt.version}"
+    rnod.y    = self.scene.target_y
 
-    rnod.y   = self.scene.target_y
+    icon.image_path = gmdt.win.icofile.replace("res://",f"{gmdt.project_dir}/")
+    
+    icon.scale_x = 57 / icon.image.width
+    icon.scale_y = 57 / icon.image.height
+
+    _refresh_save()
 
     ready  = True
 
@@ -42,13 +65,21 @@ def _process(self : ColorRect, delta : float):
     global gjsp, gid, gmdt, htbx, vlbl, nlbl, ready, lid, target_y, rnod
     if not ready:
         scnready(self)
-
+    
     if htbx.get_if_mouse_hovering():
         htbx.visible = True
         if engine.mouse.just_clicked[MOUSE_LEFT]:
+            if trsh.get_if_mouse_hovering():
+                if askyesno(engine.lang.get("ee_title"), engine.lang.get("pe_remove")):
+                    engine.savefile.pop(f"projects/{gjsp.replace(':',';').replace('/','$')}")
+                    engine.scene.load("res://scenes/master.scn")
+                return
+            if star.get_if_mouse_hovering():
+                engine.savefile.set(f"projects/{gjsp.replace(':',';').replace('/','$')}/favorited",
+                    not engine.savefile.get(f"projects/{gjsp.replace('/','$').replace(':',';')}/favorited"))
+                _refresh_save()
+                return
             engine.selected_project = gjsp
-            window                  = engine.display.get_window(MAIN_WINDOW)
-            window.set_caption(engine.lang.get("pe_titleeditor").replace("%", gmdt.name))
             engine.scene.load("res://scenes/editor.scn")
     else:
         htbx.visible = False

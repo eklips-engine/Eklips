@@ -55,9 +55,9 @@ class Checkbox(CanvasItem):
                     self.widgetman.moving_widget  = self.gid
         else:
             if self.widgetman.hovering_widget == -1:
-                engine.set_mouse(MOUSE_NORMAL)
+                engine.set_mouse(MOUSE_NORMAL, self.window_id)
             if self.get_if_mouse_hovering() or self.widgetman.moving_widget == self.gid:
-                engine.set_mouse(MOUSE_POINT)
+                engine.set_mouse(MOUSE_POINT, self.window_id)
                 self.widgetman.moving_widget = -1
         
         ## Select the image based on the value

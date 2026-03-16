@@ -46,13 +46,13 @@ class Slider(CanvasItem):
     def _set_scale(self, x, y):
         return
     def _set_alpha(self, deg):
-        self.knob.alpha = deg
+        self.citem.alpha = deg
         self.slider_bg.alpha = deg
         self.label.alpha = deg
     def _set_rot(self, deg):
-        self.knob.rotation = deg
+        self.citem.rotation = deg
     def _set_visible(self, val):
-        self.knob.visible = val
+        self.citem.visible = val
         self.slider_bg.visible = val
         self.label.visible = val
     
@@ -64,46 +64,63 @@ class Slider(CanvasItem):
         self.widgetman = engine.scene._widgetman
         
         # Set properties
+        self.slider_bg = None
+        self.label     = None
+
         self._showpercent = True
         self._minimum     = 0
         self._maximum     = 150
         self._value       = 0
         self.gid          = self.widgetman.add_widget(self)
-        
-        # Make item
+
+        # Make new item
         self._make_new_item()
     
+    def _fix_broken_item(self):
+        self._remove_item(False)
+        del self._cached_batch
+        self._make_new_item()
+        self._convert_transform_property_into_object(self.transform)
     def _make_new_item(self):
-        self._drawing_bid = self.viewport.add_batch()
-        self.slider_bg    = pg.sprite.Sprite(
-            img           = engine.theme.get_static_widget("bg"),
-            batch         = self.viewport.batches[self.batch_id])
-        self.knob         = pg.sprite.Sprite(
-            img           = engine.theme.get_static_widget("knob"),
-            batch         = self.viewport.batches[self.batch_id])
-        self.label        = pg.text.Label(
-            text          = f"0%",
-            batch         = self.viewport.batches[self.batch_id])
+        if self.slider_bg:
+            self._remove_item(False)
+        else:
+            self._drawing_bid = self.viewport.add_batch()
+        
+        self.slider_bg = pg.sprite.Sprite(
+            img        = engine.theme.get_static_widget("bg"),
+            batch      = self.batch)
+        self.citem      = pg.sprite.Sprite(
+            img        = engine.theme.get_static_widget("knob"),
+            batch      = self.batch)
+        self.label     = pg.text.Label(
+            text       = f"0%",
+            batch      = self.batch)
+        self._set_size(*self.tsize)
         self._set_anchors()
-
     def _set_anchors(self):
-        self.knob.image.anchor_x = self.knob.image.width  // 2
-        self.knob.image.anchor_y = self.knob.image.height // 2
-        self.knob._update_position()
-    
-    def _remove_item(self):
+        self.citem.image.anchor_x = self.citem.image.width  // 2
+        self.citem.image.anchor_y = self.citem.image.height // 2
+        self.citem._update_position()
+    def _remove_item(self, remove_batches=True):
+        if not self.slider_bg or not self.slider_bg._vertex_list:
+            return
         self.slider_bg.delete()
-        self.knob.delete()
-        if self.viewport:
+        self.citem.delete()
+        self.label.delete()
+        if self.viewport and remove_batches:
             self.viewport.batches.pop(self.batch_id)
     
-    def get_if_mouse_hovering_knob(self) -> bool:
+    def get_if_mouse_hovering(self) -> bool:
         """Returns true if the mouse is hovering over the knob."""
         if not self.viewport:
             return
+        if not self.viewport.is_onscreen(self):
+            return
+        
         ## Get things
         mpos   = engine.mouse.pos
-        x, y   = self.knob.x-self.knob.width/2, self.knob.y-self.knob.height/2
+        x, y   = self.citem.x-self.citem.width/2, self.citem.y-self.citem.height/2
         vx, vy = self.viewport.into_screen_coords()
 
         ## Apply viewport position into x and y
@@ -113,8 +130,8 @@ class Slider(CanvasItem):
         ## Apply viewport zooming
         x *= self.viewport.cam.zoom
         y *= self.viewport.cam.zoom
-        w  = self.knob.width  * self.viewport.cam.zoom
-        h  = self.knob.height * self.viewport.cam.zoom
+        w  = self.citem.width  * self.viewport.cam.zoom
+        h  = self.citem.height * self.viewport.cam.zoom
 
         ## Result
         return (
@@ -128,27 +145,28 @@ class Slider(CanvasItem):
         super().update()
         
         ## Handle knob
-        if self.get_if_mouse_hovering_knob():
+        if self.get_if_mouse_hovering():
             self.widgetman.hovering_widget = self.gid
         else:
             if self.widgetman.hovering_widget == self.gid:
                 self.widgetman.hovering_widget = -1
 
         if engine.mouse.buttons[MOUSE_LEFT]:
-            if self.get_if_mouse_hovering_knob():
+            if self.get_if_mouse_hovering():
                 if self.widgetman.moving_widget == -1:
                     self.widgetman.focused_widget = self.gid
                 if engine.mouse.dragging and self.widgetman.focused_widget == self.gid:
                     self.widgetman.moving_widget  = self.gid
             if self.widgetman.moving_widget  == self.gid:
-                engine.set_mouse(MOUSE_DRAG)
+                engine.set_mouse(MOUSE_DRAG, self.window_id)
                 self.value += (engine.mouse.dpos[0])/self.w*self.maximum
         else:
             if self.widgetman.hovering_widget == -1:
-                engine.set_mouse(MOUSE_NORMAL)
-            if self.get_if_mouse_hovering_knob() or self.widgetman.moving_widget == self.gid:
-                engine.set_mouse(MOUSE_DRAGGABLE)
-                self.widgetman.moving_widget = -1
+                engine.set_mouse(MOUSE_NORMAL, self.window_id)
+            if self.get_if_mouse_hovering() or self.widgetman.moving_widget == self.gid:
+                engine.set_mouse(MOUSE_DRAGGABLE, self.window_id)
+                self.widgetman.moving_widget  = -1
+                self.widgetman.focused_widget = -1
         
         ## Draw it
         self.draw()
@@ -163,13 +181,13 @@ class Slider(CanvasItem):
             return
         
         ## Fun little feature
-        self.knob.rotation = self.value/self.maximum*360
+        self.citem.rotation = self.value/self.maximum*360
 
         ## Set label text
         self.label.text = f"{int(self.value/self.maximum*100)}%" if self.show_percentage else f"{int(self.value)}"
         
         ## Get position of full slider object
-        x, y = self.into_screen_coords(self.viewport.tsize)
+        x, y = self.into_screen_coords()
 
         ## Move bg
         self.slider_bg.x = x + 5
@@ -180,9 +198,9 @@ class Slider(CanvasItem):
         self.label.y = y + self.h / 2 - self.label.content_height / 2
 
         ## Move knob
-        self.knob.y = y + self.knob.height / 2
+        self.citem.y = y + self.citem.height / 2
         if self._value   == 0:
-            self.knob.x = x
+            self.citem.x = x
         else:
-            self.knob.x = x + (self._value/self._maximum)*self.w 
-        self.knob.x += self.knob.image.anchor_x - self.knob.width / 2
+            self.citem.x = x + (self._value/self._maximum)*self.w 
+        self.citem.x += self.citem.image.anchor_x - self.citem.width / 2

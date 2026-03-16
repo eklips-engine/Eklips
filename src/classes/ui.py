@@ -267,6 +267,8 @@ class EklWindow(EklBaseWindow, pg.window.Window):
         engine.keyboard.modifiers       = modifiers
         engine.keyboard.held[symbol]    = False
         engine.keyboard.pressed[symbol] = False
+    def on_text(self, text):
+        engine.keyboard.text = text
     
     ## Misc. Events
     def on_file_drop(self, x, y, paths):
@@ -320,16 +322,12 @@ class Viewport(Transform, Color):
         return bid
 
     ## Convenience functions
-    def get_screen_pos(self, transform : Transform):
-        """Get the position of a Transform in the Window."""
-        x,y = transform.into_screen_coords(self.size)
-        return x - self.cam.x, y - self.cam.y
     def is_onscreen(self, transform : Transform):
         """Get if a Transform is visible in the Viewport."""
         if engine.debug.sprite_always_visible:
             return True
         
-        x,y = transform.into_screen_coords(self.tsize)
+        x,y = transform.into_screen_coords(viewport_size=self.tsize)
         if not (
             ((x - self.cam.x) * self.cam.zoom) + (transform.w * self.cam.zoom) < 0 or
             ((x - self.cam.x) * self.cam.zoom) > self.w                       or
@@ -381,8 +379,8 @@ class Viewport(Transform, Color):
         self.citem.image.anchor_x = self._w // 2
         self.citem.image.anchor_y = self._h // 2
         self.citem._update_position()
-    def into_screen_coords(self, do_flip : bool = True):
-        return super().into_screen_coords(self.window.size, do_flip)
+    def into_screen_coords(self, viewport_size=None, do_flip : bool = True, drawing : bool = False, parent=None):
+        return super().into_screen_coords(self.window.size, do_flip, drawing, parent)
     def _set_alpha(self, deg):
         self.citem.opacity = deg
     def _set_rot(self, deg):
@@ -452,9 +450,9 @@ class Viewport(Transform, Color):
         # Draw Viewport to Window
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        x, y         = self.into_screen_coords()
-        self.citem.x = x + (self.color_buffer.anchor_x * self.scale_x)
-        self.citem.y = y + (self.color_buffer.anchor_y * self.scale_y)
+        x, y         = self.into_screen_coords(drawing=True)
+        self.citem.x = x
+        self.citem.y = y
         self.citem.draw()
 
     ## Camera functions    
