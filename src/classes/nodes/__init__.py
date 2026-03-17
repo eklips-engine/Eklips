@@ -15,6 +15,7 @@ from classes.nodes.gui.sprite            import *
 from classes.nodes.gui.animatedsprite    import *
 from classes.nodes.gui.parallax          import *
 from classes.nodes.gui.mediaplayer       import *
+from classes.nodes.gui.ninepatchrect     import *
 
 from classes.nodes.gui.widgets.inputbox    import *
 from classes.nodes.gui.widgets.button      import *

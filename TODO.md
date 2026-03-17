@@ -24,9 +24,9 @@ The list of stuff TODO are here:
 | Add Tilemap, and tileset               | 9/10 |  No   | What's a 2d game engine without it lul   |
 | Add Networking                         | 3/10 |  No   | Idk how yet and don't need it rn         |
 | Add UI elements                        | 4/10 |  2/5  | Not really needed right now              |
-| Fix Docs                               | 1/10 |  No   | Not all features are done yet            |
-| Make a readthedocs site                | 1/10 |  No   | Not all features are done yet            |
+| Fix Docs                               | 1/10 |  No   |                                          |
+| Make a readthedocs site                | 1/10 |  No   |                                          |
 | Finish editor                          | 3/10 |  No   | After the other features are done        |
 | Add relativity to CanvasItems          | 9/10 |  Yes  |                                          |
-| Add Animation resource                 | 3/10 |  No   | Use AnimatedSprite untill i make this    |
-| Add spritesheet resource               | 3/10 |  No   | ^^^                                      |
+| Add Animation resource                 | 3/10 |  Yes  |                                          |
+| Add spritesheet resource               | 3/10 |  No   |                                          |

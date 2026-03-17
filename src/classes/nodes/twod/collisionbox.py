@@ -22,13 +22,19 @@ class CollisionBox(CanvasItem):
         self._shape = pygame.Rect((0,0,0,0))
         self.rid    = self.world.add(self._shape)
     
+    def update(self):
+        # Update CItem
+        super().update()
+        
+        # Set shape pos to be relative
+        x, y          = self.into_screen_coords()
+        self._shape.x = x
+        self._shape.y = y
     def _free(self):
         self.world.delete(self.rid)
         super()._free()
-    
     def colliderect(self, shape):
         return self._shape.colliderect(shape)
-    
     def _set_pos(self, x, y):
         self._shape.x = x
         self._shape.y = y
@@ -36,5 +42,4 @@ class CollisionBox(CanvasItem):
         self._shape.w = w
         self._shape.h = h
     def _set_rot(self, deg):
-        # pygame.Rect does not support rotation
         return

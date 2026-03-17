@@ -5,8 +5,6 @@ from classes.nodes.gui.canvasitem import *
 class Sprite(CanvasItem):
     """
     A 2D Sprite.
-    
-    XXX
     """
     _isblittable     = True
 

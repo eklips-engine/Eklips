@@ -1,5 +1,5 @@
 {
-    "name":    "Eklips Engine",
+    "name":    "Unknown",
     "version": {
         "app": "5.0A",
         "ekl": "5.0A"
@@ -17,7 +17,7 @@
         "minsize": [648,648],
         "maxsize": [648,648],
         "resizable": false,
-        "icon_file": "root://_assets/icon.png"
+        "icon_file": "root://_assets/error.png"
     },
     "scenes": {
         "master": "res://scenes/master.scn",

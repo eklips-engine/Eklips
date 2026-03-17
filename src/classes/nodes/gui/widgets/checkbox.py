@@ -4,10 +4,9 @@ from classes.nodes.gui.canvasitem import *
 # Classes
 class Checkbox(CanvasItem):
     """
-    A Checkbox element that has two states; on or off.
-    
-    XXX
+    A themed Checkbox element that has two states; on or off.
     """
+    _isblittable = True
     
     @export(False, "bool", "bool")
     def value(self) -> bool:

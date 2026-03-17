@@ -6,8 +6,6 @@ from classes.nodes.gui.canvasitem import *
 class ColorRect(CanvasItem, Color):
     """
     A single-color rectangle on the screen.
-    
-    XXX
     """
     _isblittable                = True
     citem : pg.shapes.Rectangle = None
@@ -56,4 +54,4 @@ class ColorRect(CanvasItem, Color):
             self._image = engine.loader.load("root://_assets/error.png")
         self.citem      = pg.shapes.Rectangle(0,0,self._w,self._h, color=self.color, batch=self.batch)
         self._set_anchors()
-        self.citem.visible = False
+        self._set_visible(False)

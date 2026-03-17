@@ -3,4 +3,4 @@
 from classes.nodes.gui.canvasitem import *
 
 class Progressbar(CanvasItem):
-    pass
+    _isblittable = True

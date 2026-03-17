@@ -6,9 +6,7 @@ from classes.customprops        import *
 # Classes
 class Tileset(Resource):
     """
-    Tileset
-    
-    XXX
+    An image with a set of Tiles used to make a Tilemap.
     """
 
     @property
@@ -36,18 +34,20 @@ class Tileset(Resource):
     def tiles(self, value : dict):
         self._sprites = {}
         for i in value:
-            self.add_tile(*value[i], dont_refresh=True)
-        self.refresh_tiles()
-    
-    def add_tile(self, sx, sy, sw, sh, hx, hy, hw, hh, dont_refresh=False):
-        self._sprites[len(self._sprites)] = [sx, sy, sw, sh, hx, hy, hw, hh, None]
-        if not dont_refresh:
-            self.refresh_tiles()
-    
+            self._init_tile(self.add_tile(value[i]))
+    def add_tile(self, data):
+        sid                = len(self._sprites)
+        self._sprites[sid] = data
+        self._init_tile(sid)
+
+        return sid
+    def get_tile_image(self, sid):
+        return self._sprites[sid]["image"]
+    def _init_tile(self, sid):
+        return
     def refresh_tiles(self):
-        ogsprites     = self._sprites.copy()
-        for i in ogsprites: #[SX, SY, SW, SH, HX, HY, HW, HH, img if loaded]
-            self._sprites[i][8] = self.image.get_region(*self._sprites[i][:4])
+        for i in self._sprites:
+            self._init_tile(i)
 
     def __init__(self, properties={}):
         self._image     = None

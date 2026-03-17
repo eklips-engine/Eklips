@@ -2,6 +2,7 @@ import shutil
 from classes.ui          import *
 from classes.customprops import *
 from classes.nodes       import *
+from tkinter.messagebox  import *
 
 ready : bool = False
 
@@ -47,8 +48,15 @@ def _process(self : ExtraWindow, delta : float):
 
     if engine.mouse.just_clicked[MOUSE_LEFT]:
         if makebtn.get_if_mouse_hovering():
+            if not (
+                len(path.value.split()) and
+                len(name.value.split()) and
+                len(ver.value.split())
+            ):
+                return showerror(engine.lang.get("ee_title"), engine.lang.get("pe_fillout"))
+
             # Set variables
-            directory = path.value
+            directory = os.path.abspath(path.value).replace("\\","/")
             gjsp      = f"{directory}/game.json"
 
             # Make the project.

@@ -5,10 +5,9 @@ from classes.nodes.gui.canvasitem import *
 # Classes
 class Slider(CanvasItem):
     """
-    A slider element.
-    
-    XXX
+    A themed slider element.
     """
+    _isblittable = True
     
     @export(0, "int", "int")
     def value(self):

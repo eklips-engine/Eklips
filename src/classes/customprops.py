@@ -631,6 +631,8 @@ class Keyboard:
     held      = {}
     #: Text from Window.on_text.
     text      = ""
+    #: Motion from Window.on_text_motion.
+    motion    = None
 
 class Language:
     def __init__(self, file="res://data/foobar.json"):

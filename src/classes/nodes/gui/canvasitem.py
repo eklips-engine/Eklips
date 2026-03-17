@@ -197,7 +197,7 @@ class CanvasItem(Node, Transform):
         if not self.image:
             self._image    = engine.loader.load("root://_assets/error.png")
         self.citem         = pg.sprite.Sprite(img=self.image, batch=self.batch)
-        self.citem.visible = False
+        self._set_visible(False)
     def _refresh_item(self):
         if self.citem:
             self._remove_item()
@@ -229,9 +229,9 @@ class CanvasItem(Node, Transform):
             self.citem.x = x
             self.citem.y = y
             
-            self.citem.visible = self.visible
+            self._set_visible(True)
         else:
-            self.citem.visible = False
+            self._set_visible(False)
     
     ## Convenience functions for user
     def get_if_mouse_hovering(self) -> bool:

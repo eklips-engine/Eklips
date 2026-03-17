@@ -48,6 +48,7 @@ def update(dt):
         engine.mouse.dpos         = [0,0]
         engine.mouse.just_clicked = MOUSE_DEFAULT_STATE
         engine.keyboard.text      = ""
+        engine.keyboard.motion    = None
     except Exception as error:
         engine.error_handler.show_error(error)
         engine.quit()

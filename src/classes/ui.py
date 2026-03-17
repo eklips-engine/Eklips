@@ -269,6 +269,8 @@ class EklWindow(EklBaseWindow, pg.window.Window):
         engine.keyboard.pressed[symbol] = False
     def on_text(self, text):
         engine.keyboard.text = text
+    def on_text_motion(self, motion):
+        engine.keyboard.motion = motion
     
     ## Misc. Events
     def on_file_drop(self, x, y, paths):

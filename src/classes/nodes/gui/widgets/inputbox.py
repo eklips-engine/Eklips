@@ -5,19 +5,19 @@ from classes.nodes.gui.colorrect import *
 # Classes
 class Inputbox(ColorRect, Color):
     """
-    An inputbox element.
-    
-    XXX
+    A themed inputbox element.
     """
-    _blinktimer = 0.5
+    _isblittable = True
+    _blinktimer  = 0.5
     
     ## Exports
     @export("", "str", "str")
     def value(self):
-        return self._value
+        return "".join(self._value)
     @value.setter
     def value(self, val):
-        self._value     = val
+        self._value   = list(val)
+        self._pointer = len(self._value)
     
     ## Transform related
     def _set_alpha(self, deg):
@@ -37,7 +37,8 @@ class Inputbox(ColorRect, Color):
         self.widgetman = engine.scene._widgetman
         
         # Set properties
-        self._value   = ""
+        self._value   = []
+        self._pointer = 0
         self._elapsed = 0
         self.gid      = self.widgetman.add_widget(self)
 
@@ -90,21 +91,32 @@ class Inputbox(ColorRect, Color):
 
         ## Typing
         if self.widgetman.focused_widget == self.gid:
-            char = engine.keyboard.text
-            key  = None
-
-            for kid in engine.keyboard.pressed:
-                if engine.keyboard.pressed[kid] and not key:
-                    key = kid
+            char   = engine.keyboard.text
+            motion = engine.keyboard.motion
             
             if char != "":
-                self.value += char
-            elif key == pg.window.key.ENTER:
-                self.widgetman.focused_widget = -1
-            elif key == pg.window.key.BACKSPACE:
-                self.value = self.value[:-1]
-            elif key == pg.window.key.CLEAR:
-                self.value = " "
+                self._value.insert(self._pointer, char)
+                self._pointer += len(char)
+            elif motion == key.MOTION_DELETE:
+                if len(self._value) and self._pointer < len(self._value):
+                    self._value.pop(self._pointer)
+            elif motion == key.MOTION_LEFT:
+                if self._pointer-1 > -1:
+                    self._pointer -= 1
+            elif motion == key.MOTION_RIGHT:
+                if self._pointer+1 <= len(self._value):
+                    self._pointer += 1
+            elif motion == key.MOTION_BEGINNING_OF_FILE:
+                self._pointer = 0
+            elif motion == key.MOTION_END_OF_FILE:
+                self._pointer = len(self._value)
+            elif motion == key.MOTION_BACKSPACE:
+                if len(self._value) and self._pointer-1 > -1:
+                    self._value.pop(self._pointer-1)
+                    self._pointer -= 1
+            
+            #elif key == pg.window.key.ENTER:
+            #    self.widgetman.focused_widget = -1
         
         ## Draw it
         self._elapsed += engine.delta
@@ -133,4 +145,8 @@ class Inputbox(ColorRect, Color):
         self.label.x = x + 5
         self.label.y = y + self.h / 2 - self.label.content_height / 2 + 5
 
-        self.label.text = f"{self.value}{'_' if self._elapsed > self._blinktimer and self.widgetman.focused_widget == self.gid else ' '}"
+        display_value = self._value[:]
+        blink         = "_" if self._elapsed > self._blinktimer and self.widgetman.focused_widget == self.gid else ""
+        
+        display_value.insert(self._pointer, blink)
+        self.label.text = f"{''.join(display_value)}"

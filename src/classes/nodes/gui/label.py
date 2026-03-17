@@ -6,8 +6,6 @@ from classes.nodes.gui.canvasitem import *
 class Label(CanvasItem, Color):
     """
     A Label.
-    
-    XXX
     """
     citem  : pg.text.Label = None
     _isblittable           = True
@@ -54,6 +52,7 @@ class Label(CanvasItem, Color):
     def _set_size(self, w, h):
         self._w, self._h = self.citem.content_width, self.citem.content_height
     
+    ## Init
     def __init__(self, properties={}, parent=None):
         Color.__init__(self, *WHITE)
         self._text  = "Text"

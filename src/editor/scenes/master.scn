@@ -368,38 +368,7 @@
                         "visible":  false,
                         "skew":     0
                     },
-                    "children": {
-                        "diick": {
-                            "type":     "Slider",
-                            "children": {},
-
-                            "maximum": 220,
-                            
-                            "transform": {
-                                "position": [20,0],
-                                "tsize":    [220, 50],
-                                "scale":    [1,1],
-                                "scroll":   [0,0],
-
-                                "rotation": 0,
-                                "alpha":    255,
-                                "anchor":   "top left",
-                                "visible":  true,
-                                "skew":     0
-                            }
-                        },
-                        "end": {
-                            "type":  "Inputbox",
-                            "color": [24,24,34],
-                            
-                            "transform": {
-                                "position": [20,  20],
-                                "tsize":    [220, 28],
-
-                                "anchor":   "bottom left"
-                            }
-                        }
-                    }
+                    "children": {}
                 }
             }
         }

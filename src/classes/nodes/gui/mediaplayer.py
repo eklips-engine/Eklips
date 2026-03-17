@@ -12,6 +12,7 @@ class MediaPlayer(CanvasItem):
 
     This is a Node that can play video and audio globally.
     """
+    _isblittable = True
     
     def __init__(self, properties={}, parent=None):
         self._media       : str                    = ""
@@ -97,11 +98,12 @@ class MediaPlayer(CanvasItem):
         
         if self._sound:
             self.channel.play(self._sound)
+            self._set_visible(False)
         if self._video:
             self._video.play()
             if not self.citem:
                 self._make_new_item()
-            self.citem.visible = self.visible
+            self._set_visible(True)
         
     def restart(self):
         """Restart the attached Media file."""

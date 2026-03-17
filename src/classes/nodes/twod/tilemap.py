@@ -1,14 +1,20 @@
 # Import libraries
+from classes.resources.tileset    import *
 from classes.nodes.gui.canvasitem import *
 
 # Classes
 class Tilemap(CanvasItem):
     """
     A grid of tiles placed together to make a map.
-
-    XXX
     """
+    _isblittable = True
 
+    @export({}, "dict", "rsc/Tilemap")
+    def tileset(self):
+        return self._tileset
+    @tileset.setter
+    def tileset(self, value):
+        self._tileset = engine.loader.load(value)
     @export({}, "dict", "tiles")
     def tiles(self):
         return self._tiles
@@ -22,8 +28,8 @@ class Tilemap(CanvasItem):
         self._tiles = {}
         super().__init__(properties, parent)
 
-        self.batch_id = self.viewport.add_batch()
-        ...
+        self.batch_id : int     = self.viewport.add_batch()
+        self.tileset  : Tileset = None
     
     def draw(self):
         ... # draw it

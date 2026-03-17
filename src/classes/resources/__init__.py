@@ -7,6 +7,7 @@ import classes.singleton as engine
 
 # Import resources
 print(" ~ Importing all resources")
+from classes.resources.image   import Animation, _ModifiedAnimation
 from classes.resources.object  import *
 from classes.resources.scene   import *
 from classes.resources.tileset import *
@@ -21,17 +22,17 @@ class Loader:
     resource_tree = {}
     use_binary    = False
     extensions    = {
-        "img": ["png","jpg","jpeg","bmp","gif","dds","tif","tiff"], # Image
-        "cur": ["cur"],                                             # Windows Mouse Cursor
-        "sfx": ["mp3","ogg","wav"],                                 # Sound
-        "txt": ["py","txt","ekl"],                                  # TXT file
-        "jsn": ["json"],                                            # JSON
-        "vid": ["mp4","webm"],                                      # Video
-        "ani": ["gif"],                                             # pyglet.image.Animation
-        "fnt": ["ttf","otf"],                                       # Fonts
-        "scn": ["scn","tscn"],                                      # Scene
-        "res": ["res","rc"],                                        # Ekl Resource
-        "xml": ["xml", "svg", "html"]                               # Xml
+        "img": ["png","jpg","jpeg","bmp","dds","tif","tiff"], # Image
+        "cur": ["cur"],                                       # Windows Mouse Cursor
+        "sfx": ["mp3","ogg","wav"],                           # Sound
+        "txt": ["py","txt","ekl"],                            # TXT file
+        "jsn": ["json"],                                      # JSON
+        "vid": ["mp4","webm"],                                # Video
+        "ani": ["gif"],                                       # pyglet.image.Animation
+        "fnt": ["ttf","otf"],                                 # Fonts
+        "scn": ["scn","tscn"],                                # Scene
+        "res": ["res","rc"],                                  # Ekl Resource
+        "xml": ["xml", "svg", "html"]                         # Xml
     }
 
     def _get_true_path(self, path : str):
@@ -84,6 +85,12 @@ class Loader:
                 return engine.pvd.VideoPyglet(actual_path)
             if ext in self.extensions["fnt"]:
                 pg.font.add_file(actual_path)
+            if ext in self.extensions["ani"]:
+                image= _ModifiedAnimation(pg.image.load_animation(actual_path).frames)
+
+                for frame in image.frames:
+                    frame.anchor_x = frame.width  // 2
+                    frame.anchor_y = frame.height // 2
                 return
         except Exception as error:
             engine.error_handler.show_error(error)
@@ -97,7 +104,7 @@ class Loader:
             path: Filepath. (eg: `res://media/load.mp3`, `root://_assets/icon.png`)
             force_type: If not None, what extension should `path` be treated as.
             return_identifier: If True, return resource and its ID.
-            force_new_resource: If True, don't cache resource and always load new ones. Might be useful for things like Scripts."""
+            force_new_resource: If True, don't cache resource and always load new ones. Might be useful for things like Scenes or Scripts."""
         rid = path.replace(":",".").replace("/",",")
         obj = None
         ext = path.split(".")[-1]

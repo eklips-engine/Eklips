@@ -6,9 +6,7 @@ from classes.customprops        import *
 # Classes
 class Theme(Resource):
     """
-    A Theme class
-    
-    XXX
+    A Theme class that stores images and information for different Widgets.
     """
     print(" ~ Initialize themer")
 
@@ -43,6 +41,8 @@ class Theme(Resource):
         for widget in self._widgets:
             self._widgets[widget]["obj"] = Widget(self._widgets[widget], self)
 
+    def get_widget_data(self, name):
+        return self._widgets[name]
     def get_static_widget(self, name):
         return self._widgets[name]["obj"]._image
 
@@ -57,23 +57,10 @@ class _BaseWidget:
         self._data  = data
         self._theme = theme
         self._image = None
-        
-    def get_from_size(self, size):
-        return
-    
-class _StaticWidget(_BaseWidget):
-    def __init__(self, data, theme: Theme):
-        super().__init__(data, theme)
-        
-        self._image = self._theme.image.get_region(
-            *data["pos"],
-            *data["size"]
-        )
-    
     def get_image(self):
         return self._image
 
-class _SplicedWidget(_BaseWidget):
+class Widget(_BaseWidget):
     def __init__(self, data, theme: Theme):
         super().__init__(data, theme)
         
@@ -81,16 +68,6 @@ class _SplicedWidget(_BaseWidget):
             *data["pos"],
             *data["size"]
         )
-    
-    def get_from_size(self, size):
-        return self._image
-
-class Widget(_StaticWidget, _SplicedWidget):
-    def __init__(self, data, theme: Theme):
-        if not "corner_size" in data or "side_size" in data:
-            _StaticWidget.__init__(self, data, theme)
-        else:
-            _SplicedWidget.__init__(self, data, theme)
 
 class WidgetManager:
     def __init__(self):
