@@ -2,10 +2,10 @@
 import pyglet as pg, os
 
 # Import components
-import classes.singleton     as engine
-from classes.locals          import *
-from classes.customprops     import *
-from pyglet.gl               import *
+import classes.singleton as engine
+from classes.locals      import *
+from classes.customprops import *
+from pyglet.gl           import *
 
 # Cast some fucking OpenGL spells i don't know
 glEnable(GL_BLEND)

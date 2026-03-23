@@ -1,8 +1,9 @@
 {
     "nodes": {
         "": {
-            "type":        "Node",
-            "script_path": "res://data/editor.ekl",
+            "type":           "Node",
+            "is_editor_tool": true,
+            "script_path":    "res://data/editor.ekl",
             
             "children": {
                 "backico": {

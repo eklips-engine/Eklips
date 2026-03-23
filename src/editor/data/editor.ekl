@@ -53,8 +53,9 @@ def load():
     gmdt = engine.projects[engine.selected_project]
     gjs  = engine.loader.load(gjsp)
 
-    window = engine.display.get_window(MAIN_WINDOW)
+    window      = engine.display.get_window(MAIN_WINDOW)
     window.set_caption(engine.lang.get("pe_titleeditor").replace("%", gmdt.name).replace("@", "?"))
+    window.size = [1152, 634]
 
     scenepreview = engine.scene.get_node_from_path("/scene_preview_panel/viewport/scene")
     sp_vp        = scenepreview.parent

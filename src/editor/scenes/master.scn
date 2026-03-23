@@ -50,7 +50,7 @@
                     "text":        "Edit",
                     "script_path": "res://data/workflow.ekl",
 
-                    "icon_path": "res://media/icofolder.png",
+                    "icon_path": "res://media/icoedit.png",
 
                     "transform": {
                         "position": [10,  84],

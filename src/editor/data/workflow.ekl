@@ -63,6 +63,7 @@ def _onready(self):
         engine.projects = {}
         win             = engine.display.get_window()
         win.set_caption(engine.lang.get("pe_title"))
+        win.size        = [872, 634]
         populate_frame(self)
     if self.name  == "version_str":
         self.text = engine.VERSION_FULL

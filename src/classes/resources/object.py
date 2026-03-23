@@ -28,7 +28,7 @@ class Object(metaclass=_exportmeta):
     _function_queue  = []
     _properties      = {}   # NOT actual property values, but instead info of this classes properties
     
-    # Property related functions
+    ## Property related functions
     def get(self, name, fallback=None):
         """Get the Object property `name`, if non-existent, return `fallback`."""
         return getattr(self, name, fallback)
@@ -40,20 +40,20 @@ class Object(metaclass=_exportmeta):
     def get_property_list(self):
         return self._properties.keys()
     
-    # Properties
+    ## Properties
+    @property
+    def is_editor_tool(self):
+        return self._iseditortool and engine.ineditor
     @export(None,"str","str")
     def name(self) -> str: return self._name
-    
-    @property
-    def script(self):
-        return self._script
     @export(None,"str","file_path/ekl")
     def script_path(self) -> str: return self._script_path
 
+    @is_editor_tool.setter
+    def is_editor_tool(self, val):
+        self._iseditortool = val
     @name.setter
-    def name(self, value):   self._name = value
-    @script.setter
-    def script(self, value): raise ScriptError("Object property 'script' does not have a setter. Instead, set the 'script_path' property to the path of the script needed.")
+    def name(self, value): self._name = value
     @script_path.setter
     def script_path(self, path : str):
         if not path: return
@@ -67,10 +67,11 @@ class Object(metaclass=_exportmeta):
         
         exec(src, self.__dict__, self.__dict__)
 
-    # Init
+    ## Init
     def __init__(self, properties={}):
         self._name               = self.get_class_name()
         self._properties_onready = properties
+        self._iseditortool       = False
 
         # Set Unique ID
         self.uid    = engine.uid
@@ -79,24 +80,24 @@ class Object(metaclass=_exportmeta):
         # Add signals
         self.signals = properties.get("signals", {})
 
-    # Get class name
+    ## Get class name
     def get_class_name(self) -> str: 
         """Return the name of the Object. (e.g. Object, Node...)"""
         return self.__class__.__name__
     
-    # Memory related
+    ## Memory related
     def _free(self):
         self._runnable = False
         engine.uid -= 1
-        #del self
-        #gc.collect()
+        del self
+        gc.collect()
     
     def free(self):
         """Free the object from memory."""
         self._runnable = False
         self._free()
 
-    # Script related
+    ## Script related
     def call(self, function, *args):
         """Call a function from the attached Script, if it exists."""
         if not function in self.__dict__:
@@ -128,7 +129,7 @@ class Object(metaclass=_exportmeta):
     def call_deferred(self, function, *args, is_signal = False) -> None:
         """Call a function/signal from the attached Script after the Script has finished its process tick."""
         self._function_queue.append([function, args, is_signal])
-
+    
     def update(self):
         """Run the `_process()` function on the Script and call queued functions. This is called every frame of the Object/Node's existence."""
         # Check if i have to be freed
@@ -137,7 +138,8 @@ class Object(metaclass=_exportmeta):
             return
         
         try:
-            self._process(self, engine.delta)
+            if self.is_editor_tool or not engine.ineditor:
+                self._process(self, engine.delta)
         except Exception as err:
             pass
 
