@@ -275,7 +275,6 @@ class Scene(Resource, SceneLike):
         Args:
             nodepath: The node's path in the scene tree. (etc, `/father/me`, `/me`)
             throw_error_if_failed: Throw an Error if it failed deleting the Node."""
-        timer_name = f"Delete'{nodepath}'"
         parts = [""] + nodepath.strip("/").split("/") if nodepath else [""]
         try:
             current = self.nodes[parts[0]]                   # Get root node
@@ -286,13 +285,6 @@ class Scene(Resource, SceneLike):
             node = current["children"][parts[-1]].get("obj") # Get the Node
 
             # Now we can delete the Node and remove it eternally
-            if engine.debug.enabled:
-                engine.profiling.start_timer(timer_name)
-            if node:
-                node._free()
-            if engine.debug.enabled:
-                engine.profiling.end_timer(timer_name)
-                #engine.debug.remove_timer(timer_name)
             current["children"].pop(parts[-1])
         except Exception as error:
             if throw_error_if_failed or engine.debug.avoid_error_mercy:
@@ -304,16 +296,10 @@ class Scene(Resource, SceneLike):
 
     def empty(self):
         """Empty the scene."""
-        timer_name = f"Clear'{self.file_path}'"
-        if engine.debug.enabled:
-            engine.profiling.start_timer(timer_name)
         root = self.nodes[""].get("obj")
         if root: root._free()
         self._nodes          = EMPTY_SCENE
         self._temp_node_list = []
-        if engine.debug.enabled:
-            engine.profiling.end_timer(timer_name)
-            engine.profiling.remove_timer(timer_name)
     def _free(self):
         self.empty()
         super()._free()

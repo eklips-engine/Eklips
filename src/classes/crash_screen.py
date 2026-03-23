@@ -11,9 +11,8 @@ def show_error(error : Exception):
     engine.quit()
     info = get_info(error)
     print(f"Crashed! See dialog for more info.")
-    if askyesno("Eklips Engine", f"Eklips has crashed with the traceback:\n\n{info}\n\nWould you like a dump to be saved?"):
-        os.makedirs("tmp", exist_ok=True)
-        with open(f"tmp/{len(os.listdir('tmp'))}.log","w") as f:
-            f.write(info)
+    os.makedirs("tmp", exist_ok=True)
+    with open(f"tmp/{len(os.listdir('tmp'))}.log","w") as f:
+        f.write(info)
 
 __dict__ = {"show_error": show_error, "get_info": get_info, "tb": tb, "os": os}

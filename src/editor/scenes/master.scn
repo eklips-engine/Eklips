@@ -72,9 +72,10 @@
                     }
                 },
                 "run_btn": {
-                    "type": "Button",
-                    "text": "Run..",
-
+                    "type":        "Button",
+                    "text":        "Run",
+                    "script_path": "res://data/workflow.ekl",
+                    
                     "icon_path": "res://media/icoplay.png",
 
                     "transform": {
@@ -87,7 +88,7 @@
                     "type": "Button",
                     "text": "Duplicate",
 
-                    "icon_path": "res://media/icoplay.png",
+                    "icon_path": "res://media/icoduplicate.png",
 
                     "transform": {
                         "position": [20, 174],

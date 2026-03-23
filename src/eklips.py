@@ -14,7 +14,6 @@ main_window = engine.display.get_window()
 @main_window.event
 def on_close():
     engine.handle_closing()
-    engine.display.close_windows()
 
 def update(dt):
     # Stop right there criminal scum
@@ -54,5 +53,9 @@ def update(dt):
         engine.quit()
 
 # Start the engine
-pg.clock.schedule_interval(update, 1/MAXFPS)
-pg.app.run(1 / MAXFPS)
+engine._update_func = update
+interval            = 1/MAXFPS
+if interval == 0:
+    interval = ZDE_FIX
+pg.clock.schedule_interval(update, interval)
+pg.app.run(interval)

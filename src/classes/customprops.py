@@ -40,6 +40,7 @@ class _export:
     def setter(self, fset):
         self.fset = fset
         return self
+
 def export(default=None, type_=None, hint=None):
     """
     Use this class to expose a value as a property in the editor.
@@ -53,7 +54,25 @@ def export(default=None, type_=None, hint=None):
     Args:
         default: The default value to use.
         type: The name of the type that the value should be (int, str, list, bool...)
-        hint: How to display this property in the editor (int, float, int/float, float/int, str, file_path/type, color, slider, font, bool, time, file_paths/type, vector2/ab, transform, windowid, viewportid, batchid)
+        hint: How to display this property in the editor
+    
+    Hints:
+        int:                  An integer
+        float:                A float.
+        str:                  A string.
+        int/float, float/int: A float or integer.
+        file_path/type:       A filepath of type `type`.
+        color:                An RGBA color.
+        slider:               A number but displayed as a slider instead of a textentry.
+        font:                 A font name.
+        bool:                 As a Checkbox.
+        time:                 A span of time in seconds.
+        file_paths/type:      A list of filepaths of type `type`.
+        vector2/ab:           A 2D Vector with the values A and B.
+        transform:            A Transform object.
+        windowid:             The ID of a Window. Will be displayed as a dropdown of WIDs.
+        viewportid:           The ID of a Viewport. Will be displayed as a dropdown of VIDs.
+        batchid:              The ID of a Batch. Will be displayed as a dropdown of BIDs.
     """
     def wrapper(func):
         return _export(
@@ -99,12 +118,11 @@ class WindowProperties:
 
 class DebugConfig:
     """Debugging configuration."""
-    _skipload  = True
+    _skipload  = False
     _freezload = False
     _enabled   = False
     _showfps   = True
     _nomercy   = False
-    _showgraph = False
     _alwaysvis = False
 
     @property
@@ -141,14 +159,6 @@ class DebugConfig:
         return self._nomercy and self._enabled
     @avoid_error_mercy.setter
     def avoid_error_mercy(self,val): self._nomercy = val
-    
-    @property
-    def show_graph(self):
-        """True if the engine can show a profiling graph. Read-write."""
-        return self._showgraph and self._enabled
-    @show_graph.setter
-    def show_graph(self,val):
-        self._showgraph = val
 
     @property
     def enabled(self):
@@ -588,9 +598,9 @@ class Transform:
         _screenc_cache[cid] = [x,y]
         return [x,y]
     def _offset_off_anchor(self, x, y, w=None, h=None):
-        if w == None: w = self._w
-        if h == None: h = self._h
-        return x+(w // 2) * self.scale_x, y+(h // 2) * self.scale_y
+        if w == None: w = self.w
+        if h == None: h = self.h
+        return x+(w // 2), y+(h // 2)
     
     @classmethod
     def new(cls, pos : list, surface = None, scale = [1,1], opacity = 255, layer = 0, rotation = 0, anchor = "", scroll = [0,0], visible = True, skew = 0):

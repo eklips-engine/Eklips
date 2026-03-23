@@ -27,7 +27,7 @@ class Loader:
         "sfx": ["mp3","ogg","wav"],                           # Sound
         "txt": ["py","txt","ekl"],                            # TXT file
         "jsn": ["json"],                                      # JSON
-        "vid": ["mp4","webm"],                                # Video
+        "vid": ["mp4","webm","mkv"],                          # Video
         "ani": ["gif"],                                       # pyglet.image.Animation
         "fnt": ["ttf","otf"],                                 # Fonts
         "scn": ["scn","tscn"],                                # Scene
@@ -60,13 +60,16 @@ class Loader:
             if ext in self.extensions["sfx"]:
                 return pygame.Sound(actual_path)
             if ext in self.extensions["txt"]:
-                return open(actual_path).read()
-            if ext in self.extensions["jsn"]:
-                return json.loads(open(actual_path).read())
-            if ext in self.extensions["scn"]:
+                with open(actual_path) as f:
+                    return f.read()
+            if ext in [*self.extensions["scn"],
+                       *self.extensions["jsn"]]:
+                with open(actual_path) as f:
+                    return json.loads(f.read())
                 return json.loads(open(actual_path).read())
             if ext in self.extensions["xml"]:
-                return xmltodict.parse(open(actual_path).read())
+                with open(actual_path) as f:
+                    return xmltodict.parse(f.read())
             if ext in self.extensions["cur"]:
                 image = pg.image.load(actual_path)
                 return pg.window.ImageMouseCursor(image, hot_x=0, hot_y=image.height)

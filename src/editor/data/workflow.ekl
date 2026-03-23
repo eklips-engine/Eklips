@@ -1,6 +1,7 @@
 ## Spaghetti code
 import classes.singleton       as engine
 import tkinter                 as tk, os, shutil
+import subprocess
 from tkinter                   import ttk
 from tkinter.messagebox        import *
 from tkinter.filedialog        import *
@@ -79,6 +80,20 @@ def _process(self, delta):
                     "tags":      []
                 })
             engine.scene.load("res://scenes/master.scn")
+    if self.name  == "run_btn":
+        if self.get_if_mouse_hovering() and engine.mouse.just_clicked[MOUSE_LEFT]:
+            selected = getattr(engine, "selected_project", None)
+            if selected and selected in engine.projects:
+                engine.display.get_window().close()
+                
+                gmdt = engine.projects[selected]
+                subprocess.run([
+                    "python", "eklips.py",
+                    "-file", gmdt.project_file,
+                    "-dir", gmdt.project_dir,
+                    "-fromeditor"
+                ])
+                engine.handle_closing()
 
 def open_editor_settings(self):
     # This provides an interface to modify editor settings.

@@ -111,7 +111,9 @@ class Button(BaseNinePatchRect, Color):
             self.label.y = y + (self.h//2-self.label.content_height//2)
 
             if self._iconpath:
-                self._iconspr.x = tx-self.label.content_width
+                self.label.x += ICON_BTN_OFFSET
+
+                self._iconspr.x = self.label.x - (self._iconspr.width/2) - ICON_BTN_OFFSET
                 self._iconspr.y = ty
     def update(self):
         super().update()

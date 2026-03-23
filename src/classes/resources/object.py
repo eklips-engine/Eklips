@@ -88,8 +88,8 @@ class Object(metaclass=_exportmeta):
     def _free(self):
         self._runnable = False
         engine.uid -= 1
-        del self
-        gc.collect()
+        #del self
+        #gc.collect()
     
     def free(self):
         """Free the object from memory."""

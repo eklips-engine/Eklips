@@ -4,7 +4,7 @@ import pyvidplayer2 as pvd, time
 
 # Import components
 from classes.customprops import *
-from classes             import hooks, profiling, resources, nodes, ui
+from classes             import hooks, resources, nodes, ui
 from classes             import crash_screen as error_handler
 from classes             import saving, networking
 from classes.locals      import *
@@ -159,7 +159,7 @@ def is_anything_pressed() -> bool:
 
 def handle_closing():
     """
-    Saves the game, frees the scene and sets `running` to False.
+    Saves the game, closes every window besides ID main, frees the scene and sets `running` to False.
 
     Only call this function when you are closing the game engine.
     """
@@ -168,6 +168,14 @@ def handle_closing():
     running = False
     savefile.save_data()
     scene.free()
+    pg.clock.unschedule(_update_func)
+    
+    for wid in display.windows:
+        window = display.get_window(wid)
+        if not window:
+            continue
+        if window.id != MAIN_WINDOW:
+            window.close()
 
 def set_mouse(cursor, wid = MAIN_WINDOW):
     """Set the mouse cursor.
@@ -212,3 +220,4 @@ uptime         : float                  = 0.0   #: This value is how many second
 speed          : int                    = 1     #: This value is the multiplier of `engine.delta`.
 
 _screenc_cache : dict = {}
+_update_func          = None

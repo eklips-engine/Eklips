@@ -9,7 +9,9 @@ class Parallax(Sprite):
     """
     _isblittable = True
 
-    def __init__(self, properties=..., parent=None):
+    def __init__(self, properties=None, parent=None):
+        if properties is None:
+            properties = {}
         super().__init__(properties, parent)
 
         self._citemtr    = None
@@ -61,7 +63,7 @@ class Parallax(Sprite):
         for s in [self.citem, self._citemtr, self._citembl, self._citembr]:
             if s:
                 s.delete()
-                s = None
+        self.citem = self._citemtr = self._citembl = self._citembr = None
     def _set_anchors(self):
         self.image.anchor_x = self.image.width  // 2
         self.image.anchor_y = self.image.height // 2
@@ -70,7 +72,7 @@ class Parallax(Sprite):
     def draw(self):
         if self.visible and self.citem:
             zoom  = self.viewport.cam.zoom
-            speed = self.speed / 25
+            speed = self.speed / 25 + engine.ZDE_FIX
 
             cx,cy = round(self.viewport.cam.x)+ZDE_FIX,round(self.viewport.cam.y)+ZDE_FIX
             x,  y = cx-(abs(cx/speed%self.w)), cy-(cy/speed%self.h)

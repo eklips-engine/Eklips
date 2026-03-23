@@ -233,8 +233,6 @@ class EklWindow(EklBaseWindow, pg.window.Window):
             viewport    = self.viewports[vid]
             viewport.draw()
         
-        if engine.debug.show_graph:
-            engine.profiling.draw_debug_graph()
         super().flip()
     
     ## Mouse Events

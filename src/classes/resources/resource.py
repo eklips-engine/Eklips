@@ -46,4 +46,3 @@ class MyResource(Resource):
         
         Args:
             path: Filepath. (eg: `res://media/load.mp3`, `root://_assets/icon.png`)"""
-        ...
