@@ -1,9 +1,9 @@
-# Import singleton
+## Import singleton
 import pyglet as pg
 from classes.resources.resource import *
 from classes.customprops        import *
 
-# Classes
+## Classes
 class Theme(Resource):
     """
     A Theme class that stores images and information for different Widgets.

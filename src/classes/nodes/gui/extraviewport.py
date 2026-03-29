@@ -1,8 +1,8 @@
-# Import inherited
+## Import inherited
 from classes.nodes.gui.canvasitem import *
 from classes.ui                   import *
 
-# Variables
+## Variables
 viewport_transform = {
     "position": [0,0],
     "tsize":    [320,320],
@@ -16,7 +16,7 @@ viewport_transform = {
     "skew":     0
 }
 
-# Classes
+## Classes
 class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
     """
     A Viewport Node.
@@ -50,7 +50,7 @@ class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
         window            = engine.display.get_window(self.window_id)
         self._drawing_vid = len(window.viewports)
 
-        # Init Viewport
+        ## Init Viewport
         Viewport.__init__(self, self.viewport_id, window, [])
 
         # Add a batch and add viewport to window

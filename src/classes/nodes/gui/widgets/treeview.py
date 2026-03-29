@@ -23,7 +23,7 @@ class Treeview(CanvasItem):
     @items.setter
     def items(self, val):
         # format is:
-        # item: { child1: {}, child2: {child1: {}} ... }
+        ## Item: { child1: {}, child2: {child1: {}} ... }
         self._items = val
     
     ## Update

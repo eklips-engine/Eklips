@@ -1,8 +1,8 @@
-# Import libraries
+## Import libraries
 import pyglet as pg
 from classes.nodes.gui.canvasitem import *
 
-# Classes
+## Classes
 class Slider(CanvasItem):
     """
     A themed slider element.
@@ -84,7 +84,8 @@ class Slider(CanvasItem):
         if self.slider_bg:
             self._remove_item(False)
         else:
-            self._drawing_bid = self.viewport.add_batch()
+            self._drawing_bid  = self.viewport.add_batch()
+            self._cached_batch = self.viewport.batches[self.batch_id]
         
         self.slider_bg = pg.sprite.Sprite(
             img        = engine.theme.get_static_widget("bg"),
@@ -104,6 +105,7 @@ class Slider(CanvasItem):
     def _remove_item(self, remove_batches=True):
         if not self.slider_bg or not self.slider_bg._vertex_list:
             return
+        self._switch_window()
         self.slider_bg.delete()
         self.citem.delete()
         self.label.delete()

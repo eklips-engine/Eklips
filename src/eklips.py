@@ -1,33 +1,28 @@
-# Import libraries
+## Import libraries
 import pyglet as pg, time
 
-# Import components
+## Import components
 from classes.locals      import *
 from classes.customprops import *
 import classes.singleton as engine
 
-# Load the engine components
+## Load the engine components
 engine.load_engine()
 main_window = engine.display.get_window()
 
-# Create event loop
+## Create event loop
 @main_window.event
 def on_close():
     engine.handle_closing()
 
-def update(dt):
-    # Stop right there criminal scum
+@main_window.event
+def on_draw():
+    # Stop if not running
     if not engine.running:
         return
     
     try:
-        # Calculate FPS
-        engine.fps    = 1 / dt
-        if engine.fps  < ZDE_FIX:
-            engine.fps = ZDE_FIX
-        
-        # Calculate delta
-        engine.tdelta = dt
+        # Calculate sped up delta
         engine.delta   = engine.speed * engine.tdelta
         engine.uptime += engine.tdelta
         
@@ -50,12 +45,10 @@ def update(dt):
         engine.keyboard.motion    = None
     except Exception as error:
         engine.error_handler.show_error(error)
-        engine.quit()
+        engine.quit(1)
 
-# Start the engine
-engine._update_func = update
-interval            = 1/MAXFPS
+## Start the engine
+interval     = 1/MAXFPS
 if interval == 0:
     interval = ZDE_FIX
-pg.clock.schedule_interval(update, interval)
 pg.app.run(interval)

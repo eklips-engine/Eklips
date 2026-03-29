@@ -1,7 +1,7 @@
-# Import libraries=
+## Import libraries
 from classes.nodes.gui.canvasitem import *
 
-# Classes
+## Classes
 class Camera(CanvasItem):
     """
     A 2D Camera.

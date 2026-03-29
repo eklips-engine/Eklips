@@ -1,8 +1,8 @@
-# Import inherited
+## Import inherited
 from classes.nodes.gui.canvasitem import *
 from classes.ui                   import *
 
-# Variables
+## Variables
 window_transform = {
     "position": [0,0],
     "tsize":    [320,320],
@@ -16,7 +16,7 @@ window_transform = {
     "skew":     0
 }
 
-# Classes
+## Classes
 class ExtraWindow(CanvasItem, Color):
     """
     A Window Node.
@@ -38,7 +38,7 @@ class ExtraWindow(CanvasItem, Color):
         self._icon      = engine.icon
         self._iconpath  = engine.game.win.icofile
         self._title     = DEFAULT_NAME
-        self._resizable = False
+        self._resizable = True
         super().__init__(properties, parent)
 
         ## Setup BG color
@@ -137,6 +137,9 @@ class ExtraWindow(CanvasItem, Color):
         # Add FPS Display
         if engine.debug.show_fps:
             self.fpsd = engine.hooks.HookFPSDisplay(self._window, [255,255,255,255])
+        
+        self._window.minimum_size = None
+        self._window.maximum_size = None
         
         # Hooks
         self._window.on_close = self._hookonclose

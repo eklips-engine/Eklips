@@ -1,4 +1,4 @@
-# Import singleton
+## Import singleton
 import pyglet as pg
 from classes.resources.resource import *
 from classes.customprops        import *
@@ -89,8 +89,8 @@ class Animation(Resource):
     @export({},"list","animations/img")
     def animations(self):
         # animation: {
-        #  paths: ["imgpath"]               # If animation is a sequence
-        #  path:  res://media/animation.gif # If paths property is None
+        #  paths: ["imgpath"]               ## If animation is a sequence
+        #  path:  res://media/animation.gif ## If paths property is None
         #  obj:   [Img]                     # Made on Runtime
         # }
         return self._animations

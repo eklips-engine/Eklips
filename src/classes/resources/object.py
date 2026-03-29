@@ -1,11 +1,11 @@
-# Import components
+## Import components
 import classes.singleton as engine
 import gc, types
 from classes.locals       import *
 from classes.customprops  import export, _exportmeta
 from classes.log          import *
 
-# Classes
+## Classes
 class ScriptError(Exception):
     pass
 
@@ -18,9 +18,12 @@ class Object(metaclass=_exportmeta):
 
     You can create new instances, using `Object(properties)`.
     To delete an Object instance, call `free()`. This is necessary for most classes inheriting Object, because they do not manage memory on their own, and will otherwise cause memory leaks when no longer used.
-    Objects can have a `Script` resource attached to them. Once the Script is instantiated, it effectively acts as an extension to the base class, allowing it to define and inherit new properties, methods and signals.
+    Objects can have a Script attached to them. Once the Script is instantiated, it effectively acts as an extension to the base class, allowing it to define and inherit new properties, methods and signals.
     
-    If you are setting up an Object, don't forget to call `_setup_properties()` after initializing the Object.
+    If you are setting up an Object on your own, don't forget to call `_setup_properties()` after initializing the Object.
+    
+    Also, the `_onready` function in a Script is only called after the Object is ready, not when every other Object is,
+    getting an Object on `_onready` may not work.
     """
     _runnable        = True
     _script_path     = None
@@ -68,6 +71,9 @@ class Object(metaclass=_exportmeta):
         exec(src, self.__dict__, self.__dict__)
 
     ## Init
+    def __repr__(self):
+        return f"{self.get_class_name()}(id={self.uid})"
+    
     def __init__(self, properties={}):
         self._name               = self.get_class_name()
         self._properties_onready = properties
@@ -131,7 +137,8 @@ class Object(metaclass=_exportmeta):
         self._function_queue.append([function, args, is_signal])
     
     def update(self):
-        """Run the `_process()` function on the Script and call queued functions. This is called every frame of the Object/Node's existence."""
+        """Run the `_process()` function on the Script and call queued functions.
+        This is called every frame of the Object's existence."""
         # Check if i have to be freed
         if not self._runnable:
             self._free()
@@ -151,9 +158,10 @@ class Object(metaclass=_exportmeta):
         self._function_queue.clear()
     
     def _setup_properties(self):
+        """Setup the Object's properties to whatever was passed in `__init__`, and calls `_onready`."""
         # Setup properties
         for key in self._properties_onready:
-            if key in ["children","parent","signals","type"]:
+            if key in ["signals","type"]:
                 continue
             self.set(key, self._properties_onready[key])
         

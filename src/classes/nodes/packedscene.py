@@ -1,8 +1,8 @@
-# Import inherited
+## Import inherited
 from classes.nodes.node      import *
 from classes.resources.scene import Scene, SceneError, CollisionManager, SceneLike
 
-# Classes
+## Classes
 class PackedScene(Node, Scene):
     def __init__(self, properties = {}, parent = None):
         Scene.__init__(self)

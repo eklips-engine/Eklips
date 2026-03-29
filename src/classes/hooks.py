@@ -1,7 +1,7 @@
 ## Hook Subprocess.Popen as i am too lazy to hook every single call in pyvidplayer2
 ## and also hook Pyglet to not commit suicide when a new window is made at runtime
 ## You can use this code in any project if you want :D
-# Subprocess related
+## Subprocess related
 import subprocess
 import errno
 import io
@@ -10,7 +10,7 @@ import sys
 import threading
 import warnings
 
-# Engine related
+## Engine related
 import pyglet            as pg
 from classes.ui          import *
 from classes.locals      import *
@@ -19,6 +19,14 @@ import classes.singleton as engine
 ## Pyglet event loop
 print(" ~ Modify pyglet.app.eventloop._redraw_windows")
 def newrwd(dt: float) -> None:
+    # Calculate FPS
+    engine.fps     = 1 / dt
+    if engine.fps  < ZDE_FIX:
+        engine.fps = ZDE_FIX
+    
+    # Calculate delta
+    engine.tdelta  = dt
+    
     # Redraw all windows
     for wid in engine.display.windows.copy():
         if wid in engine.display.windows:
@@ -32,6 +40,7 @@ def newrwd(dt: float) -> None:
     # Update display
     engine.display.update()
 pg.app.event_loop._redraw_windows = newrwd
+
 print(" ~ Modify pyglet.app.eventloop.idle")
 def newidle():
     clock = pg.app.event_loop.clock
@@ -41,7 +50,6 @@ def newidle():
     # Update timeout
     clock.get_sleep_time(True)
 
-    # SUNLIGHT YELLOW OVADRIVAAAAAAAAAAAAAA
     return 0
 pg.app.event_loop.idle = newidle
 
@@ -67,8 +75,11 @@ class HookFPSDisplay(pg.window.FPSDisplay):
 
         This method is called automatically when the window buffer is flipped.
         """
-        self.label.text = f"{round(engine.fps)}/{MAXFPS} FPS"
-        self.label.y    = self.viewport.h-self.label.content_height
+        self._elapsed      += engine.delta
+        if self._elapsed   >= self.update_period:
+            self._elapsed   = 0
+            self.label.text = f"{round(engine.fps)}/{MAXFPS} FPS"
+        self.label.y        = self.viewport.h-self.label.content_height
     
     def _hook_flip(self) -> None:
         self.update()

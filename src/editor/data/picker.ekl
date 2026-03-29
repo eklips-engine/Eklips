@@ -1,0 +1,117 @@
+## so many fucking imports
+import classes.singleton as engine
+import tkinter as tk, shutil, subprocess
+
+from tkinter            import ttk
+from tkinter.messagebox import *
+from tkinter.filedialog import *
+
+from classes.nodes             import *
+from classes.nodes.packedscene import *
+
+## UI related
+pid  = 0
+pry = 10
+def add_project_to_frame(project : str):
+    global pid, pry
+    gjsp = project.replace('$','/').replace(';',':')
+    try:
+        gamedata = GameData({
+            "project": {
+                "file": gjsp,
+                "dir":  "UseFileParent"
+            },
+            "name": "Editor-Runtime"
+        }, is_file=False)
+    except:
+        gamedata = GameData({
+            "project": {
+                "file": "editor/data/base_project/game.json",
+                "dir":  "editor/data/base_project"
+            },
+            "name": "Editor-Runtime"
+        }, is_file=False)
+    engine.projects[gjsp] = gamedata
+    print(f" |~ {gamedata.name}")
+
+    engine.scene.add_node({
+        "type":      "PackedScene",
+        "file_path": "res://scenes/project_entry.scn",
+        "projectid": gjsp,
+        "pid":       pid,
+        "target_y":  pry
+    }, f"/panel_obj/{pid}")
+    pry += 66
+    pid += 1
+def populate_frame(self : ExtraViewport):
+    # This checks for all projects' game.json file in your savefile,
+    # and populates the "Panel" Node with entries of those projects.
+    #
+    # The "project_list" list is formatted like this:
+    # project_list: {'editor/game.json': {'favorited':False,'tags':[]}, ...]
+    global pid, pry
+    project_list = engine.savefile.get("projects", {})
+
+    pid = 0
+    pry = 10
+    for project in project_list:
+        add_project_to_frame(project)
+def select_project_file(): return askopenfilename(
+        filetypes = [
+            (engine.lang.get("pe_pjfl"),"game.json"),
+            (engine.lang.get("pe_evfl"), "*.*")
+        ],
+        title     = engine.lang.get("pe_titleselprj")
+    )
+
+## Onready
+def _onready(self):
+    if self.name == "panel_obj":
+        print(" [editor] ~ Cleanse project list")
+        engine.projects = {}
+
+        print(" [editor] ~ Set window title")
+        win         = engine.display.get_window()
+        win.caption = engine.lang.get("pe_title")
+
+        print(" [editor] ~ Set window size")
+        win.size = [872, 634]
+        
+        print(" [editor] ~ Add projects to frame")
+        populate_frame(self)
+    if self.name  == "version_str":
+        self.text = engine.VERSION_FULL
+
+## Signals
+def edit_btn(self):
+    if getattr(engine, "selected_project", False):
+        engine.scene.load("res://scenes/editor.scn")
+def import_btn(self):
+    gjsp = select_project_file()
+    if gjsp:
+        engine.savefile.set(f"projects/{gjsp.replace('/','$').replace(':',';')}", {
+            "favorited": False,
+            "tags":      []
+        })
+        self.add_project_to_frame(gjsp)
+def run_btn(self):
+    selected = getattr(engine, "selected_project", None)
+    if selected and selected in engine.projects:
+        engine.display.get_window().close()
+                
+        gmdt = engine.projects[selected]
+        subprocess.run([
+            "python", "eklips.py",
+            "-file", gmdt.project_file,
+            "-dir", gmdt.project_dir,
+            "-fromeditor"
+        ])
+        engine.quit()
+def open_editor_settings(self):
+    window         = self.scene.get_node_from_path("/settings_window")
+    window.title   = engine.lang.get("pe_titlesetting")
+    window.visible = True
+def make_new_project_interface(self):
+    window         = self.scene.get_node_from_path("/make_new_project_window")
+    window.title   = engine.lang.get("pe_titlenewprj")
+    window.visible = True

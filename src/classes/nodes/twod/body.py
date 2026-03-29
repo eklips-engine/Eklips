@@ -1,7 +1,7 @@
-# Import libraries
+## Import libraries
 from classes.nodes.twod.collisionbox import *
 
-# Classes
+## Classes
 class Body(CollisionBox):
     """
     A CollisionBox which abides the laws of 2D physics.

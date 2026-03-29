@@ -1,8 +1,8 @@
-# Import libraries
+## Import libraries
 import pyglet as pg
 from classes.nodes.gui.canvasitem import *
 
-# Classes
+## Classes
 class Label(CanvasItem, Color):
     """
     A Label.
@@ -68,16 +68,14 @@ class Label(CanvasItem, Color):
     
     def draw(self):
         """Draw the label. This is usually called automatically."""
+        if not self.viewport:
+            return
         if self.visible and self.viewport.is_onscreen(self) and len(self.text.split()) and self.citem:
             x,y          = self.into_screen_coords()
             self.citem.x = x
             self.citem.y = y
 
     ## CItem managing
-    def _remove_item(self):
-        if self.citem:
-            self.citem.delete()
-            self.citem = None
     def _make_new_item(self) -> pg.text.Label:
         if self.citem:
             self._remove_item()

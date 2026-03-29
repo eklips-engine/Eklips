@@ -1,18 +1,15 @@
-# Import libraries
-import pyglet       as pg, pygame
+##import libraries
+import pyglet       as pg
 import pyvidplayer2 as pvd, time
 
-# Import components
+##import components
 from classes.customprops import *
 from classes             import hooks, resources, nodes, ui
 from classes             import crash_screen as error_handler
 from classes             import saving, networking
 from classes.locals      import *
 
-# Init mixer
-pygame.mixer.init(channels=2)
-
-# Functions
+## Functions
 def rgbtohex(rgb: list) -> str:
     """Turn a hex color into an RGB color."""
     r,g,b = rgb
@@ -24,7 +21,7 @@ def invertrgb(rgb: list) -> list:
 
 def get_date():
     """Returns the date and time."""
-    return time.strftime('%d %m %Y %H %M %S')
+    return time.strftime("%d %m %Y %H %M %S")
 
 def load_engine():
     global running,game,display,debug,mouse,loader,keyboard,scene,savefile,lang,icon,clock,theme
@@ -34,7 +31,10 @@ def load_engine():
 
     # Initialize metadata
     game   = GameData()
-    
+
+    # See if anti-aliasing should be on
+    ui.set_anti_aliasing(game.win.antialiasing)
+
     # Initialize resource loader
     loader = resources.Loader()
 
@@ -85,9 +85,6 @@ def load_engine():
     # Initialize localization
     lang = Language(f'{game.langdir}/{savefile.get("lang", "en")}.json')
 
-    # See if anti-aliasing should be on
-    ui.set_anti_aliasing(game.win.antialiasing)
-
     # Load custom fonts
     for i in game.fonts:
         name, path = i
@@ -110,10 +107,10 @@ def load_cursor(name) -> pg.window.MouseCursor | pg.window.ImageMouseCursor:
 
     Args:
         name: The mouse cursor to load. Can either be a path or constant (e.g. `MOUSE_NORMAL`..)
-    """
-    if os.path.exists(loader._get_true_path(str(name))):
+    """ 
+    try:
         cursor = loader.load(name)
-    else:
+    except:
         cursor = display.get_window().get_system_mouse_cursor(name)
     
     cursors[name] = cursor
@@ -189,14 +186,17 @@ def set_mouse(cursor, wid = MAIN_WINDOW):
     if not window.is_basewindow:
         window.set_mouse_cursor(cursors[cursor])
 
-def quit():
+def quit(error_code=0):
     display.get_window().on_close()
+    sys.exit(error_code)
     
-# Variables
+## Variables
 _inpyinstaller : bool = getattr(sys, "frozen", False)  and hasattr(sys, "_MEIPASS") #: is in Pyinstaller?
 _pyinstallpath : str  = getattr(sys, "_MEIPASS", None)                              #: Pyinstaller _internal dir
 
-ineditor       : bool                   = False #: If you are in the Eklips Editor project.
+_image_filter : int = pg.gl.GL_NEAREST #: OpenGL Filter to apply to images
+
+ineditor       : bool                   = False #: If you are in the Eklips Editor. Only tool Nodes can have their scripts updated. see Object.is_editor_tool
 cursors        : int                    = {}    #: Dict of cursor images
 clock          : pg.clock.Clock         = None  #: Pyglet clock
 display        : ui.Display             = None  #: Display object. See `classes.ui.Display`
@@ -212,7 +212,6 @@ keyboard       : Keyboard               = None  #: Keyboard type.
 scene          : resources.Scene        = None  #: Scene object.
 running        : bool                   = False #: If the engine is running
 uid            : int                    = 0     #: amount of Objects
-sid            : int                    = 0     #: amount of pygame Channels
 delta          : float                  = 0.0   #: deltaTime
 tdelta         : float                  = 0.0   #: `engine.delta` but not multiplied by speed
 fps            : float                  = 0.0   #: Framerate according to `engine.tdelta`

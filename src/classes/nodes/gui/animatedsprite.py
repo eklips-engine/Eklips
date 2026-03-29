@@ -1,8 +1,8 @@
-# Import libraries
+## Import libraries
 from classes.resources.image  import *
 from classes.nodes.gui.sprite import *
 
-# Classes
+## Classes
 class AnimatedSprite(Animation, CanvasItem):
     """
     A 2D Animated Sprite using the Animation resource.

@@ -1,13 +1,14 @@
 {
     "nodes": {
         "": {
-            "type":     "Node",
+            "type": "Node",
+
             "children": {
                 "panel_obj": {
                     "type":          "ScrollingViewport",
+                    "script_path":   "res://data/picker.ekl",
                     "left_to_right": false,
-                    "script_path":   "res://data/workflow.ekl",
-
+                    
                     "children": {},
 
                     "color": [25,25,35],
@@ -48,7 +49,8 @@
                 "edit_btn": {
                     "type":        "Button",
                     "text":        "Edit",
-                    "script_path": "res://data/workflow.ekl",
+                    "script_path": "res://data/picker.ekl",
+                    "signals":     {"_clicked":"edit_btn"},
 
                     "icon_path": "res://media/icoedit.png",
 
@@ -61,7 +63,8 @@
                 "import_btn": {
                     "type":        "Button",
                     "text":        "Import",
-                    "script_path": "res://data/workflow.ekl",
+                    "script_path": "res://data/picker.ekl",
+                    "signals":     {"_clicked":"import_btn"},
 
                     "icon_path": "res://media/icofolder.png",
 
@@ -74,7 +77,8 @@
                 "run_btn": {
                     "type":        "Button",
                     "text":        "Run",
-                    "script_path": "res://data/workflow.ekl",
+                    "script_path": "res://data/picker.ekl",
+                    "signals":     {"_clicked":"run_btn"},
                     
                     "icon_path": "res://media/icoplay.png",
 
@@ -85,8 +89,9 @@
                     }
                 },
                 "dup_btn": {
-                    "type": "Button",
-                    "text": "Duplicate",
+                    "type":    "Button",
+                    "text":    "Duplicate",
+                    "signals": {"_clicked":"dup_btn"},
 
                     "icon_path": "res://media/icoduplicate.png",
 
@@ -98,10 +103,9 @@
                 },
 
                 "settings_btn": {
-                    "type": "Sprite",
-                    "children": {},
+                    "type":        "Sprite",
                     "image_path":  "res://media/icosetting.png",
-                    "script_path": "res://data/workflow.ekl",
+                    "script_path": "res://data/picker.ekl",
                     "signals":     {"_clicked":"open_editor_settings"},
                     
                     "transform": {
@@ -119,9 +123,8 @@
                 },
                 "newproje_btn": {
                     "type": "Sprite",
-                    "children": {},
                     "image_path":  "res://media/iconew.png",
-                    "script_path": "res://data/workflow.ekl",
+                    "script_path": "res://data/picker.ekl",
                     "signals":     {"_clicked":"make_new_project_interface"},
                     
                     "transform": {
@@ -139,9 +142,8 @@
                 },
 
                 "version_str": {
-                    "type": "Label",
-                    "children": {},
-                    "script_path": "res://data/workflow.ekl",
+                    "type":        "Label",
+                    "script_path": "res://data/picker.ekl",
                     
                     "transform": {
                         "position": [2,4],
@@ -422,8 +424,7 @@
                         "anchor":   "",
                         "visible":  false,
                         "skew":     0
-                    },
-                    "children": {}
+                    }
                 }
             }
         }

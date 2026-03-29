@@ -1,20 +1,20 @@
-# Import libraries
+## Import libraries
 import pyglet as pg, os
 
-# Import components
+##import components
 import classes.singleton as engine
 from classes.locals      import *
 from classes.customprops import *
 from pyglet.gl           import *
 
-# Cast some fucking OpenGL spells i don't know
+## Cast some fucking OpenGL spells i don't know
 glEnable(GL_BLEND)
 glEnable(GL_CULL_FACE)
 
-# Variables
+## Variables
 groups = {}
 
-# Classes
+## Classes
 class EklBaseWindow(pg.window.BaseWindow):
     """A Window to handle with Eklips viewports and NOT display them in one Window."""
     is_basewindow = True
@@ -35,6 +35,10 @@ class EklBaseWindow(pg.window.BaseWindow):
     @property
     def visible(self): return self._visible
 
+    @caption.setter
+    def caption(self, val):
+        self._caption = val
+        self.set_caption(val)
     @width.setter
     def width(self, val):
         self._width = val
@@ -48,15 +52,21 @@ class EklBaseWindow(pg.window.BaseWindow):
         self.set_size(*val)
     @maximum_size.setter
     def maximum_size(self, val):
+        if val == None:
+            self.set_maximum_size(engine.display.width, engine.display.height)
+            return
         self.set_maximum_size(*val)
     @minimum_size.setter
     def minimum_size(self, val):
+        if val == None:
+            self.set_minimum_size(1, 1)
+            return
         self.set_minimum_size(*val)
     @visible.setter
     def visible(self, val):
         self.set_visible(val)
     
-    ## Init
+    ##init
     def _refresh_viewports(self):
         self.switch_to()
         for vid in self.viewports:
@@ -103,7 +113,7 @@ class EklBaseWindow(pg.window.BaseWindow):
         self.id         = wid
         self._lastvid   = MAIN_VIEWPORT
 
-        # Init
+        ## Init
         ## Code taken from pyglet/window/base/__init__.py line 508-546
         if not display:
             display = pg.display.get_display()
@@ -184,6 +194,7 @@ class EklBaseWindow(pg.window.BaseWindow):
             if VIEWPORT_EQUAL_WINDOW in viewport.flags:
                 viewport.w = width
                 viewport.h = height
+            viewport._set_pos(*viewport.position)
     
     ## Add Viewport
     def add_viewport(
@@ -364,6 +375,7 @@ class Viewport(Transform, Color):
         self.framebuffer.attach_texture(self.color_buffer, attachment=GL_COLOR_ATTACHMENT0)
         self.citem.image = self.color_buffer
         self._set_anchors()
+        self._set_pos(*self.position)
         
     def _delete_buffer(self):
         if not self.framebuffer:
@@ -379,6 +391,10 @@ class Viewport(Transform, Color):
         self.citem.image.anchor_x = self._w // 2
         self.citem.image.anchor_y = self._h // 2
         self.citem._update_position()
+    def _set_pos(self, x, y):
+        x, y = self.into_screen_coords(drawing=True)
+        self.citem.x = x
+        self.citem.y = y
     def into_screen_coords(self, viewport_size=None, do_flip : bool = True, drawing : bool = False, parent=None):
         return super().into_screen_coords(self.window.size, do_flip, drawing, parent)
     def _set_alpha(self, deg):
@@ -414,7 +430,7 @@ class Viewport(Transform, Color):
         """
         Draw viewport contents to the window.
         """
-        # If you or the window is closed, don't bother
+        ## If you or the window is closed, don't bother
         if self._closing:
             return
         if not self.window:
@@ -424,7 +440,7 @@ class Viewport(Transform, Color):
         if not self.window.visible:
             return
         
-        # Init viewport
+        ## Init viewport
         self.window.switch_to()
         self.framebuffer.bind()
         if not NO_CLEAR_BACKGROUND in self.flags:
@@ -448,9 +464,6 @@ class Viewport(Transform, Color):
 
         # Draw Viewport to Window
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        x, y         = self.into_screen_coords(drawing=True)
-        self.citem.x = x
-        self.citem.y = y
         self.citem.draw()
 
     ## Camera functions    
@@ -517,8 +530,27 @@ class Display:
     _doomed        : int                  = []          # List of windows to run through remove_window
     _merciless     : int                  = []          # List of windows to run through window.close
     main_window_id : int | None           = None        # Name
+    _displayobj    : pg.display.Display   = pg.display.get_display()
     _windid        : int                  = MAIN_WINDOW # Next ID
     print(" ~ Initialize Display")
+    
+    ## Size
+    @property
+    def primary_screen(self):
+        return self._displayobj.get_default_screen()
+    @property
+    def primary_scr_info(self):
+        return self.primary_screen.get_mode()
+    
+    @property
+    def width(self):
+        return self.primary_scr_info.width
+    @property
+    def height(self):
+        return self.primary_scr_info.height
+    @property
+    def size(self):
+        return [self.width, self.height]
     
     ## Update
     def update(self):
@@ -681,7 +713,7 @@ class Display:
         except:
             return
 
-# Functions
+## Functions
 def request_group(order     : int):
     """Get a group with the order `order`.
     
@@ -695,8 +727,9 @@ def set_anti_aliasing(value : bool):
     
     Args:
         value: True for on, False for off."""
-    if value: aliasval = GL_LINEAR
-    else:     aliasval = GL_NEAREST
+    aliasval = GL_LINEAR if value else GL_NEAREST
+
+    engine._image_filter                = aliasval
     pg.image.Texture.default_mag_filter = pg.image.Texture.default_min_filter = aliasval
 
 def _rebase_window(window : EklWindow):

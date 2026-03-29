@@ -1,11 +1,11 @@
-# Import libraries
+## Import libraries
 import pygame, pyglet as pg, json, xmltodict, pkgutil
 
-# Import components
+## Import components
 from classes.locals      import *
 import classes.singleton as engine
 
-# Import resources
+## Import resources
 print(" ~ Importing all resources")
 from classes.resources.image   import Animation, _ModifiedAnimation
 from classes.resources.object  import *
@@ -13,7 +13,7 @@ from classes.resources.scene   import *
 from classes.resources.tileset import *
 from classes.resources.theme   import *
 
-# Classes
+## Classes
 class Loader:
     """
     A class to load resources for use.
@@ -27,54 +27,52 @@ class Loader:
         "sfx": ["mp3","ogg","wav"],                           # Sound
         "txt": ["py","txt","ekl"],                            # TXT file
         "jsn": ["json"],                                      # JSON
-        "vid": ["mp4","webm","mkv"],                          # Video
+        "vid": ["mp4","webm","mkv","flv"],                    # Video
         "ani": ["gif"],                                       # pyglet.image.Animation
         "fnt": ["ttf","otf"],                                 # Fonts
         "scn": ["scn","tscn"],                                # Scene
-        "res": ["res","rc"],                                  # Ekl Resource
+        "res": ["res","rc"],                                  # Eklips Resource
         "xml": ["xml", "svg", "html"]                         # Xml
     }
 
     def _get_true_path(self, path : str):
         path = path.replace("\\", "/")
         
-        if engine._inpyinstaller:
-            if path.startswith("res://"):  return f"{engine._pyinstallpath}/{engine.game.project_dir}/{path.removeprefix('res://')}"
-            if path.startswith("root://"): return f"{engine._pyinstallpath}/{path.removeprefix('root://')}"
+        if path.startswith("res://"):    return f"{engine.game.project_dir}/{path.removeprefix('res://')}".replace("\\", "/")
+        elif path.startswith("root://"): return f"{path.removeprefix('root://')}".replace("\\", "/")
+        elif path.startswith("user://"): return f"{engine.game.save_dir}{path.removeprefix('user://')}".replace("\\", "/")
         else:
-            if path.startswith("res://"):  return f"{engine.game.project_dir}/{path.removeprefix('res://')}"
-            if path.startswith("root://"): return f"{path.removeprefix('root://')}"
-        if path.startswith("user://"): return f"{engine.game.save_dir}{path.removeprefix('user://')}"
-
-        return path
+            return os.path.relpath(path).replace("\\", "/")
 
     def _load(self, path, ext):
         actual_path = self._get_true_path(path)
         
         try:
             if ext in self.extensions["img"]:
-                image          = pg.image.load(actual_path)
+                image          = pg.resource.image(actual_path)
                 image.anchor_x = image.width  // 2
                 image.anchor_y = image.height // 2
+                
                 return image
             if ext in self.extensions["sfx"]:
-                return pygame.Sound(actual_path)
+                return pg.resource.media(actual_path)
             if ext in self.extensions["txt"]:
-                with open(actual_path) as f:
+                with pg.resource.file(actual_path, "r") as f:
                     return f.read()
             if ext in [*self.extensions["scn"],
                        *self.extensions["jsn"]]:
-                with open(actual_path) as f:
+                with pg.resource.file(actual_path, "r") as f:
                     return json.loads(f.read())
                 return json.loads(open(actual_path).read())
             if ext in self.extensions["xml"]:
-                with open(actual_path) as f:
+                with pg.resource.file(actual_path, "r") as f:
                     return xmltodict.parse(f.read())
             if ext in self.extensions["cur"]:
-                image = pg.image.load(actual_path)
+                image = pg.resource.image(actual_path)
                 return pg.window.ImageMouseCursor(image, hot_x=0, hot_y=image.height)
             if ext in self.extensions["res"]:
-                data     = json.loads(open(actual_path).read())
+                with pg.resource.file(actual_path, "r") as f:
+                    data = json.loads(f.read())
                 
                 ## Make Resource
                 classobj = globals().get(data["type"])
@@ -85,11 +83,11 @@ class Loader:
                 obj._setup_properties()
                 return obj
             if ext in self.extensions["vid"]:
-                return engine.pvd.VideoPyglet(actual_path)
+                return engine.pvd.VideoPyglet(pg.resource.file(actual_path).read())
             if ext in self.extensions["fnt"]:
-                pg.font.add_file(actual_path)
+                pg.resource.add_font(actual_path)
             if ext in self.extensions["ani"]:
-                image= _ModifiedAnimation(pg.image.load_animation(actual_path).frames)
+                image= _ModifiedAnimation(pg.resource.animation(actual_path).frames)
 
                 for frame in image.frames:
                     frame.anchor_x = frame.width  // 2

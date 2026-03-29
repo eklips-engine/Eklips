@@ -1,7 +1,7 @@
-# Import libraries
+## Import libraries
 from classes.nodes.gui.canvasitem import *
 
-# Classes
+## Classes
 class BaseNinePatchRect(CanvasItem):
     """
     A CanvasItem with an spliced image.
@@ -46,6 +46,7 @@ class BaseNinePatchRect(CanvasItem):
         self._resize_images()
         self._set_anchors()
     def _remove_item(self):
+        self._switch_window()
         for s in [
             self.citem, self._citemtr, self._citembl, self._citembr,
             self._citemt, self._citeml, self._citemr, self._citemb, self._citemc
@@ -173,6 +174,8 @@ class BaseNinePatchRect(CanvasItem):
         self._make_new_item()
     def draw(self):
         """Draw the NinePatchRect. This is usually called automatically."""
+        if not self.viewport:
+            return
         if self.visible and self.viewport.is_onscreen(self) and self.citem:
             x, y   = self.into_screen_coords()
             cw, ch = self.corner_size

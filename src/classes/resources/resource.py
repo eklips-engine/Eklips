@@ -1,9 +1,9 @@
-# Import singleton
+## Import singleton
 import pyglet as pg
 from classes.resources.object import *
 from classes.customprops      import *
 
-# Classes
+## Classes
 class Resource(Object):
     """
     An Object that can be saved or loaded.

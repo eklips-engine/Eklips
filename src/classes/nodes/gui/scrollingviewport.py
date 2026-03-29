@@ -1,8 +1,8 @@
-# Import inherited
+## Import inherited
 from classes.nodes.gui.extraviewport import *
 from classes.ui                      import *
 
-# Variables
+## Variables
 viewport_transform = {
     "position": [0,0],
     "tsize":    [320,320],
@@ -16,7 +16,7 @@ viewport_transform = {
     "skew":     0
 }
 
-# Classes
+## Classes
 class ScrollingViewport(ExtraViewport):
     """
     A Viewport Node.
@@ -53,6 +53,11 @@ class ScrollingViewport(ExtraViewport):
     @left_to_right.setter
     def left_to_right(self, value):
         self._left_to_right = value
+        if value:
+            self.scrollbar_bg.image = engine.theme.get_static_widget("scrollbg_hor")
+        else:
+            self.scrollbar_bg.image = engine.theme.get_static_widget("scrollbg")
+        self._set_scrollbar_size()
     
     @export(False, "int", "slider")
     def content_width(self):
@@ -70,9 +75,16 @@ class ScrollingViewport(ExtraViewport):
         if value < ZDE_FIX: value = ZDE_FIX
         self._content_height = value
     
+    def _set_scrollbar_size(self):
+        if self.left_to_right:
+            self.scrollbar_bg.scale_x = self._w               / self.scrollbar_bg.image.width
+            self.scrollbar_bg.scale_y = self.scrollbar.height / self.scrollbar_bg.image.height
+        else:
+            self.scrollbar_bg.scale_x = self.scrollbar.width / self.scrollbar_bg.image.width
+            self.scrollbar_bg.scale_y = self._h              / self.scrollbar_bg.image.height
+    
     def _set_size(self, w, h):
-        self.scrollbar_bg.scale_x = self.scrollbar.width / self.scrollbar_bg.image.width
-        self.scrollbar_bg.scale_y = h                    / self.scrollbar_bg.image.height
+        self._set_scrollbar_size()
         super()._set_size(w, h)
     
     def __init__(self, properties={}, parent=None):
@@ -196,9 +208,9 @@ class ScrollingViewport(ExtraViewport):
             if self.cam.x > self.content_width:
                 self.cam.x = self.content_width
             
+            self.scrollbar_bg.x = self.cam.x
             self.scrollbar_bg.y = self.scrollbar.y = 0
-            # XXX make bg horizontal
-            self.scrollbar.x    = self.cam.x+((self.cam.x/self.content_width) * (self.w-self.scrollbar.width))
+            self.scrollbar.x    = self.cam.x+((self.cam.x/self.content_width) * (self._w-self.scrollbar.width))
         else:
             self.cam.y   += self._vel
             if self.cam.y > 0:
@@ -207,10 +219,10 @@ class ScrollingViewport(ExtraViewport):
                 self.cam.y = -self.content_height
             
             self.scrollbar_bg.y = self.cam.y
-            self.scrollbar_bg.x = self.w-self.scrollbar_bg.width
-            self.scrollbar.x    = self.w-self.scrollbar.width
-            y                   = (self.cam.y/self.content_height) * (self.h-self.scrollbar.height)
-            self.scrollbar.y    = self.h-self.scrollbar.height+self.cam.y+y
+            self.scrollbar_bg.x = self._w-self.scrollbar_bg.width
+            self.scrollbar.x    = self._w-self.scrollbar.width
+            y                   = (self.cam.y/self.content_height) * (self._h-self.scrollbar.height)
+            self.scrollbar.y    = self._h-self.scrollbar.height+self.cam.y+y
         
         # Weeeeeee
         self._vel += (-self._vel) / ((engine.fps+ZDE_FIX) * 0.25)

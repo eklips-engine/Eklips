@@ -1,8 +1,8 @@
-# Import inherited
+## Import inherited
 import time
 from classes.nodes.node import *
 
-# Classes
+## Classes
 class Timer(Node):
     def __init__(self, properties = {}, parent = None):
         super().__init__(properties, parent)

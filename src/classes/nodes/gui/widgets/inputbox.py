@@ -1,8 +1,8 @@
-# Import libraries
+## Import libraries
 import pyglet as pg
 from classes.nodes.gui.colorrect import *
 
-# Classes
+## Classes
 class Inputbox(ColorRect, Color):
     """
     A themed inputbox element.
@@ -55,7 +55,8 @@ class Inputbox(ColorRect, Color):
         if self.citem:
             self._remove_item(False)
         else:
-            self._drawing_bid = self.viewport.add_batch()
+            self._drawing_bid  = self.viewport.add_batch()
+            self._cached_batch = self.viewport.batches[self.batch_id]
 
         self.citem = pg.shapes.Rectangle(0,0,self.w,self.h, color=self.color, batch=self.batch)
         self.label = pg.text.Label(
@@ -63,6 +64,7 @@ class Inputbox(ColorRect, Color):
             batch  = self.batch)
         self._set_anchors()
     def _remove_item(self, remove_batches=True):
+        self._switch_window()
         self.citem.delete()
         self.label.delete()
         if self.viewport and remove_batches:
@@ -85,7 +87,7 @@ class Inputbox(ColorRect, Color):
         ## Mouse
         if self.widgetman.hovering_widget == -1:
             engine.set_mouse(MOUSE_NORMAL, self.window_id)
-        if self.get_if_mouse_hovering():# or self.widgetman.focused_widget == self.gid:
+        if self.get_if_mouse_hovering():
             engine.set_mouse(MOUSE_IBEAM, self.window_id)
             self.widgetman.moving_widget = -1
 
@@ -114,9 +116,6 @@ class Inputbox(ColorRect, Color):
                 if len(self._value) and self._pointer-1 > -1:
                     self._value.pop(self._pointer-1)
                     self._pointer -= 1
-            
-            #elif key == pg.window.key.ENTER:
-            #    self.widgetman.focused_widget = -1
         
         ## Draw it
         self._elapsed += engine.delta
@@ -146,7 +145,7 @@ class Inputbox(ColorRect, Color):
         self.label.y = y + self.h / 2 - self.label.content_height / 2 + 5
 
         display_value = self._value[:]
-        blink         = "_" if self._elapsed > self._blinktimer and self.widgetman.focused_widget == self.gid else ""
-        
-        display_value.insert(self._pointer, blink)
+        if self.widgetman.focused_widget == self.gid:
+            display_value.insert(self._pointer, "_" if self._elapsed > self._blinktimer else "")
+        self._get_window().switch_to()
         self.label.text = f"{''.join(display_value)}"

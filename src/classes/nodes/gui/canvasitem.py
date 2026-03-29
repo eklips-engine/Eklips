@@ -1,12 +1,12 @@
-# Import libraries
+## Import libraries
 import pyglet as pg
 from classes import ui
 
-# Import inherited
+## Import inherited
 from classes.nodes.node  import *
 from classes.customprops import *
 
-# Variables
+## Variables
 base_transform = {
     "position": [0,0],
     "tsize":    [0,0],
@@ -20,7 +20,7 @@ base_transform = {
     "skew":     0
 }
 
-# Classes
+## Classes
 class CanvasItem(Node, Transform):
     """
     A Canvas Node.
@@ -45,15 +45,17 @@ class CanvasItem(Node, Transform):
     _ignore_size_if_drawing                     = False
 
     ## Properties
+    def _switch_window(self):
+        self._get_window().switch_to()
     @property
     def viewport(self):
         if not hasattr(self, "_cached_viewport"):
-            self._cached_viewport = engine.display.get_viewport_from_window(self.window_id, self.viewport_id)
+            self._cached_viewport = self._get_viewport()
         return self._cached_viewport
     @property
     def batch(self):
         if not hasattr(self, "_cached_batch"):
-            self._cached_batch = engine.display.get_batch_from_window(self.window_id, self.viewport_id, self.batch_id)
+            self._cached_batch = self._get_viewport().batches[self.batch_id]
         return self._cached_batch
     @property
     def image(self):
@@ -185,6 +187,7 @@ class CanvasItem(Node, Transform):
     
     ## CItem managing
     def _remove_item(self):
+        self._switch_window()
         if self.citem:
             self.citem.delete()
             self.citem = None
@@ -226,6 +229,8 @@ class CanvasItem(Node, Transform):
     
     def draw(self):
         """Draw the CanvasItem. This is usually called automatically."""
+        if not self.viewport:
+            return
         if self.visible and self.viewport.is_onscreen(self) and self.citem:
             x, y         = self.into_screen_coords(drawing=True)
             self.citem.x = x

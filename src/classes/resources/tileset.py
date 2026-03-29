@@ -1,9 +1,9 @@
-# Import singleton
+## Import singleton
 import pyglet as pg
 from classes.resources.resource import *
 from classes.customprops        import *
 
-# Classes
+## Classes
 class Tileset(Resource):
     """
     An image with a set of Tiles used to make a Tilemap.

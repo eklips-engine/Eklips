@@ -1,5 +1,5 @@
 ## Spaghetti code
-import classes.singleton       as engine
+import classes.singleton       as engine, subprocess
 import tkinter                 as tk
 from tkinter                   import ttk
 from tkinter.messagebox        import *
@@ -36,13 +36,9 @@ def change_scn(scn): # XXX this is a buggy mess
     window        = engine.display.get_window(MAIN_WINDOW)
     window.set_caption(engine.lang.get("pe_titleeditor").replace("%", gmdt.name).replace("@", scn))
     
-    _data                     = engine.loader.load(true_scn)["nodes"]
-    _data[""]["_drawing_vid"] = sp_vp.viewport_id
+    scenepreview.nodes = engine.loader.load(true_scn)["nodes"]
 
-    scenepreview.nodes = _data
-
-    scenepreview.pause()
-def load():
+def _onready(self):
     global backbtn, settbtn, playbtn, gjsp, gmdt, gjs, current_scene, scenepreview, sp_vp
     
     backbtn = engine.scene.get_node_from_path("/backico")
@@ -62,7 +58,7 @@ def load():
     sp_vp.color  = gmdt.win.color
     
     engine.ineditor = True
-    #change_scn(gmdt.master_scene)
+    change_scn(gmdt.master_scene)
 
     fb_title = engine.scene.get_node_from_path("/file_browser_panel/titlebar/text")
     st_title = engine.scene.get_node_from_path("/scene_tree_panel/titlebar/text")
@@ -77,88 +73,89 @@ def load():
     sg_title.text = engine.lang.get(sg_title.text)
 
 ## Settings dialog
-def save():
-    global icnpth, msrpth, lsrpth
-    global winw, winh, mxwinw, mxwinh, mnwinw, mnwinh, resiz, antiali, languages, langdir, name, ver, verekl
-    gjs["viewport"]["size"]         = [winw.get(),   winh.get()]
-    gjs["viewport"]["maxsize"]      = [mxwinw.get(), mxwinh.get()]
-    gjs["viewport"]["minsize"]      = [mnwinw.get(), mnwinh.get()]
-    gjs["viewport"]["color"]        = wincol
-    gjs["viewport"]["resizable"]    = resiz.get()
-    gjs["behavior"]["antialiasing"] = antiali.get()
-
-    gjs["behavior"]["fonts"] = fonts
-
-    gjs["language"]["langs"] = languages
-    gjs["language"]["dir"]   = langdir.get()
-
-    gjs["name"]                  = name.get()
-    gjs["version"]["app"]        = ver.get()
-    gjs["version"]["ekl"]        = verekl.get()
-    gjs["viewport"]["icon_file"] = icnpth.get()
-
-    gjs["scenes"]["master"]  = msrpth.get()
-    gjs["scenes"]["loading"] = lsrpth.get()
-
-    with open(gjsp, "w") as f:
-        f.write(json.dumps(gjs, indent=4))
-def add_action(action):
-    global acttrv, actions
-    data      = actions[action]
-    acts      = ""
-    for act in data["actions"]:
-        if act == MOUSE_LEFT:
-            name = engine.lang.get("es_mleft")
-        elif act == MOUSE_MIDDLE:
-            name = engine.lang.get("es_mmdl")
-        elif act == MOUSE_RIGHT:
-            name = engine.lang.get("es_mrght")
-        else:
-            name = pg.window.key.symbol_string(act)
-        acts += f"{name}, "
-    acts      = acts.rstrip(", ")
-    holdable  = engine.lang.get("yes") if data["holdable"] else engine.lang.get("no")
-
-    acttrv.insert("", "end", action, values=(action, acts, holdable))
-def add_lang(lang):
-    global lngtrv, gmdt
-    path = f"{langdir.get()}/{lang}.json"
-    name = Language(f"{path.replace('res://',f'{gmdt.project_dir}/')}").name
-    lngtrv.insert("", "end", lang, values=(name, path))
-def make_font():
-    global fonts
-    path = askopenfilename(filetypes=[("TrueType Font","*.ttf"), ("OpenType Font","*.otf"), ("Everything else","*.*")], initialdir=gmdt.project_dir, title=engine.lang.get("op_font"))
-    if not path:
-        return
-    try:
-        font = ttLib.TTFont(path)
-        name = font["name"].getDebugName(1)
-        
-        data = [name, os.path.relpath(path).replace("\\","/").replace(f"{gmdt.project_dir}/", "res://")]
-    except:
-        showerror(engine.lang.get("ee_title"), engine.lang.get("notfont"))
-        return
-    
-    if not data in fonts:
-        fonts.append(data)
-        add_font(data)
-def add_font(font):
-    global fnttrv
-    fnttrv.insert("", "end", font[0], values=(font[0], font[1]))
-def change_color():
-    global wincol, ekv_entry
-    hexrgb = colorchooser.askcolor(title=engine.lang.get("ec_bgcol"), initialcolor=engine.rgbtohex(wincol))
-    if not hexrgb:
-        return wincol
-    ekv_entry.config(background=hexrgb[1])
-    ekv_entry.config(foreground=engine.rgbtohex(engine.invertrgb(hexrgb[0])))
-    wincol = hexrgb[0]
-    return wincol
 def _settings_dialog():
     global wincol, ekv_entry, gmdt, gjs, gjsp
     global icnpth, msrpth, lsrpth, fnttrv, lngtrv, fonts
     global winw, winh, mxwinw, mxwinh, mnwinw, mnwinh, resiz, antiali, languages, langdir, name, ver, verekl
     global gjsp, gmdt, gjs, root, s, acttrv, actions, lngtrv
+    
+    def save():
+        global icnpth, msrpth, lsrpth
+        global winw, winh, mxwinw, mxwinh, mnwinw, mnwinh, resiz, antiali, languages, langdir, name, ver, verekl
+        gjs["viewport"]["size"]         = [winw.get(),   winh.get()]
+        gjs["viewport"]["maxsize"]      = [mxwinw.get(), mxwinh.get()]
+        gjs["viewport"]["minsize"]      = [mnwinw.get(), mnwinh.get()]
+        gjs["viewport"]["color"]        = wincol
+        gjs["viewport"]["resizable"]    = resiz.get()
+        gjs["behavior"]["antialiasing"] = antiali.get()
+
+        gjs["behavior"]["fonts"] = fonts
+
+        gjs["language"]["langs"] = languages
+        gjs["language"]["dir"]   = langdir.get()
+
+        gjs["name"]                  = name.get()
+        gjs["version"]["app"]        = ver.get()
+        gjs["version"]["ekl"]        = verekl.get()
+        gjs["viewport"]["icon_file"] = icnpth.get()
+
+        gjs["scenes"]["master"]  = msrpth.get()
+        gjs["scenes"]["loading"] = lsrpth.get()
+
+        with open(gjsp, "w") as f:
+            f.write(json.dumps(gjs, indent=4))
+    def add_action(action):
+        global acttrv, actions
+        data      = actions[action]
+        acts      = ""
+        for act in data["actions"]:
+            if act == MOUSE_LEFT:
+                name = engine.lang.get("es_mleft")
+            elif act == MOUSE_MIDDLE:
+                name = engine.lang.get("es_mmdl")
+            elif act == MOUSE_RIGHT:
+                name = engine.lang.get("es_mrght")
+            else:
+                name = pg.window.key.symbol_string(act)
+            acts += f"{name}, "
+        acts      = acts.rstrip(", ")
+        holdable  = engine.lang.get("yes") if data["holdable"] else engine.lang.get("no")
+
+        acttrv.insert("", "end", action, values=(action, acts, holdable))
+    def add_lang(lang):
+        global lngtrv, gmdt
+        path = f"{langdir.get()}/{lang}.json"
+        name = Language(f"{path.replace('res://',f'{gmdt.project_dir}/')}").name
+        lngtrv.insert("", "end", lang, values=(name, path))
+    def make_font():
+        global fonts
+        path = askopenfilename(filetypes=[("TrueType Font","*.ttf"), ("OpenType Font","*.otf"), ("Everything else","*.*")], initialdir=gmdt.project_dir, title=engine.lang.get("op_font"))
+        if not path:
+            return
+        try:
+            font = ttLib.TTFont(path)
+            name = font["name"].getDebugName(1)
+            
+            data = [name, os.path.relpath(path).replace("\\","/").replace(f"{gmdt.project_dir}/", "res://")]
+        except:
+            showerror(engine.lang.get("ee_title"), engine.lang.get("notfont"))
+            return
+        
+        if not data in fonts:
+            fonts.append(data)
+            add_font(data)
+    def add_font(font):
+        global fnttrv
+        fnttrv.insert("", "end", font[0], values=(font[0], font[1]))
+    def change_color():
+        global wincol, ekv_entry
+        hexrgb = colorchooser.askcolor(title=engine.lang.get("ec_bgcol"), initialcolor=engine.rgbtohex(wincol))
+        if not hexrgb:
+            return wincol
+        ekv_entry.config(background=hexrgb[1])
+        ekv_entry.config(foreground=engine.rgbtohex(engine.invertrgb(hexrgb[0])))
+        wincol = hexrgb[0]
+        return wincol
 
     window   = engine.display.windows[MAIN_WINDOW]
     window.switch_to()
@@ -244,7 +241,7 @@ def _settings_dialog():
     ati_entry.place(x=105,y=85)
 
     # Scenes
-    scenes = ttk.Frame(tab, borderwidth=1, relief=tk.SUNKEN, width=385, height=52, style='Sunk.TFrame')
+    scenes = ttk.Frame(tab, borderwidth=1, relief=tk.SUNKEN, width=385, height=52, style="Sunk.TFrame")
     scenes.place(x=5, y=115)
 
     msr_label = ttk.Label(scenes, text=engine.lang.get("es_mstrscn"), style="Sunk.TLabel")
@@ -425,15 +422,17 @@ def _process(self : Node, delta : float):
     global backbtn, settbtn, playbtn
 
     gmdt : GameData = engine.projects[engine.selected_project]
-
-    if not backbtn:
-        load()
     
     if backbtn.get_if_mouse_hovering() and engine.mouse.buttons[MOUSE_LEFT]:
         if askyesno(engine.lang.get("ee_title"), engine.lang.get("pe_warnleaveprj")):
             engine.ineditor = False
             engine.scene.load("res://scenes/master.scn")
     if playbtn.get_if_mouse_hovering() and engine.mouse.buttons[MOUSE_LEFT]:
-        os.system(f"eklips.py -file {gmdt.project_file} -dir {gmdt.project_dir} -editordebug")
+        subprocess.run([
+            "python", "eklips.py",
+            "-file", gmdt.project_file,
+            "-dir", gmdt.project_dir,
+            "-editordebug"
+        ])
     if settbtn.get_if_mouse_hovering() and engine.mouse.buttons[MOUSE_LEFT]:
         _settings_dialog()

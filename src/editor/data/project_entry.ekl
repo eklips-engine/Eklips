@@ -1,9 +1,5 @@
 import classes.singleton as engine
-import tkinter           as tk, os, shutil
-from tkinter             import ttk
 from tkinter.messagebox  import *
-from tkinter.filedialog  import *
-from classes.ui          import *
 from classes.customprops import *
 from classes.nodes       import *
 

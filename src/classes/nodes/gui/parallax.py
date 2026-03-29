@@ -1,8 +1,8 @@
-# Import libraries
+## Import libraries
 import pyglet as pg
 from classes.nodes.gui.sprite import *
 
-# Classes
+## Classes
 class Parallax(Sprite):
     """
     A 2D scrolling Sprite.
@@ -60,6 +60,7 @@ class Parallax(Sprite):
         self._set_anchors()
         self._set_visible(False)
     def _remove_item(self):
+        self._switch_window()
         for s in [self.citem, self._citemtr, self._citembl, self._citembr]:
             if s:
                 s.delete()

@@ -1,7 +1,7 @@
-# Import libraries
+## Import libraries
 from classes.nodes.gui.canvasitem import *
 
-# Classes
+## Classes
 class Checkbox(CanvasItem):
     """
     A themed Checkbox element that has two states; on or off.

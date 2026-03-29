@@ -1,8 +1,8 @@
-# Import libraries
+## Import libraries
 import pyglet as pg
 from classes.nodes.gui.canvasitem import *
 
-# Classes
+## Classes
 class ColorRect(CanvasItem, Color):
     """
     A single-color rectangle on the screen.

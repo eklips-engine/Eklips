@@ -1,14 +1,14 @@
-# Import libraries & components
+## Import libraries & components
 import json, pyglet      as pg, sys
 import os
 from classes.locals    import *
 from typing_extensions import *
 from typing            import *
 
-# Variables
+## Variables
 _screenc_cache = {}
 
-# Classes
+## Classes
 @disjoint_base
 class _export:
     def __init__(self, type_=None, default=None, hint=None, fget=None, fset=None):
@@ -120,7 +120,7 @@ class DebugConfig:
     """Debugging configuration."""
     _skipload  = False
     _freezload = False
-    _enabled   = False
+    _enabled   = True
     _showfps   = True
     _nomercy   = False
     _alwaysvis = False
@@ -203,8 +203,8 @@ class GameData:
     loading_scene = None
 
     def __init__(self, settings="settings.json", is_file = True):
-        #### Settings file related
-        ### Load settings
+        ### Settings file related
+        ## Load settings
         if is_file:
             self.file_data = json.loads(open(settings).read())
         else:
@@ -349,7 +349,7 @@ class Transform:
     @property
     def scale(self):
         """The Transform's scaling. Read-write"""
-        return [self.scale_x, self.scale_y]
+        return [self._scale_x, self._scale_y]
     
     @property
     def w(self):
@@ -529,7 +529,6 @@ class Transform:
             "visible":  self.visible,
             "tsize":    self.tsize
         }
-    
     def _convert_transform_property_into_object(self, value):
         """Sets the Transform object's properties from a dictionary."""
         self.tsize     = value.get("tsize",    self.tsize)
@@ -576,16 +575,11 @@ class Transform:
         else:
             x += self.x
 
-        if do_flip:
-            if "top" in anchor:
-                y += parent_rect[3] - self.h - self.y
-            else:
-                y += self.y
+        flip_offset = parent_rect[3] - self.h - self.y
+        if "top" in anchor:
+            y += flip_offset if do_flip else self.y
         else:
-            if "top" in anchor:
-                y += self.y
-            else:
-                y += parent_rect[3] - self.h - self.y
+            y += self.y if do_flip else flip_offset
 
         if "centery" in anchor:
             y += (parent_rect[3]/2) - (self.h/2) + self.y

@@ -1,7 +1,7 @@
-# Import libraries
+## Import libraries
 from classes.nodes.gui.ninepatchrect import *
 
-# Classes
+## Classes
 class Button(BaseNinePatchRect, Color):
     """
     A themed Button.
@@ -58,6 +58,7 @@ class Button(BaseNinePatchRect, Color):
     
     ## CItem Management
     def _remove_item(self):
+        self._switch_window()
         for s in [
             self.citem,   self._citemtr, self._citembl, self._citembr,
             self._citemt, self._citeml,  self._citemr,  self._citemb,  self._citemc,
@@ -104,6 +105,8 @@ class Button(BaseNinePatchRect, Color):
     ## Updating
     def draw(self):
         super().draw()
+        if not self.viewport:
+            return
         if self.visible and self.viewport.is_onscreen(self) and self.citem:
             x,   y        = self.into_screen_coords()
             tx,  ty       = self.into_screen_coords(drawing=True)
@@ -148,7 +151,7 @@ class Button(BaseNinePatchRect, Color):
         self.widgetman.widgets.pop(self.gid)
         super()._free()
     def __init__(self, properties={}, parent=None):
-        # Init color
+        ## Init color
         Color.__init__(self, *WHITE)
         
         # Make widget
@@ -164,7 +167,7 @@ class Button(BaseNinePatchRect, Color):
         self.icon      : pg.image.AbstractImage = engine.loader.load("root://_assets/error.png") # The icon image
         self._iconspr  : pg.sprite.Sprite       = None                                           # The icon sprite
 
-        # Init CItem
+        ## Init CItem
         super().__init__(properties, parent)
 
         # Make image theme

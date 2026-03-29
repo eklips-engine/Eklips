@@ -1,8 +1,8 @@
-# Import libraries
+## Import libraries
 from pygame import mixer
 from classes.nodes.gui.canvasitem import *
 
-# Classes
+## Classes
 class PlayerError(Exception):
     """Exception class for problems caused in the `MediaPlayer` Node."""
 
@@ -21,18 +21,12 @@ class MediaPlayer(CanvasItem):
         self._playing     : bool                   = True
         self._ogsize      : list[int]              = [320,240]
         self._volume      : float | int            = 0
-        self._sound       : mixer.Sound            = None
+        self._sound       : pg.media.Player        = None
         self._video       : engine.pvd.VideoPyglet = None
-        self.channel      : mixer.Channel          = None
         self._autostart   : bool                   = False
         self._loops       : int                    = 0
 
         super().__init__(properties, parent)
-        
-        self.media_id = engine.sid
-        self.channel  = mixer.Channel(self.media_id)
-        
-        engine.sid += 1
     
     def _setup_properties(self, scene=None):
         super()._setup_properties(scene)
@@ -76,7 +70,8 @@ class MediaPlayer(CanvasItem):
             if self._video:
                 self.stop()
             self._video = None
-            self._sound = engine.loader.load(value)
+            self._sound = pg.media.Player()
+            self._sound.queue(engine.loader.load(self.media))
         else:
             raise PlayerError(f"File format {extension} unknown")
 
@@ -96,52 +91,52 @@ class MediaPlayer(CanvasItem):
         if not keep_play_counter:
             self._playcounter = 0
         
-        if self._sound:
-            self.channel.play(self._sound)
-            self._set_visible(False)
         if self._video:
             self._video.play()
             if not self.citem:
                 self._make_new_item()
-            self._set_visible(True)
+            self._set_visible(self.visible)
+        else:
+            self._sound.play()
+            self._set_visible(False)
         
     def restart(self):
         """Restart the attached Media file."""
-        if self._sound:
-            self.channel.stop()
-            self.channel.play(self._sound)
         if self._video:
             self._video.restart()
+        else:
+            self.channel.stop()
+            self.channel.play(self._sound)
     
     def stop(self):
         """Stop the attached Media file."""
         self._playing = False
-        if self._sound:
-            self.channel.stop()
         if self._video:
             self._video.stop()
+        else:
+            self._sound.pause()
     
     def pause(self):
         """Pause the attached Media file."""
-        if self._sound:
-            self.channel.pause()
         if self._video:
             self._video.pause()
+        else:
+            self._sound.pause()
     
     def resume(self):
         """Resume the attached Media file."""
-        if self._sound:
-            self.channel.unpause()
         if self._video:
+            self._video.resume()
+        else:
             self._video.resume()
     
     @property
     def busy(self) -> bool:
         """True if media is playing. Read-only"""
-        if self._sound:
-            return self.channel.get_busy()
         if self._video:
             return self._video.active
+        else:
+            return self._sound.playing
     
     def update(self):
         super().update()
@@ -176,10 +171,10 @@ class MediaPlayer(CanvasItem):
     @volume.setter
     def volume(self, value : int | float | None):
         self._volume = value
-        if self._sound:
-            self.channel.set_volume(value)
         if self._video:
             self._video.set_volume(value)
+        else:
+            self._sound.volume = value
     
     @export(False, "bool", "bool")
     def auto_start(self):
@@ -193,4 +188,5 @@ class MediaPlayer(CanvasItem):
         self.stop()
         if self._video:
             self._video.close()
+        self._sound.delete()
         super()._free()

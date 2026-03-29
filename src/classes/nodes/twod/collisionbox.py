@@ -1,8 +1,8 @@
-# Import libraries
+## Import libraries
 import pygame
 from classes.nodes.gui.colorrect import *
 
-# Classes
+## Classes
 class CollisionBox(CanvasItem):
     """
     A rectangle with Collision abilities.

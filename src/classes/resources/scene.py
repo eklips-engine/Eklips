@@ -1,9 +1,9 @@
-# Import classes
+## Import classes
 from classes.resources.resource import *
 from classes.resources.theme    import *
 from classes.nodes              import *
 
-# Classes
+## Classes
 class SceneError(Warning):
     pass
 
@@ -75,7 +75,7 @@ class Scene(Resource, SceneLike):
         if self._file_path != None: # Scene is probs empty if this is True so dont bother if it is
             self.empty()
 
-        # Init managers
+        ## Init managers
         self._reload_managers()
 
         # Set filepath and load
@@ -84,7 +84,9 @@ class Scene(Resource, SceneLike):
         if _data["properties"]["inherits"]:
             self._inherited_scn = _data["properties"]["inherits"]
             self._loadscenefile(_data["properties"]["inherits"])
-        self._loadscenefile(path)
+            self._loadscenefile(path, append_nodes=True)
+        else:
+            self._loadscenefile(path)
     @export({}, "dict", "HIDDEN")
     def nodes(self) -> dict:
         return self._nodes
@@ -95,15 +97,26 @@ class Scene(Resource, SceneLike):
         self._nodes = nodes
         self._reload_nodes()
     def _reload_managers(self):
+        print(" ~ Reload Collision and Widget managers")
         self._collisionman = engine.resources.CollisionManager()
         self._widgetman    = engine.resources.WidgetManager()
     def _reload_nodes(self):
-        nodepaths          = self.get_node_paths("")
+        nodepaths = self.get_node_paths("")
+        _nodes    = []
+
+        # Make nodes
         for nodepath in nodepaths:
-            self._initialize_node_entry(nodepath)
-    def _loadscenefile(self, path):
-        _data       = engine.loader.load(path, force_new_resource=True)
-        self._nodes = _data["nodes"]
+            node = self._initialize_node_entry(nodepath)
+            _nodes.append(node)
+        
+        # Make nodes ready up
+        for node in _nodes:
+            self._ready_node(node)
+    def _loadscenefile(self, path, append_nodes=False):
+        print(f" ~ Load scene {path}")
+        _data     = engine.loader.load(path, force_new_resource=True)
+        _nodedata = _data["nodes"]
+        self._nodes = _nodedata
         self._reload_nodes()
     def load(self, path):
         """
@@ -117,7 +130,7 @@ class Scene(Resource, SceneLike):
         self._marked_scene_chng = path
     @classmethod
     def new(cls):
-        return Scene({"nodes":{"":{"type":"Node"}}})
+        return Scene({"nodes":EMPTY_SCENE})
     def save(self, path):
         with open(engine.loader._get_true_path(path), "w") as f:
             f.write(json.dumps({
@@ -150,7 +163,7 @@ class Scene(Resource, SceneLike):
 
         # Return Node if needed
         return obj
-    def add_node(self, data, nodepath="/test", throw_error_if_failed=False):
+    def add_node(self, data, nodepath="/test", throw_error_if_failed=False) -> None:
         """Add a node with parameters after the scene has finished updating.
         
         Args:
@@ -158,7 +171,7 @@ class Scene(Resource, SceneLike):
             nodepath: The node's path in the scene tree. (etc, `/father/me`, `/me`)
             throw_error_if_failed: Throw an Error if it failed making the Node."""
         self._blessed.append([data, nodepath, throw_error_if_failed])
-    def _add_node(self, data, nodepath="", throw_error_if_failed=False) -> int:
+    def _add_node(self, data, nodepath="/test", throw_error_if_failed=False) -> int:
         """Add a node with parameters. Returns the Node object.
         
         Args:
@@ -175,9 +188,17 @@ class Scene(Resource, SceneLike):
             if throw_error_if_failed or engine.debug.avoid_error_mercy:
                 raise SceneError(f"Tried to make node entry {nodepath} but failed")
             return
-        
+
         # Initialize Node object and recompile Node list
-        return self._initialize_node_entry(nodepath)
+        return self._ready_node(self._initialize_node_entry(nodepath))
+    
+    ## Ready node
+    def _ready_node(self, node) -> Node:
+        try:
+            node._onready(node)
+        except AttributeError:
+            pass # Script probably doesn't have an onready func
+        return node
     
     ## Get nodes
     def get_node_paths(self, nodepath, exclude_self=False, out=None) -> list[str]:
@@ -210,7 +231,7 @@ class Scene(Resource, SceneLike):
         if len(nodepath.split("/")) == 1:
             nodepath = "/" + nodepath
         
-        parts    = nodepath.split("/")
+        parts = nodepath.split("/")
         try:
             current = self.nodes[parts[0]]          # Get root node
             for name in parts[1:]:                  # Go through the Nodes in the path
@@ -219,7 +240,7 @@ class Scene(Resource, SceneLike):
         except Exception as error:
             if throw_error_if_failed or engine.debug.avoid_error_mercy:
                 raise SceneError(f"Tried to get node entry {nodepath} but failed")
-            return
+            raise error
     def get_node_from_path(self, nodepath, throw_error_if_failed : bool = False) -> Node:
         """Get a Node using its path in the scene tree. (e.g. `/foo/bar`)
         
@@ -281,7 +302,7 @@ class Scene(Resource, SceneLike):
             for name in parts[1:][:-1]:                      # Go through the Nodes in the path
                 current = current["children"][name]          # Get the previous iter.'s child
             if parts[-1] not in current["children"]:
-                return "NOT_FOUND"
+                return
             node = current["children"][parts[-1]].get("obj") # Get the Node
 
             # Now we can delete the Node and remove it eternally
@@ -289,15 +310,18 @@ class Scene(Resource, SceneLike):
         except Exception as error:
             if throw_error_if_failed or engine.debug.avoid_error_mercy:
                 raise SceneError(f"Tried to delete node entry {nodepath} but failed")
-            return "FOUND_BUT_FAILED"
+            return
         
         # Recompile list of nodes
         self._temp_node_list.remove([node, nodepath])
 
     def empty(self):
         """Empty the scene."""
+        print(" ~ Empty scene\n |~ Free root")
         root = self.nodes[""].get("obj")
         if root: root._free()
+        
+        print(" |~ Cleanup")
         self._nodes          = EMPTY_SCENE
         self._temp_node_list = []
     def _free(self):
@@ -330,10 +354,10 @@ class Scene(Resource, SceneLike):
         # Add nodes
         for data, path, throw in self._blessed:
             self._add_node(data, path, throw)
-
+        
         # Clear queues
         self._blessed.clear()
         self._doomed.clear()
 
-# Import PackedScene here to not have any trouble
+## Import PackedScene here to not have any trouble
 from classes.nodes.packedscene import *
