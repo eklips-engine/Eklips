@@ -9,18 +9,20 @@ class MediaPlayer(CanvasItem):
     This is a Node that can play video and audio globally.
     """
     _isblittable = True
+    _audiofile   = None
     
     def __init__(self, properties={}, parent=None):
         self._media       : str                    = ""
         self._playcounter : int                    = 0
         self._rpop        : bool                   = True
-        self._playing     : bool                   = True
+        self._playing     : bool                   = False
         self._ogsize      : list[int]              = [320,240]
         self._volume      : float | int            = 0
         self._sound       : pg.media.Player        = None
         self._video       : engine.pvd.VideoPyglet = None
         self._autostart   : bool                   = False
         self._loops       : int                    = 0
+        self._audiofile   : pg.media.Source        = None
 
         super().__init__(properties, parent)
     
@@ -29,9 +31,30 @@ class MediaPlayer(CanvasItem):
         if self.auto_start:
             self.play()
     
+    ## Exports
+    @export(1.0, "float", "float")
+    def volume(self) -> int:
+        """Volume of the attached Media file."""
+        return self._volume
+    @volume.setter
+    def volume(self, value : int | float | None):
+        self._volume = value
+        if self._video:
+            self._video.set_volume(value)
+        else:
+            self._sound.volume = value
+    
+    @export(False, "bool", "bool")
+    def auto_start(self):
+        """If the Media should automatically start when created."""
+        return self._autostart
+    @auto_start.setter
+    def auto_start(self, value):
+        self._autostart = value
+    
     @export(0,     "int",   "int")
     def loops(self) -> int:
-        """How many times the Media should loop. Set to -1 for infinite."""
+        """How many times the Media should loop. Set to a value less than 0 for infinite."""
         return self._loops
     @loops.setter
     def loops(self, value): self._loops = value
@@ -40,7 +63,7 @@ class MediaPlayer(CanvasItem):
     def reset_playback_on_play(self) -> bool:
         """If the playback should restart if the `play()` function is called.
 
-        If False, `play()` will return if `busy` is true.
+        If False, `play()` will stop if `busy` is true.
         If True, the playback will restart. This may lead to noise if `play()` is spammed."""
         return self._rpop
     @reset_playback_on_play.setter
@@ -50,7 +73,6 @@ class MediaPlayer(CanvasItem):
     def media(self) -> str:
         """Filepath of the attached media file. Read-write."""
         return self._media
-    
     @media.setter
     def media(self, value):
         self._media = value
@@ -65,12 +87,14 @@ class MediaPlayer(CanvasItem):
         elif extension in extensions["sfx"]:
             if self._video:
                 self.stop()
-            self._video = None
-            self._sound = pg.media.Player()
-            self._sound.queue(engine.loader.load(self.media))
+            self._video     = None
+            self._audiofile = engine.loader.load(self.media)
+            self._sound     = pg.media.Player()
+            self._sound.queue(self._audiofile)
         else:
             raise PlayerError(f"File format {extension} unknown")
 
+    ## Playback functions
     def play(self, keep_play_counter=False):
         """
         Play the attached Media file using the Node's properties.
@@ -95,15 +119,18 @@ class MediaPlayer(CanvasItem):
         else:
             self._sound.play()
             self._set_visible(False)
-        
     def restart(self):
         """Restart the attached Media file."""
+        if not self._playing:
+            return
         if self._video:
             self._video.restart()
         else:
-            self.channel.stop()
-            self.channel.play(self._sound)
-    
+            if self._audiofile:
+                self._sound.seek(0.0)
+                self._sound.next_source()
+                self._sound.queue(self._audiofile)
+                self._sound.play()
     def stop(self):
         """Stop the attached Media file."""
         self._playing = False
@@ -111,14 +138,12 @@ class MediaPlayer(CanvasItem):
             self._video.stop()
         else:
             self._sound.pause()
-    
     def pause(self):
         """Pause the attached Media file."""
         if self._video:
             self._video.pause()
         else:
             self._sound.pause()
-    
     def resume(self):
         """Resume the attached Media file."""
         if self._video:
@@ -132,8 +157,25 @@ class MediaPlayer(CanvasItem):
         if self._video:
             return self._video.active
         else:
-            return self._sound.playing
+            if not self._sound._audio_player:
+                return False
+            return self.timestamp < self.duration
+    @property
+    def timestamp(self) -> float:
+        """Returns the current media timestamp in seconds (float)."""
+        if self._video:
+            return self._video.get_pos()
+        else:
+            return self._sound.time
+    @property
+    def duration(self) -> float:
+        """Returns the current media duration in seconds (float)."""
+        if self._video:
+            return self._video.duration
+        else:
+            return self._sound.source.duration
     
+    ## Update
     def update(self):
         super().update()
         
@@ -145,41 +187,21 @@ class MediaPlayer(CanvasItem):
         else:
             if self._playing:
                 self._playcounter += 1
-                self.playing       = False
                 if self._playcounter < self.loops or self.loops < 0:
                     self.restart()
-    
     def draw(self):
         if self._video.frame_surf:
             self.citem.image = self._video.frame_surf
             self._set_anchors()
             super().draw()
     
+    ## Transform tweaks
     def _set_size(self,w,h):
         if self._video:
             self._w, self._h = self._ogsize
             self._video.resize(self.size)
-
-    @export(1.0, "float", "float")
-    def volume(self) -> int:
-        """Volume of the attached Media file."""
-        return self._volume
-    @volume.setter
-    def volume(self, value : int | float | None):
-        self._volume = value
-        if self._video:
-            self._video.set_volume(value)
-        else:
-            self._sound.volume = value
     
-    @export(False, "bool", "bool")
-    def auto_start(self):
-        """If the Media should automatically start when created."""
-        return self._autostart
-    @auto_start.setter
-    def auto_start(self, value):
-        self._autostart = value
-    
+    ## Free
     def _free(self):
         self.stop()
         if self._video:

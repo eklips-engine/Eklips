@@ -177,7 +177,7 @@ class BaseNinePatchRect(CanvasItem):
         if not self.viewport:
             return
         if self.visible and self.viewport.is_onscreen(self) and self.citem:
-            x, y   = self.into_screen_coords()
+            x, y   = self.into_viewport_coords()
             cw, ch = self.corner_size
             w, h   = self.w, self.h
 

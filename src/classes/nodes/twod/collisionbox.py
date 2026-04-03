@@ -1,8 +1,7 @@
 ## Import libraries
-import pymunk
 from classes.nodes.gui.colorrect import *
 
-## Classes
+## Classes XXX implement the World
 class CollisionBox(CanvasItem):
     """
     A rectangle with Collision abilities.
@@ -24,12 +23,9 @@ class CollisionBox(CanvasItem):
         super().update()
         
         # Set shape pos to be relative
-        x, y          = self.into_screen_coords()
+        x, y          = self.into_viewport_coords()
         self._shape.x = x
         self._shape.y = y
-    def _free(self):
-        self.world.delete(self.rid)
-        super()._free()
     def colliderect(self, shape):
         return self._shape.colliderect(shape)
     def _set_pos(self, x, y):

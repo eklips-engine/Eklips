@@ -131,8 +131,8 @@ class Inputbox(ColorRect, Color):
             return
         
         ## Get position of full object
-        x,   y = self.into_screen_coords()
-        tx, ty = self.into_screen_coords(drawing=True)
+        x,   y = self.into_viewport_coords()
+        tx, ty = self.into_viewport_coords(drawing=True)
 
         ## Move bg
         self.citem.x = tx

@@ -1,10 +1,10 @@
 ## Import components
 import classes.singleton as engine
 import gc, types
-from classes.locals       import *
-from classes.customprops  import _exportmeta, export
-from classes.customprops  import *
-from classes.log          import *
+from classes.locals import *
+from classes.types  import export, _exportmeta
+from classes.types  import *
+from classes.log    import *
 
 ## Classes
 class Object(metaclass=_exportmeta):

@@ -1,5 +1,4 @@
 ## Import classes
-import pymunk
 from classes.resources.resource import *
 from classes.resources.theme    import *
 from classes.nodes              import *

@@ -1,5 +1,5 @@
 import classes.singleton as engine
-from classes.customprops import *
+from classes.types       import *
 
 def info(text):
     """Log some text as info."""

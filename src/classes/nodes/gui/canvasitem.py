@@ -3,8 +3,8 @@ import pyglet as pg
 from classes import ui
 
 ## Import inherited
-from classes.nodes.node  import *
-from classes.customprops import *
+from classes.nodes.node import *
+from classes.types      import *
 
 ## Variables
 base_transform = {
@@ -156,19 +156,20 @@ class CanvasItem(Node, Transform):
     def _set_alpha(self, deg):
         if self.citem:
             self.citem.opacity = round(deg)
-    def into_screen_coords(self, viewport_size = None, do_flip = True, drawing = False, parent_rect=None):
+    def into_viewport_coords(self, viewport = None, drawing = False, parent_rect=None):
         """Get the position of the CanvasItem in the Viewport.
         
         Args:
-            viewport_size: If not specified, will use CanvasItem.viewport.size.
+            viewport: If not specified, will use CanvasItem.viewport.size.
             parent_rect: This argument does nothing and uses `self.parent` instead."""
-        if not viewport_size:
-            viewport_size = self.viewport.size
+        if not viewport:
+            viewport = self.viewport
+        return super().into_viewport_coords(viewport, drawing, self._isc_get_parent_property())
+    def _isc_get_parent_property(self):
         if self.parent and self.parent.get("_iscitem", False) and self._relativity_pos:
-            return super().into_screen_coords(viewport_size, do_flip, drawing, 
-                [*self.parent.into_screen_coords(),
-                 *self.parent.size])
-        return super().into_screen_coords(viewport_size, do_flip, drawing)
+            return [*self.parent.into_viewport_coords(),
+                    *self.parent.size]
+        return None
 
     ## Display object getters
     def _get_viewport(self) -> ui.Viewport:
@@ -224,7 +225,7 @@ class CanvasItem(Node, Transform):
         if not self.viewport:
             return
         if self.visible and self.viewport.is_onscreen(self) and self.citem:
-            x, y         = self.into_screen_coords(drawing=True)
+            x, y         = self.into_viewport_coords(drawing=True)
             self.citem.x = x
             self.citem.y = y
             
@@ -245,22 +246,8 @@ class CanvasItem(Node, Transform):
             return
         if not self.viewport.is_onscreen(self):
             return
-        
-        ## XXX fix this, time crunc hAAHHHH
-        """
-        vx, vy = self.viewport.into_screen_coords()
-
-        ## Apply viewport position into x and y
-        x,y=0,0
-        x += vx - self.viewport.cam.x
-        y += vy - self.viewport.cam.y
-
-        ## Apply viewport zooming
-        x *= self.viewport.cam.zoom
-        y *= self.viewport.cam.zoom
-        w  = self.w * self.viewport.cam.zoom
-        h  = self.h * self.viewport.cam.zoom
 
         ## Result
-        return engine.mouse.collides_with(self)
-        """
+        return engine.mouse.collides_ui_aabb(self, ctx_a=(
+            self.viewport, self._isc_get_parent_property()
+        ), ctx_b=(self._get_window(), None))

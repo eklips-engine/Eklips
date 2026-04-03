@@ -122,9 +122,9 @@ class Slider(CanvasItem):
             return
         
         ## Get things
-        mpos   = engine.mouse.pos
+        mpos   = engine.mouse.position
         x, y   = self.citem.x-self.citem.width/2, self.citem.y-self.citem.height/2
-        vx, vy = self.viewport.into_screen_coords()
+        vx, vy = self.viewport.into_viewport_coords()
 
         ## Apply viewport position into x and y
         x += vx - self.viewport.cam.x
@@ -190,8 +190,8 @@ class Slider(CanvasItem):
         self.label.text = f"{int(self.value/self.maximum*100)}%" if self.show_percentage else f"{int(self.value)}"
         
         ## Get position of full slider object
-        bgx, bgy = self.into_screen_coords(drawing=True)
-        x,     y = self.into_screen_coords()
+        bgx, bgy = self.into_viewport_coords(drawing=True)
+        x,     y = self.into_viewport_coords()
 
         ## Move bg
         self.slider_bg.x = bgx + 5

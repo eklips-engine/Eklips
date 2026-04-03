@@ -3,7 +3,7 @@ import pyglet as pg, time
 
 ## Import components
 from classes.locals      import *
-from classes.customprops import *
+from classes.types       import *
 import classes.singleton as engine
 
 ## Load the engine components

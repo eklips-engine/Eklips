@@ -134,8 +134,8 @@ class Progressbar(CanvasItem):
         self.label.text = f"{int(self.value/self.maximum*100)}%" if self.show_percentage else f"{int(self.value)}"
         
         ## Get position of full progressbar object
-        bgx, bgy = self.into_screen_coords(drawing=True)
-        x,     y = self.into_screen_coords(drawing=False)
+        bgx, bgy = self.into_viewport_coords(drawing=True)
+        x,     y = self.into_viewport_coords(drawing=False)
 
         ## Move bg
         self.bar.x = bgx

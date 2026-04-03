@@ -113,9 +113,9 @@ class ScrollingViewport(ExtraViewport):
         if not self.viewport:
             return
         ## Get things
-        mpos   = engine.mouse.pos
+        mpos   = engine.mouse.position
         x,y,z  = self.scrollbar.position
-        vx, vy = self.into_screen_coords()
+        vx, vy = self.into_viewport_coords()
 
         ## Apply viewport position into x and y
         x += vx - self.viewport.cam.x

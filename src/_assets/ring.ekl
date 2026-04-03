@@ -2,18 +2,29 @@ import classes.singleton as engine, random, time
 from classes.nodes       import *
 
 eklips : Sprite = None
+text   : Label  = None
+text2  : Label  = None
 timer  : float  = 0.0
+force  : float  = ZDE_FIX
 
 def _process(self : Sprite, delta):
     # Get eklips node
-    global eklips, timer
+    global eklips, timer, text, text2, force
+    troll = (time.strftime("%m-%d") == "04-01")
+
     if not eklips:
         eklips = self.scene.get_node_from_path("/Eklips")
         text   = self.scene.get_node_from_path("/Text")
-        if time.strftime("%m-%d") == "04-01":
-            text.visible = True
-        else:
-            text.visible = False
+        text2  = self.scene.get_node_from_path("/Text2")
+        faudio = self.scene.get_node_from_path("FAudio")
+        if troll:
+            faudio.play()
+            eklips.image_path = "root://_assets/eklips_beta.png"
+            eklips.alpha      = 127
+            self.viewport.rgb = BLACK
+            self.alpha        = 127
+            text.visible      = True
+            text2.visible     = True
     
     # Load master scene if Sprite is fully invisible or halt if not found
     if self.alpha < 0:
@@ -22,17 +33,26 @@ def _process(self : Sprite, delta):
         return
     
     # Rotate the ring
-    if time.strftime("%m-%d") == "04-01":
-        self.viewport.rotation += (150+(self.rotation/180))*delta
-        eklips.rotation        += 15                          * delta
-        
-        # Check if rotated fully, then start fading out
-        if self.viewport.rotation > 360:
-            self.alpha  -= (300 + (self.rotation/180)) * delta
-            eklips.alpha = self.alpha
+    if troll:
+        if timer > 0.02:
+            text.color  = [random.choice([0,255]),random.choice([0,255]),random.choice([0,255])]
+            force      += (1+force/180) * delta
+            maxf        = 20
+            if force    > maxf:
+                force   = maxf
+            text2.alpha = force/maxf*255
+
+            rforce              = round(force)
+            self.viewport.cam.x = random.randint(-rforce,rforce)
+            self.viewport.cam.y = random.randint(-rforce,rforce)
+            timer = 0
+
+        self.rotation   += (150+(self.viewport.rotation/180)) * delta
+        eklips.rotation += 15                                 * delta
+        timer           += delta
     else:
-        self.rotation   += (150 + (self.rotation/180)) * delta
-        eklips.rotation += 15                          * delta
+        self.rotation   += (150+(self.rotation/180)) * delta
+        eklips.rotation += 15                        * delta
 
         # Check if rotated fully, then start fading out
         if (self.rotation > 360 or engine.debug.skip_load) and not engine.debug.freeze_load:

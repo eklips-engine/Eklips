@@ -5,7 +5,7 @@ from tkinter                   import ttk
 from tkinter.messagebox        import *
 from tkinter.filedialog        import *
 from fontTools                 import ttLib
-from classes.customprops       import *
+from classes.types             import *
 from classes.nodes             import *
 from classes.nodes.packedscene import *
 from tkinter                   import colorchooser

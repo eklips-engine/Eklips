@@ -71,7 +71,7 @@ class Label(CanvasItem, Color):
         if not self.viewport:
             return
         if self.visible and self.viewport.is_onscreen(self) and len(self.text.split()) and self.citem:
-            x,y          = self.into_screen_coords()
+            x,y          = self.into_viewport_coords()
             self.citem.x = x
             self.citem.y = y
 

@@ -1,7 +1,7 @@
 ## Import singleton
 import pyglet as pg
 from classes.resources.resource import *
-from classes.customprops        import *
+from classes.types              import *
 
 ## Image Grid
 class ImageGrid(Resource):

@@ -108,8 +108,8 @@ class Button(BaseNinePatchRect, Color):
         if not self.viewport:
             return
         if self.visible and self.viewport.is_onscreen(self) and self.citem:
-            x,   y        = self.into_screen_coords()
-            tx,  ty       = self.into_screen_coords(drawing=True)
+            x,   y        = self.into_viewport_coords()
+            tx,  ty       = self.into_viewport_coords(drawing=True)
             self.label.x = x + (self.w//2-self.label.content_width //2)
             self.label.y = y + (self.h//2-self.label.content_height//2)
 

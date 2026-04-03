@@ -1,24 +1,15 @@
 ## Import libraries
-import pyglet       as pg, pymunk
+import pyglet       as pg
 import pyvidplayer2 as pvd, time
 
 ## Import components
-from classes.customprops import *
-from classes             import hooks, resources, nodes, ui
-from classes             import crash_screen as error_handler
-from classes             import saving, networking
-from classes.locals      import *
+from classes.types  import *
+from classes        import hooks, resources, nodes, ui
+from classes        import crash_screen as error_handler
+from classes        import saving, networking
+from classes.locals import *
 
 ## Functions
-def rgbtohex(rgb: list) -> str:
-    """Turn a hex color into an RGB color."""
-    r,g,b = rgb
-    return "#{:02x}{:02x}{:02x}".format(round(r),round(g),round(b))
-def invertrgb(rgb: list) -> list:
-    """Invert an RGB color."""
-    r,g,b = rgb
-    return [255-r,255-g,255-b]
-
 def get_date():
     """Returns the date and time."""
     return time.strftime("%d %m %Y %H %M %S")
@@ -227,7 +218,8 @@ debug : DebugConfig = None
 #: The project's savefile.
 savefile : saving.Savefile = None
 
-#: A class storing information about mouse input.
+#: A class storing information about mouse input on the focused window.
+#: Each viewport has their own mouse attribute.
 mouse    : Mouse    = None
 #: A class storing information about keyboard input.
 keyboard : Keyboard = None
@@ -255,6 +247,3 @@ fps    : float = 0.0
 uptime : float = 0.0
 #: How fast the engine should be.
 speed  : int   = 1
-
-#: Space
-world = pymunk.Space()

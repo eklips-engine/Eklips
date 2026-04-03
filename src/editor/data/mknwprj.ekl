@@ -1,8 +1,8 @@
 import shutil
-from classes.ui          import *
-from classes.customprops import *
-from classes.nodes       import *
-from tkinter.messagebox  import *
+from classes.ui         import *
+from classes.types      import *
+from classes.nodes      import *
+from tkinter.messagebox import *
 
 ready : bool = False
 

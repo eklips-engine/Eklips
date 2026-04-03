@@ -59,7 +59,7 @@ class Body(CollisionBox):
             self._velocity[1] = self.velocity_cap
         if not self.noclip:
             self.x += self.velocity[0] * engine.delta
-            if self.world.get_collisions(self):
+            if True:#self.world.get_collisions(self):
                 self.x           -= self._velocity[0]
                 self._velocity[0] = 0
                 self._onwall      = True
@@ -67,7 +67,7 @@ class Body(CollisionBox):
                 self._onwall      = False
             
             self.y -= self.velocity[1] * engine.delta
-            if self.world.get_collisions(self):
+            if True:#self.world.get_collisions(self):
                 self.y           += self._velocity[1]
                 self._velocity[1] = 0
                 self._onground    = True

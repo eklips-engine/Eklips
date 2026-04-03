@@ -3,7 +3,7 @@ from classes.nodes.gui.canvasitem import *
 from classes.ui                   import *
 
 ## Classes
-class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
+class ExtraViewport(CanvasItem, Viewport):
     """
     A Viewport Node.
     
@@ -69,16 +69,7 @@ class ExtraViewport(CanvasItem, Viewport): # Group project looking ass node 😭
         Viewport.draw(self)
     
     def get_if_mouse_hovering(self):
-        mpos   = engine.mouse.pos
-        x,y    = self.into_screen_coords()
-        is_it  = (
-            mpos[0] >= x          and
-            mpos[0] <= x + self.w and
-            mpos[1] >= y          and
-            mpos[1] <= y + self.h
-        )
+        return engine.mouse.collides_ui_aabb(self, ctx_a=(self, None), ctx_b=(self._get_window(), None))
         
-        return is_it
-    
     def _remove_item(self):
         self.close()

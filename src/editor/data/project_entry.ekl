@@ -1,6 +1,6 @@
 import classes.singleton as engine
 from tkinter.messagebox  import *
-from classes.customprops import *
+from classes.types       import *
 from classes.nodes       import *
 
 gjsp : str      = ""

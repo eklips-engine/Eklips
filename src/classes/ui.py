@@ -4,7 +4,7 @@ import pyglet as pg, os
 ##import components
 import classes.singleton as engine
 from classes.locals      import *
-from classes.customprops import *
+from classes.types       import *
 from pyglet.gl           import *
 
 ## Cast some fucking OpenGL spells i don't know
@@ -42,19 +42,19 @@ class EklBaseWindow(pg.window.BaseWindow):
     def _present_one(self, vp):
         if not (vp.framebuffer or vp):
             return
-        x,y        = vp.into_screen_coords(self.size, drawing=True)
+        x,y        = vp.into_viewport_coords(self.size, drawing=True)
         vp.citem.x = x
         vp.citem.y = y
 
         vp.citem.draw()
         
-    ## Properties
+    ## Getters
     @property
-    def width(self): return self._width
+    def width(self): return self.get_size()[0]
     @property
-    def height(self): return self._height
+    def height(self): return self.get_size()[1]
     @property
-    def size(self): return [self.width, self.height]
+    def size(self): return self.get_size()
     @property
     def caption(self): return self._caption
     @property
@@ -63,7 +63,23 @@ class EklBaseWindow(pg.window.BaseWindow):
     def maximum_size(self): return self._maximum_size
     @property
     def visible(self): return self._visible
+    @property
+    def cam(self):
+        vp = self.viewports.get(MAIN_VIEWPORT)
+        if vp:
+            return vp.cam
+        return
 
+    # Make into_viewport_coords not kill itself by adding this
+    # Making these actually return the coords of the window is a bad idea for sakes of the function
+    @property
+    def x(self): return 0
+    @property
+    def y(self): return 0
+    @property
+    def position(self): return [0,0]
+
+    ## Setters
     @caption.setter
     def caption(self, val):
         self._caption = val
@@ -277,22 +293,22 @@ class EklWindow(EklBaseWindow, pg.window.Window):
     
     ## Mouse Events
     def on_mouse_motion(self, x, y, dx, dy):
-        engine.mouse.pos  = [x, y]
-        engine.mouse.dpos = [dx,dy]
+        engine.mouse.position = [x, self.height - y - 10]
+        engine.mouse.dpos     = [dx,dy]
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         # Who gives a fuck about some "Apple Mighty Mouse" like just put the fries in the bag cuh
-        engine.mouse.pos    = [x, y]
-        engine.mouse.scroll = scroll_y
+        engine.mouse.position = [x, self.height - y - 10]
+        engine.mouse.scroll   = scroll_y
     def on_mouse_press(self, x, y, button, modifiers):
-        engine.mouse.pos                  = [x, y]
+        engine.mouse.position             = [x, self.height - y - 10]
         engine.mouse.buttons[button]      = True
         engine.mouse.just_clicked[button] = True
     def on_mouse_release(self, x, y, button, modifiers):
-        engine.mouse.pos                  = [x, y]
+        engine.mouse.position             = [x, self.height - y - 10]
         engine.mouse.buttons[button]      = False
         engine.mouse.just_clicked[button] = False
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, buttons: int, modifiers: int):
-        engine.mouse.pos      = [x, y]
+        engine.mouse.position = [x, self.height - y - 10]
         engine.mouse.dpos     = [dx,dy]
         engine.mouse.dragging = True
     
@@ -312,7 +328,7 @@ class EklWindow(EklBaseWindow, pg.window.Window):
     
     ## Misc. Events
     def on_file_drop(self, x, y, paths):
-        engine.mouse.pos   = [x, y]
+        engine.mouse.position   = [x, y]
         engine.mouse.paths = paths
 class Viewport(Transform, Color):
     """A class to manage a portion of a Window."""
@@ -341,6 +357,7 @@ class Viewport(Transform, Color):
     def _parentvalid(self): return (self._vpparent and
                                     getattr(self._vpparent, "_is_viewport", True))
 
+    ## Init
     def __init__(self, vid : int, window : EklWindow, flags : list = [], parent : Self = None):
         """Initialize a Viewport.
         
@@ -406,7 +423,7 @@ class Viewport(Transform, Color):
         if engine.debug.sprite_always_visible:
             return True
         
-        x,y = transform.into_screen_coords(viewport_size=self.size)
+        x,y = transform.into_viewport_coords(viewport=self)
         if not (
             ((x - self.cam.x) * self.cam.zoom) + (transform.w * self.cam.zoom) < 0 or
             ((x - self.cam.x) * self.cam.zoom) > self.w                       or
@@ -479,11 +496,11 @@ class Viewport(Transform, Color):
         self.citem.image.anchor_x = self._w // 2
         self.citem.image.anchor_y = self._h // 2
         self.citem._update_position()
-    def into_screen_coords(self, viewport_size=None, do_flip : bool = True, drawing : bool = False, parent_rect=None):
+    def into_viewport_coords(self, viewport=None, drawing : bool = False, parent_rect=None):
         if self._vpparent:
-            return super().into_screen_coords(self._vpparent.size, do_flip, drawing, parent_rect)
+            return super().into_viewport_coords(self._vpparent, drawing, parent_rect)
         else:
-            return super().into_screen_coords(self.window.size, do_flip, drawing, parent_rect)
+            return super().into_viewport_coords(self.window, drawing, parent_rect)
     def _set_alpha(self, deg):
         self.citem.opacity = deg
     def _set_rot(self, deg):
@@ -495,7 +512,7 @@ class Viewport(Transform, Color):
         self._resize_framebuffer()
     def _set_visible(self, val):
         self.citem.visible = val
-
+    
     ## Drawing related
     def _finalize_batch(self):
         if not self._batch_pending:
@@ -567,7 +584,7 @@ class Viewport(Transform, Color):
             )
         )
         view_matrix = view_matrix.rotate(
-            -self.cam.rotation * (math.pi/180),
+            -self.cam.altrotation,
             (
                 0,
                 0,
@@ -591,7 +608,7 @@ class Viewport(Transform, Color):
             )
         )
         view_matrix = view_matrix.rotate(
-            self.cam.rotation * (math.pi/180),
+            self.cam.altrotation,
             (
                 0,
                 0,
