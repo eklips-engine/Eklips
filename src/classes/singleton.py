@@ -1,13 +1,13 @@
 ## Import libraries
 import pyglet       as pg
-import pyvidplayer2 as pvd, time
+import time
 
 ## Import components
-from classes.types  import *
-from classes        import hooks, resources, nodes, ui
-from classes        import crash_screen as error_handler
-from classes        import saving, networking
-from classes.locals import *
+from classes.types        import *
+from classes              import hooks, resources, nodes, ui
+from classes.crash_screen import report_error
+from classes              import saving, networking
+from classes.locals       import *
 
 ## Functions
 def get_date():
@@ -15,7 +15,7 @@ def get_date():
     return time.strftime("%d %m %Y %H %M %S")
 
 def load_engine():
-    global running,game,display,debug,mouse,loader,keyboard,scene,savefile,lang,icon,clock,theme
+    global running,game,display,debug,loader,keyboard,scene,savefile,lang,icon,clock,theme
 
     # Make debug config
     debug = DebugConfig()
@@ -35,7 +35,7 @@ def load_engine():
     if not running:
         display = ui.Display()
         clock   = pg.clock.Clock()
-        display.add_window(
+        display.make_window(
             name           = game.name,
             
             size           = game.win.vsize,
@@ -60,7 +60,6 @@ def load_engine():
                     display.windows.pop(wid)
     
     # Initialize user input sections
-    mouse    = Mouse()
     keyboard = Keyboard()
 
     # Initialize Scene
@@ -107,9 +106,15 @@ def load_cursor(name) -> pg.window.MouseCursor | pg.window.ImageMouseCursor:
     cursors[name] = cursor
     return cursor
 
-def is_action_pressed(entry) -> bool:
-    """Returns true if action `entry` is pressed. Might return False if the entry's settings have `holdable` disabled."""
+def is_action_pressed(entry : str, wid : int = MAIN_WINDOW) -> bool:
+    """Returns true if action `entry` is pressed. Might return False if the entry's settings have `holdable` disabled.
+    
+    Args:
+        entry: The name of the action.
+        wid: The ID of the window to check inputs for."""
+    mouse          = display.get_window(wid).mouse
     action_entries = game.actions
+
     if entry in action_entries:
         action_data = action_entries[entry]
         for action in action_data["actions"]:
@@ -133,8 +138,12 @@ def is_action_pressed(entry) -> bool:
                     if mouse.buttons[action]: return True
     return False
 
-def is_anything_pressed() -> bool:
-    """Returns true if any key or button is pressed or held down."""
+def is_anything_pressed(wid : int = MAIN_WINDOW) -> bool:
+    """Returns true if any key or button is pressed or held down.
+    
+    Args:
+        wid: The ID of the window to check inputs for."""
+    mouse = display.get_window(wid).mouse
     for i in keyboard.pressed:
         if keyboard.pressed[i]: return True
     for i in keyboard.held:
@@ -218,9 +227,6 @@ debug : DebugConfig = None
 #: The project's savefile.
 savefile : saving.Savefile = None
 
-#: A class storing information about mouse input on the focused window.
-#: Each viewport has their own mouse attribute.
-mouse    : Mouse    = None
 #: A class storing information about keyboard input.
 keyboard : Keyboard = None
 

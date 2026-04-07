@@ -25,7 +25,7 @@
                 },
                 "Audio": {
                     "type":       "MediaPlayer",
-                    "media":      "root://_assets/load.mp3",
+                    "media_path":      "root://_assets/load.mp3",
                     "auto_start": true,
 
                     "volume":     1,
@@ -47,7 +47,7 @@
                 },
                 "FAudio": {
                     "type":       "MediaPlayer",
-                    "media":      "root://_assets/fool.mp3",
+                    "media_path":      "root://_assets/fool.mp3",
                     "auto_start": false,
                     "loops":      -1,
 

@@ -46,7 +46,7 @@ def _process(self : ExtraWindow, delta : float):
     if not ready:
         scnready(self)
 
-    if engine.mouse.just_clicked[MOUSE_LEFT]:
+    if self.mouse.just_clicked[MOUSE_LEFT]:
         if makebtn.get_if_mouse_hovering():
             if not (
                 len(path.value.split()) and

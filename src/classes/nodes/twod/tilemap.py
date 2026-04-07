@@ -5,7 +5,6 @@ from classes.nodes.gui.canvasitem import *
 
 ## XXX implement rendering and collision logic
 class Tilemap(CanvasItem):
-    _isblittable                                = True
     citem : pg.graphics.vertexdomain.VertexList = None
 
     ## Exported

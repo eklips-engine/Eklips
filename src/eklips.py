@@ -37,14 +37,18 @@ def on_draw():
 
         # Clear the list of temporary actions
         engine.keyboard.pressed.clear()
-        engine.mouse.scroll       = 0
-        engine.mouse.dragging     = False
-        engine.mouse.dpos         = [0,0]
-        engine.mouse.just_clicked = MOUSE_DEFAULT_STATE.copy()
-        engine.keyboard.text      = ""
-        engine.keyboard.motion    = None
+
+        for window in engine.display.windows.values():
+            mouse              = window.mouse
+            mouse.scroll       = 0
+            mouse.dragging     = False
+            mouse.dpos         = [0,0]
+            mouse.just_clicked = MOUSE_DEFAULT_STATE.copy()
+        
+        engine.keyboard.text   = ""
+        engine.keyboard.motion = None
     except Exception as error:
-        engine.error_handler.report_error(error)
+        engine.report_error(error)
         engine.quit(1)
 
 ## Start the engine

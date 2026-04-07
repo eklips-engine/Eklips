@@ -28,14 +28,9 @@ def newrwd(dt: float) -> None:
     engine.tdelta  = dt
     
     # Redraw all windows
-    for wid in engine.display.windows.copy():
-        if wid in engine.display.windows:
-            window : EklBaseWindow = engine.display.windows.get(wid)
-            
-            if window and not window.is_basewindow:
-                window.draw(dt)
-        else:
-            continue
+    for window in tuple(engine.display.windows.values()):
+        if not window.is_basewindow and window.context:
+            window.draw(dt)
     
     # Update display
     engine.display.update()
@@ -59,16 +54,23 @@ class HookFPSDisplay(pg.window.FPSDisplay):
         super().__init__(window, color, samples)
 
         self.window   : EklWindow = window
+        self._color   : list      = color
         self.viewport : Viewport  = window.viewports[UI_VIEWPORT]
-        self.label                = pg.text.Label(
-            x                     = 5,
-            y                     = 5,
-            text                  = "0 FPS",
-            font_name             = DEFAULT_FONT_NAME,
-            font_size             = DEFAULT_FONT_SIZE * 1.25,
-            batch                 = self.viewport.batches[MAIN_BATCH],
-            color                 = color,
-            group                 = engine.ui.request_group(999))
+        self.label                = None
+        self._make_label()
+    
+    def _make_label(self):
+        if self.label:
+            self.label.delete()
+        self.label    = pg.text.Label(
+            x         = 5,
+            y         = 5,
+            text      = "0 FPS",
+            font_name = DEFAULT_FONT_NAME,
+            font_size = DEFAULT_FONT_SIZE * 1.25,
+            batch     = self.viewport.batches[MAIN_BATCH],
+            color     = self._color,
+            group     = engine.ui.request_group(999))
         
     def update(self) -> None:
         """Records a new data point at the current time.

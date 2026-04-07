@@ -21,6 +21,7 @@ base_transform = {
 }
 
 ## Classes
+## XXX rewrite this so it itself is a pg.sprite.Sprite
 class CanvasItem(Node, Transform):
     """
     A Canvas Node.
@@ -34,10 +35,9 @@ class CanvasItem(Node, Transform):
     _iscitem                                    = True 
     _isdisplayobject                            = False
     _parentrect                                 = None
-    _isblittable                                = False # If class is meant to blit CItem
-    _drawing_bid : int                          = 0    
-    _drawing_vid : int                          = 0    
-    _drawing_wid : int                          = 0    
+    _drawing_bid : int                          = MAIN_BATCH
+    _drawing_vid : int                          = MAIN_VIEWPORT
+    _drawing_wid : int                          = MAIN_WINDOW
     citem        : pg.sprite.Sprite             = None 
     _imagesid    : int                          = 0    
     _images      : list[pg.image.AbstractImage] = {}   
@@ -48,11 +48,16 @@ class CanvasItem(Node, Transform):
     def _switch_window(self):
         self._get_window().switch_to()
     @property
+    def mouse(self):
+        return self._get_window().mouse
+    @property
     def viewport(self):
         return self._get_viewport()
     @property
     def batch(self):
-        return self.viewport.batches[self.batch_id]
+        if not getattr(self, "_cached_batch", None):
+            self._cached_batch = self.viewport.batches[self.batch_id]
+        return self._cached_batch
     @property
     def image(self):
         return self._image
@@ -69,7 +74,7 @@ class CanvasItem(Node, Transform):
 
     ## Init
     def __init__(self, properties={}, parent = None):
-        engine.Transform.__init__(self)
+        Transform.__init__(self)
         super().__init__(properties, parent)
 
         self._parentrect = None
@@ -96,12 +101,16 @@ class CanvasItem(Node, Transform):
         self.flip_h  = value[1]
     @export(base_transform, "dict", "transform")
     def transform(self):
-        return self._turn_object_into_transform_property()
+        return self._get_transform_property()
     @transform.setter
     def transform(self, value):
-        if self._isblittable:
+        if not self.citem:
             self._make_new_item()
-        self._convert_transform_property_into_object(value)
+        self._set_transform_property(value)
+    def _set_transform_property(self, value):
+        super()._set_transform_property(value)
+        if self.citem:
+            self.draw()
     
     def _update_drawing_ids(self, attr, value):
         if self._isdisplayobject:
@@ -109,6 +118,8 @@ class CanvasItem(Node, Transform):
         if self.citem:
             self._remove_item()
         setattr(self, attr, value)
+        if hasattr(self, "_cached_batch"):
+            del self._cached_batch
         self._make_new_item()
     @export(MAIN_WINDOW, "int", "windowid")
     def window_id(self): return self._drawing_wid
@@ -165,6 +176,15 @@ class CanvasItem(Node, Transform):
         if not viewport:
             viewport = self.viewport
         return super().into_viewport_coords(viewport, drawing, self._isc_get_parent_property())
+    def into_window_coords(self, viewport = None, drawing = False, parent_rect=None):
+        """Get the position of the CanvasItem in the Viewport.
+        
+        Args:
+            viewport: If not specified, will use CanvasItem.viewport.size.
+            parent_rect: This argument does nothing and uses `self.parent` instead."""
+        if not viewport:
+            viewport = self.viewport
+        return super().into_window_coords(viewport, drawing, self._isc_get_parent_property())
     def _isc_get_parent_property(self):
         if self.parent and self.parent.get("_iscitem", False) and self._relativity_pos:
             return [*self.parent.into_viewport_coords(),
@@ -186,9 +206,8 @@ class CanvasItem(Node, Transform):
             self.citem.delete()
             self.citem = None
     def _fix_broken_item(self):
-        self._remove_item()
-        self._make_new_item()
-        self._convert_transform_property_into_object(self.transform)
+        self._refresh_item()
+        self._set_transform_property(self.transform)
     def _make_new_item(self):
         if self.citem:
             self._remove_item()
@@ -199,6 +218,7 @@ class CanvasItem(Node, Transform):
     def _refresh_item(self):
         if self.citem:
             self._remove_item()
+            del self._cached_batch
         self._make_new_item()
     def _free(self):
         self._remove_item()
@@ -208,18 +228,17 @@ class CanvasItem(Node, Transform):
     def update(self):
         super().update()
         
-        ## Reset CITEM if it's fucked.
-        if getattr(self.batch, "invalid", False) and self.citem and not self.viewport._refreshing:
+        ## Reset CItem if it's fucked.
+        if getattr(self.batch, "invalid", False) and self.citem:
             self._fix_broken_item()
         
         ## Check for hovering
         if self.get_if_mouse_hovering():
             self.call_signal("_hover")
-            if engine.mouse.buttons[engine.MOUSE_LEFT]:
+            if self.mouse.buttons[engine.MOUSE_LEFT]:
                 self.call_signal("_held")
-            if engine.mouse.just_clicked[engine.MOUSE_LEFT]:
+            if self.mouse.just_clicked[engine.MOUSE_LEFT]:
                 self.call_signal("_clicked")
-    
     def draw(self):
         """Draw the CanvasItem. This is usually called automatically."""
         if not self.viewport:
@@ -237,7 +256,7 @@ class CanvasItem(Node, Transform):
     def _setup_properties(self, scene=None):
         super()._setup_properties(scene)
         if engine.ineditor and not self._iseditortool:
-            self._drawing_vid = engine._editor_viewport_id
+            self.viewport_id = engine._editor_viewport_id
     
     ## Convenience functions for user
     def get_if_mouse_hovering(self) -> bool:
@@ -248,6 +267,6 @@ class CanvasItem(Node, Transform):
             return
 
         ## Result
-        return engine.mouse.collides_ui_aabb(self, ctx_a=(
-            self.viewport, self._isc_get_parent_property(), 0
-        ), ctx_b=(self._get_window(), None, 0))
+        return self.mouse.collides_ui_aabb(self,
+            ctx_a=(self.viewport, self._isc_get_parent_property(), 0),
+            ctx_b=(self._get_window(), None, 0))

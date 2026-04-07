@@ -103,9 +103,7 @@ class Object(metaclass=_exportmeta):
     ## Memory related
     def _free(self):
         self._runnable = False
-        engine.uid    -= 1
-        del self
-        gc.collect()
+        #gc.collect()
     
     def free(self):
         """Free the object from memory."""
@@ -156,7 +154,7 @@ class Object(metaclass=_exportmeta):
         try:
             if self.processable:
                 self._process(self, engine.delta)
-        except Exception as err:
+        except AttributeError:
             pass
 
         for info in self._function_queue:
@@ -177,5 +175,5 @@ class Object(metaclass=_exportmeta):
         # Call _onready
         try:
             self._onready(self)
-        except:
+        except AttributeError:
             pass

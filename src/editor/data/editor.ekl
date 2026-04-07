@@ -428,16 +428,16 @@ def _process(self : Node, delta : float):
 
     gmdt : GameData = engine.projects[engine.selected_project]
     
-    if backbtn.get_if_mouse_hovering() and engine.mouse.buttons[MOUSE_LEFT]:
+    if backbtn.get_if_mouse_hovering() and self.mouse.buttons[MOUSE_LEFT]:
         if askyesno(engine.lang.get("ee_title"), engine.lang.get("pe_warnleaveprj")):
             engine.ineditor = False
             engine.scene.load("res://scenes/master.scn")
-    if playbtn.get_if_mouse_hovering() and engine.mouse.buttons[MOUSE_LEFT]:
+    if playbtn.get_if_mouse_hovering() and self.mouse.buttons[MOUSE_LEFT]:
         subprocess.run([
             "python", "eklips.py",
             "-file", gmdt.project_file,
             "-dir", gmdt.project_dir,
             "-editordebug"
         ])
-    if settbtn.get_if_mouse_hovering() and engine.mouse.buttons[MOUSE_LEFT]:
+    if settbtn.get_if_mouse_hovering() and self.mouse.buttons[MOUSE_LEFT]:
         _settings_dialog()

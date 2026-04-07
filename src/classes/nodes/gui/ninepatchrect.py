@@ -6,7 +6,6 @@ class BaseNinePatchRect(CanvasItem):
     """
     A CanvasItem with an spliced image.
     """
-    _isblittable = True
 
     ## Exports
     @export([0,0], "list", "9patch")

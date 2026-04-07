@@ -8,7 +8,6 @@ class Parallax(Sprite):
     """
     A 2D scrolling Sprite.
     """
-    _isblittable = True
 
     def __init__(self, properties=None, parent=None):
         if properties is None:

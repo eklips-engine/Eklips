@@ -9,8 +9,6 @@ import operator
 from classes.nodes.gui.canvasitem import *
 
 class Treeview(CanvasItem):
-    _isblittable = True
-    
     ## Init
     def __init__(self, properties={}, parent=None):
         self._items = {}

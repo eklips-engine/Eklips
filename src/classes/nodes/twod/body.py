@@ -13,6 +13,13 @@ class Body(CollisionBox):
     @velocity.setter
     def velocity(self, value):
         self._velocity = value
+    
+    @export(150,   "int",  "int")
+    def acceleration(self):
+        return self._accel
+    @acceleration.setter
+    def acceleration(self, val):
+        self._accel = val
     @export(False, "bool", "bool")
     def noclip(self):
         return self._noclip
@@ -44,6 +51,7 @@ class Body(CollisionBox):
     def __init__(self, properties={}, parent=None):
         self._velocity = [0,0]
         self._noclip   = False
+        self._accel    = 150
         self._onground = False
         self._gravity  = 195
         self._velcap   = 180
@@ -59,7 +67,7 @@ class Body(CollisionBox):
             self._velocity[1] = self.velocity_cap
         if not self.noclip:
             self.x += self.velocity[0] * engine.delta
-            if True:#self.world.get_collisions(self):
+            if False:#self.world.get_collisions(self):
                 self.x           -= self._velocity[0]
                 self._velocity[0] = 0
                 self._onwall      = True
@@ -67,7 +75,7 @@ class Body(CollisionBox):
                 self._onwall      = False
             
             self.y -= self.velocity[1] * engine.delta
-            if True:#self.world.get_collisions(self):
+            if False:#self.world.get_collisions(self):
                 self.y           += self._velocity[1]
                 self._velocity[1] = 0
                 self._onground    = True
@@ -77,5 +85,5 @@ class Body(CollisionBox):
             self.x += self._velocity[0] * engine.delta
             self.y -= self._velocity[1] * engine.delta
         
-        self._velocity[0] += (-self.velocity[0])                / (engine.fps*0.25)
-        self._velocity[1] += ((-self.gravity)-self.velocity[1]) / (engine.fps*0.25)
+        self._velocity[0] += (-self.velocity[0])                / (engine.delta*self.acceleration)
+        self._velocity[1] += ((-self.gravity)-self.velocity[1]) / (engine.delta*self.acceleration)

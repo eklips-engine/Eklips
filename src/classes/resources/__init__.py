@@ -7,6 +7,7 @@ import classes.singleton as engine
 
 ## Import resources
 print(" ~ Importing all resources")
+from classes.resources.media   import *
 from classes.resources.image   import Animation, _ModifiedAnimation
 from classes.resources.object  import *
 from classes.resources.scene   import *
@@ -59,8 +60,6 @@ class Loader:
             image.anchor_y = image.height // 2
             
             return image
-        if ext in self.extensions["sfx"]:
-            return pg.resource.media(actual_path)
         if ext in self.extensions["txt"]:
             with pg.resource.file(actual_path, "r") as f:
                 return f.read()
@@ -87,8 +86,14 @@ class Loader:
             ## Setup properties
             obj._setup_properties()
             return obj
+        if ext in self.extensions["sfx"]:
+            media = MediaFile()
+            media.assign(actual_path, SOUND)
+            return media
         if ext in self.extensions["vid"]:
-            return engine.pvd.VideoPyglet(pg.resource.file(actual_path).read())
+            media = MediaFile()
+            media.assign(actual_path, VIDEO)
+            return media
         if ext in self.extensions["fnt"]:
             pg.resource.add_font(actual_path)
         if ext in self.extensions["ani"]:
@@ -101,26 +106,23 @@ class Loader:
         
         return None
     
-    def load(self, path, force_type = None, return_identifier = False, force_new_resource = False) -> Any | (tuple[Any | str]):
+    def load(self,
+             path               : str,
+             force_type         : str | None = None,
+             force_new_resource : bool       = False) -> Any | (tuple[Any | str]):
         """Load a resource from a file.
         
         Args:
             path: Filepath. (eg: `res://media/load.mp3`, `root://_assets/icon.png`)
             force_type: If not None, what extension should `path` be treated as.
-            return_identifier: If True, return resource and its ID.
             force_new_resource: If True, don't cache resource and always load new ones. Might be useful for things like Scenes or Scripts."""
-        rid = path.replace(":",".").replace("/",",")
         obj = None
         ext = path.split(".")[-1]
         if force_type: ext = force_type
 
-        if rid in self.resource_tree and not force_new_resource:
-            obj = self.resource_tree[rid]
+        if path in self.resource_tree and not force_new_resource:
+            obj = self.resource_tree[path]
         else:
             obj = self._load(path, ext)
-            self.resource_tree[rid] = obj
-        
-        if return_identifier:
-            return obj, rid
-        else:
-            return obj
+            self.resource_tree[path] = obj
+        return obj

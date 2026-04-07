@@ -6,7 +6,6 @@ class Sprite(CanvasItem):
     """
     A 2D Sprite.
     """
-    _isblittable     = True
 
     @export("root://_assets/error.png","str","file_path/img")
     def image_path(self):

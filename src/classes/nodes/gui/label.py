@@ -8,7 +8,6 @@ class Label(CanvasItem, Color):
     A Label.
     """
     citem  : pg.text.Label = None
-    _isblittable           = True
 
     ## Exported properties
     @export("dolorem ipsum","str","str")
@@ -70,10 +69,14 @@ class Label(CanvasItem, Color):
         """Draw the label. This is usually called automatically."""
         if not self.viewport:
             return
-        if self.visible and self.viewport.is_onscreen(self) and len(self.text.split()) and self.citem:
+        if self.visible and self.viewport.is_onscreen(self) and len(self.text) and self.citem:
             x,y          = self.into_viewport_coords()
             self.citem.x = x
             self.citem.y = y
+
+            self.citem.visible = True
+        else:
+            self.citem.visible = False
 
     ## CItem managing
     def _make_new_item(self) -> pg.text.Label:

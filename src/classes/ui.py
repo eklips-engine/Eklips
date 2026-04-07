@@ -33,7 +33,6 @@ class EklBaseWindow(pg.window.BaseWindow):
             if not (vp.framebuffer and vp):
                 return
             
-            self.switch_to()
             self._present(vp)
     def _present(self, vp):
         if not (vp.framebuffer or vp):
@@ -45,6 +44,8 @@ class EklBaseWindow(pg.window.BaseWindow):
         if len(vp._vpchildren):
             for child in vp._vpchildren:
                 vp.framebuffer.bind()
+                ## we want to draw the child viewport in our framebuffer because hierarchy
+                ## stuff
                 self._present(child)
                 vp.framebuffer.unbind()
                 
@@ -88,14 +89,21 @@ class EklBaseWindow(pg.window.BaseWindow):
         self.set_caption(val)
     @width.setter
     def width(self, val):
+        if self.fullscreen:
+            return
         self._width = val
         self.set_size(*self.size)
     @height.setter
     def height(self, val):
+        if self.fullscreen:
+            return
         self._height = val
         self.set_size(*self.size)
     @size.setter
     def size(self, val):
+        if self.fullscreen:
+            return
+        self._width, self._height = val
         self.set_size(*val)
     @maximum_size.setter
     def maximum_size(self, val):
@@ -114,29 +122,16 @@ class EklBaseWindow(pg.window.BaseWindow):
         self.set_visible(val)
     
     ## Init
-    def _refresh_viewports(self):
+    def _refresh(self):
+        ## Refresh viewports
         self.switch_to()
         for viewport in self.viewports.values():
-            ## Remove framebuffer
-            viewport._refreshing = True
-            viewport._delete_buffer()
+            viewport._refresh(self)
 
-            viewport.window = self
-            viewport._make_framebuffer()
-
-            ## Remake all batches
-            _revive = []
-            for bid in viewport.batches:
-                batch : pg.graphics.Batch = viewport.batches[bid]
-                batch.invalid = True
-                
-                _revive.append(bid)
-            viewport._lastbid = MAIN_BATCH
-
-            for bid in _revive:
-                viewport.batches.pop(bid)
-                viewport.add_batch()
-            viewport._refreshing = False
+        ## Refresh FPSd
+        if self.fpsd:
+            self.fpsd.viewport = self.viewports[UI_VIEWPORT]
+            self.fpsd._make_label()
     def __init__(self, wid : int,
                 width      : int | None                        = 1152,
                 height     : int | None                        = 648,
@@ -159,7 +154,8 @@ class EklBaseWindow(pg.window.BaseWindow):
         self.closed       = False
         self.viewports    = {}
         self.id           = wid
-        self.render_graph = []
+        self.mouse        = Mouse()
+        self.fpsd         = None
         self._lastvid     = MAIN_VIEWPORT
 
         ## Init
@@ -298,24 +294,24 @@ class EklWindow(EklBaseWindow, pg.window.Window):
     
     ## Mouse Events
     def on_mouse_motion(self, x, y, dx, dy):
-        engine.mouse.position = [x, self.height - y - 10]
-        engine.mouse.dpos     = [dx,dy]
+        self.mouse.position = [x, self.height - y - 10]
+        self.mouse.dpos     = [dx,dy]
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         # Who gives a fuck about some "Apple Mighty Mouse" like just put the fries in the bag cuh
-        engine.mouse.position = [x, self.height - y - 10]
-        engine.mouse.scroll   = scroll_y
+        self.mouse.position = [x, self.height - y - 10]
+        self.mouse.scroll   = scroll_y
     def on_mouse_press(self, x, y, button, modifiers):
-        engine.mouse.position             = [x, self.height - y - 10]
-        engine.mouse.buttons[button]      = True
-        engine.mouse.just_clicked[button] = True
+        self.mouse.position             = [x, self.height - y - 10]
+        self.mouse.buttons[button]      = True
+        self.mouse.just_clicked[button] = True
     def on_mouse_release(self, x, y, button, modifiers):
-        engine.mouse.position             = [x, self.height - y - 10]
-        engine.mouse.buttons[button]      = False
-        engine.mouse.just_clicked[button] = False
+        self.mouse.position             = [x, self.height - y - 10]
+        self.mouse.buttons[button]      = False
+        self.mouse.just_clicked[button] = False
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, buttons: int, modifiers: int):
-        engine.mouse.position = [x, self.height - y - 10]
-        engine.mouse.dpos     = [dx,dy]
-        engine.mouse.dragging = True
+        self.mouse.position = [x, self.height - y - 10]
+        self.mouse.dpos     = [dx,dy]
+        self.mouse.dragging = True
     
     ## Keyboard Events
     def on_key_press(self, symbol, modifiers):
@@ -333,12 +329,34 @@ class EklWindow(EklBaseWindow, pg.window.Window):
     
     ## Misc. Events
     def on_file_drop(self, x, y, paths):
-        engine.mouse.position   = [x, y]
-        engine.mouse.paths = paths
+        self.mouse.position   = [x, y]
+        self.mouse.paths = paths
 class Viewport(Transform, Color):
     """A class to manage a portion of a Window."""
     _isdisplayobject = True
     _is_viewport     = True
+    
+    ## Refresh
+    def _refresh(self, window=None):
+        ## Remove framebuffer
+        self._refreshing = True
+        self._delete_buffer()
+
+        ## Remake framebuffer
+        if window: self.window = window
+        self._make_framebuffer()
+
+        ## Remake all batches
+        self._lastbid = MAIN_WINDOW
+        batches       = self.batches.copy()
+        for bid in batches:
+            batch : pg.graphics.Batch = batches[bid]
+            batch.invalid             = True
+            
+            self.batches.pop(bid)
+            self.add_batch()
+
+        self._refreshing = False
     
     ## Parent
     @property
@@ -394,8 +412,6 @@ class Viewport(Transform, Color):
         self._refreshing = False
         # Am i created? Or am i destroyed?
         self._state = "uninitialized"
-        # Do i need a new Batch?
-        self._batch_pending = False
         
         ## ID
         self.id = self._drawing_vid = vid
@@ -415,8 +431,9 @@ class Viewport(Transform, Color):
     ## Add Batch
     def add_batch(self):
         """Add a batch to the Viewport. Returns its ID."""
-        bid            = self._lastbid
-        batch          = pg.graphics.Batch()
+        bid           = self._lastbid
+        batch         = pg.graphics.Batch()
+        batch.invalid = False
         
         self.batches[bid] = batch
         self._lastbid    += 1
@@ -461,16 +478,14 @@ class Viewport(Transform, Color):
             self.citem.delete()
             self.citem       = None
         
-        self.citem          = pg.sprite.Sprite(self.color_buffer, z=self.id)
-        self._batch_pending = True
+        self.citem = pg.sprite.Sprite(self.color_buffer, z=self.id)
     def _resize_framebuffer(self):
-        if self._state in ("destroyed", "uninitialized"):
+        if self._state == "uninitialized":
             return
         if self.window:
             self.window.switch_to()
         if not self.framebuffer:
             return
-        self.color_buffer.delete()
         self.color_buffer = pg.image.Texture.create(
             self._w, self._h,
             min_filter=GL_NEAREST, mag_filter=GL_NEAREST,
@@ -485,6 +500,7 @@ class Viewport(Transform, Color):
         if self.window:
             self.window.switch_to()
         self.citem.batch = None
+        self._state      = "uninitialized"
         
         if self.citem:
             self.citem.delete()
@@ -519,13 +535,6 @@ class Viewport(Transform, Color):
         self.citem.visible = val
     
     ## Drawing related
-    def _finalize_batch(self):
-        if not self._batch_pending:
-            return
-        if not self.color_buffer or self.color_buffer.id is None:
-            return
-
-        self._batch_pending = False
     def set_background(self, r=0,g=0,b=0,a=255):
         """
         Set the background color of the Viewport.
@@ -554,10 +563,6 @@ class Viewport(Transform, Color):
         if not self.framebuffer:
             return
         
-        ## Fix batch if needed
-        if self._batch_pending:
-            self._finalize_batch()
-        
         ## Init viewport
         self.framebuffer.bind()
         if not NO_CLEAR_BACKGROUND in self.flags:
@@ -573,60 +578,30 @@ class Viewport(Transform, Color):
             batch = self.batches[bid]
             batch.draw()
         
-        ## Unbind viewport
-        self.framebuffer.unbind()
-        
         ## Reset camera
         self._reset_camera()
+
+        ## Unbind viewport
+        self.framebuffer.unbind()
     
     ## Camera functions    
     def _reset_camera(self):
-        view_matrix = self.window.view.scale(
-            (
-                1 / self.cam.zoom,
-                1 / self.cam.zoom,
-                1
-            )
-        )
-        view_matrix = view_matrix.rotate(
-            -self.cam.altrotation,
-            (
-                0,
-                0,
-                1
-            )
-        )
+        view_matrix = self.window.view.scale((1/self.cam.zoom, 1/self.cam.zoom, 1))
+        view_matrix = view_matrix.rotate(-self.cam.altrotation, (0,0,1))
         view_matrix = view_matrix.translate(
-            (
-                self.cam.x * self.cam.zoom,
-                self.cam.y * self.cam.zoom,
-                self.cam.z * self.cam.zoom
-            )
-        )
+            (self.cam.x * self.cam.zoom,
+             self.cam.y * self.cam.zoom,
+             self.cam.z * self.cam.zoom))
+        
         self.window.view = view_matrix
     def _move_camera(self):
         view_matrix = self.window.view.translate(
-            (
-                -self.cam.x * self.cam.zoom,
-                -self.cam.y * self.cam.zoom,
-                -self.cam.z * self.cam.zoom
-            )
-        )
-        view_matrix = view_matrix.rotate(
-            self.cam.altrotation,
-            (
-                0,
-                0,
-                1
-            )
-        )
-        view_matrix = view_matrix.scale(
-            (
-                self.cam.zoom,
-                self.cam.zoom,
-                1
-            )
-        )
+            (-self.cam.x * self.cam.zoom,
+             -self.cam.y * self.cam.zoom,
+             -self.cam.z * self.cam.zoom))
+        view_matrix = view_matrix.rotate(self.cam.altrotation, (0,0,1))
+        view_matrix = view_matrix.scale((self.cam.zoom, self.cam.zoom, 1))
+
         self.window.view = view_matrix
 
     ## Closing
@@ -647,8 +622,8 @@ class Viewport(Transform, Color):
 class Display:
     """A class to manage `EklWindow`'s."""
     windows        : dict[int, EklWindow] = {}          # Dict of windows
-    _doomed        : int                  = []          # List of windows to run through remove_window
-    _merciless     : int                  = []          # List of windows to run through window.close
+    _doomed        : list                 = []          # List of windows to run through remove_window
+    _merciless     : list                 = []          # List of windows to run through window.close
     main_window_id : int | None           = None        # Name
     _displayobj    : pg.display.Display   = pg.display.get_display()
     _windid        : int                  = MAIN_WINDOW # Next ID
@@ -674,22 +649,24 @@ class Display:
     
     ## Update
     def update(self):
-        for doomedid in self._doomed.copy():
+        doomed = self._doomed
+        merciless = self._merciless
+        self._doomed = []
+        self._merciless = []
+
+        for doomedid in doomed:
             self.remove_window(doomedid)
-        for doomedid in self._merciless.copy():
+        for doomedid in merciless:
             self.get_window(doomedid).close()
             self.windows[doomedid] = None
-        
-        self._doomed.clear()
-        self._merciless.clear()
     
     ## Add/Remove
-    def _add_window_entry(self):
+    def _make_window_entry(self):
         wid               = self._windid
         self.windows[wid] = None
         self._windid     += 1
         return wid
-    def add_window(self,
+    def make_window(self,
         name           : str                    = DEFAULT_NAME,
         size           : list[int]              = [640,480],
         viewport_flags : list                   = [],
@@ -731,7 +708,7 @@ class Display:
         
         # Reserve window slot
         if wid == None:
-            wid = self._add_window_entry()
+            wid = self._make_window_entry()
         if self.main_window_id == None:
             self.main_window_id = wid
         
@@ -759,7 +736,7 @@ class Display:
 
         # Add FPS Display
         if fpsvisible or engine.debug.show_fps:
-            fpsd = engine.hooks.HookFPSDisplay(window, [255,255,255,255])
+            window.fpsd = engine.hooks.HookFPSDisplay(window, [255,255,255,255])
         
         # Finishing up
         if minimum_size:
@@ -778,7 +755,6 @@ class Display:
         Args:
             wid: ID of the Window."""
         if not wid in self.windows:
-            print(f"??? {wid}")
             return
         window = self.get_window(wid)
 
@@ -866,11 +842,10 @@ def _rebase_window(window : EklWindow):
     new_window._lastvid  = window._lastvid
     new_window.viewports = window.viewports
     new_window.on_close = window.on_close
-    new_window._refresh_viewports()
+    new_window._refresh()
 
     window.viewports = {}
     window.close(False)
-    del window
 
     engine.display.windows[new_window.id] = new_window
     return new_window
@@ -888,11 +863,10 @@ def _unbase_window(window : EklBaseWindow):
     new_window._lastvid  = window._lastvid
     new_window.viewports = window.viewports
     new_window.on_close = window.on_close
-    new_window._refresh_viewports()
+    new_window._refresh()
 
     window.viewports = {}
     window.close(False)
-    del window
 
     engine.display.windows[new_window.id] = new_window
     return new_window

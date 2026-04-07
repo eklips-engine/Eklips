@@ -1,4 +1,5 @@
 ## Import libraries & components
+from abc import abstractmethod
 from typing            import *
 from classes.locals    import *
 from typing_extensions import *
@@ -280,21 +281,19 @@ class Transform:
         pass
     
     ## Helper functions for CanvasItems etc
-    def _turn_object_into_transform_property(self):
+    def _get_transform_property(self):
         """Returns a dictionary of the Transform object's properties."""
-        return {
-            "position": self.position,
-            "scale":    self.scale,
-            "alpha":    self.alpha,
-            "skew":     self.skew,
-            "layer":    self.layer,
-            "rotation": self.rotation,
-            "anchor":   self.anchor,
-            "scroll":   self.scroll,
-            "visible":  self.visible,
-            "size":     self.size
-        }
-    def _convert_transform_property_into_object(self, value):
+        return {"position": self.position,
+                "scale":    self.scale,
+                "alpha":    self.alpha,
+                "skew":     self.skew,
+                "layer":    self.layer,
+                "rotation": self.rotation,
+                "anchor":   self.anchor,
+                "scroll":   self.scroll,
+                "visible":  self.visible,
+                "size":     self.size}
+    def _set_transform_property(self, value):
         """Sets the Transform object's properties from a dictionary."""
         self.size      = value.get("size",    self.size)
         self.flip      = value.get("flip",     self.flip)
@@ -327,7 +326,7 @@ class Transform:
         else:
             y += self.y
 
-        return x, y
+        return round(x), round(y)
     def into_window_coords(self,
         viewport    : Self = None,
         drawing     : bool = False,
@@ -343,7 +342,15 @@ class Transform:
         if parent_rect is None:
             parent_rect = (*viewport.position, *viewport.size)
 
-        return self.into_viewport_coords(viewport, drawing, parent_rect)
+        ## Calculate pos
+        if drawing:
+            ## Offset the position if `drawing` is True, implying the sprite
+            ## has the anchor w/2,h/2 since.. All of them do, and you're not
+            ## really supposed to make your own pyglet Sprite manually, just
+            ## use the Sprite node.
+            return self._offset_off_anchor(*self._calculate_anchors(parent_rect))
+        else:
+            return self._calculate_anchors(parent_rect)
     def into_viewport_coords(self,
         viewport    : Self = None,
         drawing     : bool = False,
@@ -356,22 +363,16 @@ class Transform:
             parent_rect: If specified, will account the parent Transform for anchoring."""
 
         ## Fixup
-        anchor          = self.anchor
         if parent_rect is None:
             parent_rect = (0,0, *viewport.size)
         
         ## Calculate pos
-        x, y = self._calculate_anchors(parent_rect)
-        
-        ## Offset the position if `drawing` is True, implying the sprite
-        ## has the anchor w/2,h/2 since.. All of them do, and you're not
-        ## really supposed to make your own pyglet Sprite manually, just
-        ## use the Sprite node.
         if drawing:
-            x, y = self._offset_off_anchor(x, y)
-        
-        ## Return result
-        return [x,y]
+            ## ^^^ See into_window_coords
+            return self._offset_off_anchor(*self._calculate_anchors(parent_rect))
+        else:
+            return self._calculate_anchors(parent_rect)
+    
     def _offset_off_anchor(self, x, y, w=None, h=None):
         if w == None: w = self.w
         if h == None: h = self.h

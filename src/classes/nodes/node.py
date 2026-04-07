@@ -46,7 +46,7 @@ class Node(Object, NodeMixin):
         # Setup properties
         self._scene = scene
         for key in self._properties_onready:
-            if key in ["children","parent","signals","type"]:
+            if key in ["children","signals","type"]:
                 continue
             self.set(key, self._properties_onready[key])
         

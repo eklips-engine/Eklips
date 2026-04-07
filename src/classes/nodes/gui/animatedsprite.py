@@ -7,7 +7,6 @@ class AnimatedSprite(Animation, CanvasItem):
     """
     A 2D Animated Sprite using the Animation resource.
     """
-    _isblittable     = True
 
     ## Init
     def __init__(self, properties={}, parent=None):
@@ -19,4 +18,4 @@ class AnimatedSprite(Animation, CanvasItem):
     
     def update(self):
         super().update()
-        self.draw()
+        self.draw() 

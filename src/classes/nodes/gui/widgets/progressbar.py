@@ -6,7 +6,6 @@ class Progressbar(CanvasItem):
     """
     A themed progressbar element.
     """
-    _isblittable = True
     
     @export(0, "int", "int")
     def value(self):
@@ -80,15 +79,19 @@ class Progressbar(CanvasItem):
         # Make new item
         self._make_new_item()
     
-    def _fix_broken_item(self):
-        self._remove_item(False)
+    ## CItem Management
+    def _refresh_item(self):
+        if self.citem:
+            self._remove_item(False)
+            del self._cached_batch
         self._make_new_item()
-        self._convert_transform_property_into_object(self.transform)
     def _make_new_item(self):
         if self.bar:
             self._remove_item(False)
         else:
             self._drawing_bid = self.viewport.add_batch()
+            if getattr(self, "_cached_batch", None):
+                del self._cached_batch
         
         self.bar   = pg.sprite.Sprite(
             img    = engine.theme.get_static_widget("bg"),

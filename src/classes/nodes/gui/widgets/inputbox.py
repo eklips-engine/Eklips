@@ -7,7 +7,6 @@ class Inputbox(ColorRect, Color):
     """
     A themed inputbox element.
     """
-    _isblittable = True
     _blinktimer  = 0.5
     
     ## Exports
@@ -46,15 +45,18 @@ class Inputbox(ColorRect, Color):
         self._make_new_item()
     
     ## CItem management
-    def _fix_broken_item(self):
-        self._remove_item(False)
+    def _refresh_item(self):
+        if self.citem:
+            self._remove_item(False)
+            del self._cached_batch
         self._make_new_item()
-        self._convert_transform_property_into_object(self.transform)
     def _make_new_item(self):
         if self.citem:
             self._remove_item(False)
         else:
             self._drawing_bid = self.viewport.add_batch()
+            if getattr(self, "_cached_batch", None):
+                del self._cached_batch
 
         self.citem = pg.shapes.Rectangle(0,0,self.w,self.h, color=self.color, batch=self.batch)
         self.label = pg.text.Label(
@@ -78,7 +80,7 @@ class Inputbox(ColorRect, Color):
             if self.widgetman.hovering_widget == self.gid:
                 self.widgetman.hovering_widget = -1
 
-        if engine.mouse.buttons[MOUSE_LEFT]:
+        if self.mouse.buttons[MOUSE_LEFT]:
             if self.widgetman.hovering_widget == self.gid:
                 self.widgetman.focused_widget  = self.gid
 

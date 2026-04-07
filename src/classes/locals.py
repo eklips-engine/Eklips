@@ -1,3 +1,4 @@
+## What do the numbers mean, Mason?
 import pyglet as pg, socket as sock, math, sys, os
 from typing        import *
 from pyglet.window import key
@@ -8,23 +9,26 @@ USE_GAME_CV_DIR = "UseFileCVar"   #: Use the specified project dir in the game.j
 ASSERTIONS = bool(int(os.environ.get("ANYTREE_ASSERTIONS", "0"))) #: Anytree config
 
 NAME         = "Eklips Engine" #: Name of the engine
-BDATE        = [13, 3, 2026]  #:  Uses DD/MM/YYYY format
-MAJOR        = "5"            #: Major; [5].0 A 
-MINOR        = "0"            #: Minor;  5.[0]A 
-HOTFIX       = "A"            #: Hotfix; 5. 0[A]
-BUILD        = 35             #: Increment every time a major feature has been added/completely overhauled
-VERSION      = f"{MAJOR}.{MINOR}{HOTFIX}"
-VERSION_FULL = f"v{VERSION}.build{BUILD}"
+BDATE        = [5, 4, 2026]    #:  Uses DD/MM/YYYY format
+MAJOR        = "5"             #: Major; [5].0 A  (Add every time you rewrite the engine...)
+MINOR        = "0"             #: Minor;  5.[0]A  (Add for every update to the major ver)
+HOTFIX       = "A"             #: Hotfix; 5. 0[A] (Add for every... hotfix)
+BUILD        = 38              #: Increment every time a major feature has been added/completely overhauled
+VERSION      = f"{MAJOR}.{MINOR}{HOTFIX}" #: 5.0A
+VERSION_FULL = f"v{VERSION}.build{BUILD}" #: 5.0A.build38
 print(f"{NAME} {VERSION_FULL}")
+
+VIDEO = "video"
+SOUND = "sfx"
 
 AUTOMATICALLY_CREATE = 50152971
 DETECT               = 50152972
 
-MAIN_WINDOW           = 0 # Main Window ID
-MAIN_BATCH            = 0 # Main Batch ID
-MAIN_VIEWPORT         = 0 # Main Viewport ID
-UI_VIEWPORT           = 1 # Viewport ID for UI
-DEFAULT_NAME          = "Eklips Engine" # Default window name
+MAIN_WINDOW           = 0 #: Main Window ID
+MAIN_BATCH            = 0 #: Main Batch ID
+MAIN_VIEWPORT         = 0 #: Main Viewport ID
+UI_VIEWPORT           = MAIN_VIEWPORT+1 #: Viewport ID for UI
+DEFAULT_NAME          = "Eklips Engine" #: Default window name
 VIEWPORT_EQUAL_WINDOW = 50151 #: Viewport size = Window size
 NO_CLEAR_BACKGROUND   = 50152 #: Don't clear the Viewport
 NO_CLEAR              = 50153 #: Ignore Viewport's color background
@@ -81,14 +85,15 @@ AXIS_Y  = 128227 #: Reference y axis for collision
 
 MAXFPS = 560 #: Maximum FPS
 
-NEIGHBOR_TOPLEFT  = 83850
-NEIGHBOR_TOPRIGHT = 83854
-NEIGHBOR_TOPMID   = 83858
-NEIGHBOR_BOTLEFT  = 83860
-NEIGHBOR_BOTRIGHT = 83864
-NEIGHBOR_BOTMID   = 83868
-NEIGHBOR_LEFT     = 83800
-NEIGHBOR_RIGHT    = 83844
+ANCHOR_TOPLEFT  = 83850 #: Top left
+ANCHOR_TOPRIGHT = 83854 #: Top right
+ANCHOR_TOPMID   = 83858 #: Top centerx
+ANCHOR_BOTLEFT  = 83860 #: Bottom left
+ANCHOR_BOTRIGHT = 83864 #: Bottom right
+ANCHOR_BOTMID   = 83868 #: Bottom centerx
+ANCHOR_LEFT     = 83800 #: Left
+ANCHOR_RIGHT    = 83844 #: Right
+ANCHOR_MID      = 83888 #: Center of screen
 
 RED         = [255, 0,   0,   255]
 GREEN       = [0,   255, 0,   255]

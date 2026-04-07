@@ -7,7 +7,6 @@ class ColorRect(CanvasItem, Color):
     """
     A single-color rectangle on the screen.
     """
-    _isblittable                = True
     citem : pg.shapes.Rectangle = None
 
     def __init__(self, properties={}, parent=None):

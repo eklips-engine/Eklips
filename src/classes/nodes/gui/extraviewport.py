@@ -64,6 +64,9 @@ class ExtraViewport(CanvasItem, Viewport):
     def _make_new_item(self):
         self._make_framebuffer()
     def _remove_item(self):
+        self._switch_window()
+        if not self.citem:
+            return
         self.close()
     
     ## Draw
@@ -74,7 +77,6 @@ class ExtraViewport(CanvasItem, Viewport):
     ## Convenience functions for user
     def get_if_mouse_hovering(self) -> bool:
         """Returns true if the mouse is hovering over self."""
-        return engine.mouse.collides_ui_aabb(self, ctx_a=(
-            self, self._isc_get_parent_property(), 1
-        ), ctx_b=(self._get_window(), None, 1))
-        return engine.mouse.collides_ui_aabb(self, ctx_a=(self, None), ctx_b=(self._get_window(), None))
+        return self.mouse.collides_ui_aabb(self,
+            ctx_a=(self, self._isc_get_parent_property(), 1),
+            ctx_b=(self._get_window(), None, 1))

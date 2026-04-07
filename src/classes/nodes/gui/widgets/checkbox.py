@@ -6,7 +6,6 @@ class Checkbox(CanvasItem):
     """
     A themed Checkbox element that has two states; on or off.
     """
-    _isblittable = True
     
     @export(False, "bool", "bool")
     def value(self) -> bool:
@@ -35,7 +34,7 @@ class Checkbox(CanvasItem):
         super().update()
         
         ## Handle widget
-        if engine.mouse.just_clicked[MOUSE_LEFT]:
+        if self.mouse.just_clicked[MOUSE_LEFT]:
             if self.get_if_mouse_hovering():
                 self.value = not self.value
         
@@ -46,11 +45,11 @@ class Checkbox(CanvasItem):
             if self.widgetman.hovering_widget == self.gid:
                 self.widgetman.hovering_widget = -1
         
-        if engine.mouse.buttons[MOUSE_LEFT]:
+        if self.mouse.buttons[MOUSE_LEFT]:
             if self.get_if_mouse_hovering():
                 if self.widgetman.moving_widget == -1:
                     self.widgetman.focused_widget = self.gid
-                if engine.mouse.dragging and self.widgetman.focused_widget == self.gid:
+                if self.mouse.dragging and self.widgetman.focused_widget == self.gid:
                     self.widgetman.moving_widget  = self.gid
         else:
             if self.widgetman.hovering_widget == -1:

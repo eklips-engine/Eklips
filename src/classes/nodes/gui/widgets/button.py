@@ -6,7 +6,6 @@ class Button(BaseNinePatchRect, Color):
     """
     A themed Button.
     """
-    _isblittable = True
 
     ## Exported properties
     @export("dolorem ipsum","str","str")
@@ -128,11 +127,11 @@ class Button(BaseNinePatchRect, Color):
             if self.widgetman.hovering_widget == self.gid:
                 self.widgetman.hovering_widget = -1
         
-        if engine.mouse.buttons[MOUSE_LEFT]:
+        if self.mouse.buttons[MOUSE_LEFT]:
             if self.get_if_mouse_hovering():
                 if self.widgetman.moving_widget == -1:
                     self.widgetman.focused_widget = self.gid
-                if engine.mouse.dragging and self.widgetman.focused_widget == self.gid:
+                if self.mouse.dragging and self.widgetman.focused_widget == self.gid:
                     self.widgetman.moving_widget  = self.gid
                 self.image = engine.theme.get_static_widget("pressed_btn")
         else:

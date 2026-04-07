@@ -17,21 +17,16 @@ window_transform = {
 }
 
 ## Classes
-class ExtraWindow(CanvasItem, Color):
+class ExtraWindow(Node, Transform, Color):
     """
     A Window Node.
     
     This Node will create a new Window with its own viewport. You can
     get this window by using `engine.display.get_window(node.window_id)`
     or by using `node._window`.
-    
-    Definitely wouldn't recommend giving it any CanvasItem-related children
-    if the Window is initialized as invisible, as the engine crashes since
-    the `ExtraWindow` object has its own WindowID but no Window to go along
-    with it to save resources.. and stuff.. 
     """
-    _isdisplayobject = True
-    _isblittable     = False
+    _isdisplayobject   = True
+    _drawing_wid : int = MAIN_WINDOW
 
     def __init__(self, properties={}, parent=None):
         ## Setup variables
@@ -39,13 +34,16 @@ class ExtraWindow(CanvasItem, Color):
         self._iconpath  = engine.game.win.icofile
         self._title     = DEFAULT_NAME
         self._resizable = True
+
+        Transform.__init__(self)
+        self._drawing_wid = MAIN_WINDOW
         super().__init__(properties, parent)
 
         ## Setup BG color
         Color.__init__(self, *BLACK)
 
         ## Claim an empty slot for use
-        self._drawing_wid                               = engine.display._add_window_entry()
+        self._drawing_wid                               = engine.display._make_window_entry()
         self._window : EklWindow | EklBaseWindow | None = None
 
         self._init_item()
@@ -68,6 +66,8 @@ class ExtraWindow(CanvasItem, Color):
         if not value: return
         self._iconpath = value
         self.icon      = engine.loader.load(value)
+        if self._window:
+            self._window.set_icon(self.icon)
     
     @property
     def icon(self): return self._icon
@@ -90,30 +90,34 @@ class ExtraWindow(CanvasItem, Color):
     @resizable.setter
     def resizable(self, val):
         self._resizable = val
-        raise Exception("Fuck you for trying to do this, said Pyglet")
+    
+    @export(base_transform, "dict", "transform")
+    def transform(self):
+        return self._get_transform_property()
+    @transform.setter
+    def transform(self, value):
+        self._set_transform_property(value)
     
     ## Transform related
     def _set_size(self, w, h):
         if not self._window:
             return
         self._window.size = [w,h]
-    def _set_alpha(self, deg):
-        # Any desktop environment does not have support for opacity, unless i manage the window frame and shit
-        # myself. Which i am NOT doing.
-        return
-    def _set_rot(self, deg):
-        # Unless you're FlyTech, Microsoft Windows does not have support for rotating windows
-        return
-    def _set_scale(self, x, y):
-        # Unless there's some way to magically set the user's DPI scale on one window in particular,
-        # this shit is not happening, unless i manage the window frame and shit myself. Which i am NOT doing.
-        return
     def _update_color(self, r, g, b, a):
         if not self._window:
             return
         self._window.viewports[MAIN_VIEWPORT].set_background(r,g,b,a)
     
+    ## IDs
+    @property
+    def window_id(self): return self._drawing_wid
+    @window_id.setter
+    def window_id(self, value): pass
+    
     ## Window management
+    def _free(self):
+        self._remove_item()
+        super()._free()
     def _init_item(self, as_base=True):
         ## Make base window
         if as_base:
@@ -131,12 +135,12 @@ class ExtraWindow(CanvasItem, Color):
         engine.display.windows[self.window_id] = self._window
 
         # Create viewports
-        self._window.add_viewport(flags=[VIEWPORT_EQUAL_WINDOW], parent=None)       # MAIN_VIEWPORT
+        self._window.add_viewport(flags=[VIEWPORT_EQUAL_WINDOW])                    # MAIN_VIEWPORT
         self._window.add_viewport(color=TRANSPARENT, flags=[VIEWPORT_EQUAL_WINDOW]) # UI_VIEWPORT
 
         # Add FPS Display
         if engine.debug.show_fps:
-            self.fpsd = engine.hooks.HookFPSDisplay(self._window, [255,255,255,255])
+            self._window.fpsd = engine.hooks.HookFPSDisplay(self._window, [255,255,255,255])
         
         self._window.minimum_size = None
         self._window.maximum_size = None
@@ -158,15 +162,13 @@ class ExtraWindow(CanvasItem, Color):
         self._window.size = self.size
         self._window.set_caption(self.title)
         self._window.set_icon(self.icon)
-        
-        engine.display.windows[self.window_id] = self._window
+        self._window.draw(engine.delta)
     def _hookonclose(self):
         if not self._window:
             return
         if self._window.closed:
             return
-        self._window                           = engine.ui._rebase_window(self._window)
-        engine.display.windows[self.window_id] = self._window
+        self._window = engine.ui._rebase_window(self._window)
     def _remove_item(self):
         if not self._window:
             return
