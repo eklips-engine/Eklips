@@ -7,7 +7,7 @@
                 "panel_obj": {
                     "type":          "ScrollingViewport",
                     "script_path":   "res://data/picker.ekl",
-                    "left_to_right": true,
+                    "left_to_right": false,
                     
                     "children": {},
 
